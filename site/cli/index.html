@@ -34,6 +34,12 @@
     <h1>OpenCode CLI</h1>
     <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev.</p>
 
+    <div class="step">
+      <h3>API key</h3>
+      <p>Already filled into the commands below. Keep it private: anyone with it can use the GPU.</p>
+      <pre><code>__AIBOX_KEY__</code></pre>
+    </div>
+
     <div class="toggle" role="tablist">
       <button id="t-unix" class="on" onclick="setOS('unix')">Linux / macOS</button>
       <button id="t-win" onclick="setOS('win')">Windows</button>
@@ -42,8 +48,8 @@
     <div data-os="unix">
       <div class="step">
         <h3>Install</h3>
-        <p>Installs OpenCode if needed, asks for the API key, writes the config.</p>
-        <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | bash</code></pre>
+        <p>Installs OpenCode if needed and writes the config with the key above.</p>
+        <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
       </div>
       <div class="step">
         <h3>Then</h3>
@@ -62,8 +68,8 @@ opencode</code></pre>
     <div data-os="win">
       <div class="step">
         <h3>Install</h3>
-        <p>PowerShell. Needs Node.js, Scoop or Chocolatey present so it can install OpenCode.</p>
-        <pre><code>Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression</code></pre>
+        <p>PowerShell. Needs Node.js, Scoop or Chocolatey present so it can install OpenCode. Writes the config with the key above.</p>
+        <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression</code></pre>
       </div>
       <div class="step">
         <h3>Then</h3>
