@@ -28,9 +28,9 @@ if "searxng" in mcp:
     hit = True; del mcp["searxng"]
     if not mcp: d.pop("mcp", None)
 perm = d.get("permission", {})
-if "searxng_*" in perm:
-    hit = True; del perm["searxng_*"]
-    if not perm: d.pop("permission", None)
+for k in ("searxng_*", "webfetch", "websearch"):
+    if k in perm: hit = True; del perm[k]
+if "permission" in d and not perm: d.pop("permission", None)
 if not hit: sys.exit(1)
 json.dump(d, open(p, "w"), indent=2)
 PY

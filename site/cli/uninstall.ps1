@@ -28,9 +28,10 @@ if (Test-Path $Cfg) {
             $d.mcp.PSObject.Properties.Remove("searxng")
             if ($d.mcp.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("mcp") }
         }
-        if ($d.permission -and $d.permission.PSObject.Properties.Name -contains "searxng_*") {
-            $hit = $true
-            $d.permission.PSObject.Properties.Remove("searxng_*")
+        if ($d.permission) {
+            foreach ($k in @("searxng_*", "webfetch", "websearch")) {
+                if ($d.permission.PSObject.Properties.Name -contains $k) { $hit = $true; $d.permission.PSObject.Properties.Remove($k) }
+            }
             if ($d.permission.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("permission") }
         }
         if ($hit) {
