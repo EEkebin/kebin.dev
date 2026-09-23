@@ -21,6 +21,7 @@
 | pve.kebin.dev | https://10.0.0.200:8006 | Proxmox UI, behind Tinyauth, self-signed upstream |
 | ai.kebin.dev | 10.0.10.100:8080 | model API (llama-swap), bearer key from `/etc/nginx/secrets/ai-key` on the web VM |
 | kebin.dev/cli/ | static | OpenCode CLI installers (install.sh, install.ps1) |
+| vr.kebin.dev | 10.0.10.30:8000 | HLS for VRChat players, per-share tokens, no Tinyauth on purpose |
 
 Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
 

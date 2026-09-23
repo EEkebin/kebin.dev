@@ -159,6 +159,25 @@ services:
       - "8266:8266"
     restart: always
 
+  # ---------- vrchat streaming ----------
+  vrc-stream:
+    image: ghcr.io/c9glax/jellyfin-vrc-stream:latest
+    container_name: vrc-stream
+    user: "1000:1000"
+    environment:
+      JELLYFIN_URL: http://jellyfin:8096
+      JELLYFIN_API_KEY: ${VRC_STREAM_KEY}
+      CACHE_DIR: /cache
+      PUBLIC_BASE_URL: https://vr.kebin.dev
+      DEFAULT_SHARE_TTL_SECONDS: "86400"
+      STREAM_IDLE_TIMEOUT: "900"
+      MAX_CACHE_SIZE_MB: "20000"
+    volumes:
+      - /srv/media/cache/vrc-stream:/cache
+    ports:
+      - "8000:8000"
+    restart: always
+
   # ---------- music ----------
   navidrome:
     image: docker.io/deluan/navidrome:latest
