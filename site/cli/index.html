@@ -49,6 +49,15 @@ opencode</pre>
       <p>The scripts only add a provider named <strong>aibox</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, key required.</p>
     </div>
 
+    <div class="step">
+      <h3>Uninstall</h3>
+      <p>Removes the kebin.dev profile and restores your previous OpenCode config. Add <code>--all</code> (Linux/macOS) or set <code>$env:AIBOX_UNINSTALL_ALL = "1"</code> (Windows) to remove OpenCode itself as well.</p>
+      <pre>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash
+curl -fsSL https://kebin.dev/cli/uninstall.sh | bash -s -- --all</pre>
+      <pre>irm https://kebin.dev/cli/uninstall.ps1 | iex
+$env:AIBOX_UNINSTALL_ALL = "1"; irm https://kebin.dev/cli/uninstall.ps1 | iex</pre>
+    </div>
+
     <a class="back" href="/">← back</a>
   </main>
 </body>
