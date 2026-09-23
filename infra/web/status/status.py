@@ -5,6 +5,7 @@ GET /api/status?svc=<name>  ->  HTML fragment: <span class="dot up"></span>onlin
 Only reports up/down. Never exposes versions, errors, or anything from the backend.
 Results are cached per service for CACHE_SECONDS so page views cannot hammer the media VM.
 """
+import ssl
 import sys
 import time
 import threading
@@ -25,6 +26,7 @@ SERVICES = {
     "cloud":  f"{MEDIA}:8081/status.php",
     "code":   "http://10.0.10.100:4096/",
     "comfy":  "http://10.0.10.100:8188/system_stats",
+    "pve":    "https://10.0.0.200:8006/",
 }
 
 _cache = {}
@@ -34,7 +36,10 @@ _lock = threading.Lock()
 def probe(url):
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "kebin-status/1"})
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as r:
+        ctx = None
+        if url.startswith("https://10."):  # internal self-signed endpoints (Proxmox)
+            ctx = ssl.create_default_context(); ctx.check_hostname = False; ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, timeout=TIMEOUT, context=ctx) as r:
             return r.status < 500
     except Exception:
         return False
