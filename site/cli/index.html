@@ -18,9 +18,9 @@
     .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
     .step h3 { margin: 0 0 8px; font-size: 1rem; }
     .step p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
-    pre { position: relative; margin: 6px 0 0; background: #000; border: 1px solid var(--line); border-radius: 10px; padding: 12px 64px 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
-    pre .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--line); background: #15151b; color: var(--muted); cursor: pointer; }
-    pre .copy:hover { color: var(--fg); }
+    pre { margin: 6px 0 0; background: #000; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+    pre code { user-select: all; -webkit-user-select: all; cursor: text; }
+    .hint { color: var(--muted); font-size: .8rem; text-align: center; margin: -10px 0 18px; }
     [data-os] { display: none; }
     body.os-unix [data-os="unix"], body.os-win [data-os="win"] { display: block; }
     .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: .85rem; }
@@ -37,6 +37,8 @@
       <button id="t-unix" class="on" onclick="setOS('unix')">Linux / macOS</button>
       <button id="t-win" onclick="setOS('win')">Windows</button>
     </div>
+
+    <p class="hint">Click a command to select it, then copy it yourself. Copy buttons are left out on purpose: ad blockers refuse scripted copies of shell commands.</p>
 
     <div data-os="unix">
       <div class="step">
@@ -95,11 +97,6 @@ opencode</code></pre>
       try { os = localStorage.getItem('cli-os'); } catch (e) {}
       if (os !== 'unix' && os !== 'win') os = /Windows/i.test(navigator.userAgent) ? 'win' : 'unix';
       setOS(os);
-      document.querySelectorAll('pre').forEach(pre => {
-        const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'copy';
-        b.onclick = async () => { await navigator.clipboard.writeText(pre.querySelector('code').textContent); b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy', 1500); };
-        pre.appendChild(b);
-      });
     })();
   </script>
 </body>
