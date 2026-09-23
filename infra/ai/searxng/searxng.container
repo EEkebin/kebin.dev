@@ -1,0 +1,16 @@
+[Unit]
+Description=SearXNG local search
+After=network-online.target
+
+[Container]
+Image=docker.io/searxng/searxng:latest
+ContainerName=searxng
+PublishPort=8888:8080
+Volume=/home/user/llama/searxng:/etc/searxng:z
+Environment=SEARXNG_BASE_URL=http://10.0.10.100:8888/
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

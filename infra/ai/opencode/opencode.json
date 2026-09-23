@@ -5,22 +5,61 @@
     "aibox": {
       "npm": "@ai-sdk/openai-compatible",
       "name": "aibox (llama-swap on the V100)",
-      "options": { "baseURL": "http://127.0.0.1:8080/v1", "apiKey": "local" },
+      "options": {
+        "baseURL": "http://127.0.0.1:8080/v1",
+        "apiKey": "local"
+      },
       "models": {
         "qwen3.5-9b": {
           "name": "Qwen3.5 9B (vision, 128K)",
           "attachment": true,
-          "modalities": { "input": ["text", "image"], "output": ["text"] },
-          "limit": { "context": 131072, "output": 16384 }
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 131072,
+            "output": 16384
+          }
         },
         "qwen3.8-27b": {
           "name": "Qwen3.8 27B (vision, 32K, V100+P100)",
           "attachment": true,
-          "modalities": { "input": ["text", "image"], "output": ["text"] },
-          "limit": { "context": 32768, "output": 8192 }
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 32768,
+            "output": 8192
+          }
         }
       }
     }
   },
-  "lsp": true
+  "lsp": true,
+  "mcp": {
+    "searxng": {
+      "type": "remote",
+      "url": "http://127.0.0.1:8899/mcp",
+      "oauth": false,
+      "enabled": true,
+      "timeout": 60000
+    }
+  },
+  "permission": {
+    "webfetch": "allow",
+    "websearch": "deny",
+    "searxng_*": "allow"
+  }
 }

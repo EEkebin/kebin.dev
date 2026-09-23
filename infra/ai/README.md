@@ -18,7 +18,8 @@ Driver 580 is the last branch that supports all three (Maxwell, Pascal, Volta). 
 | `opencode-web.service` | 0.0.0.0:4096 | OpenCode web UI + API, workspace `/srv/code/projects` |
 | `comfyui.service` | 0.0.0.0:8188 | ComfyUI, default device CUDA0, fp32 VAE (fp16 VAE produces black images on Volta) |
 | `tinyauth.service` (Quadlet) | 0.0.0.0:3000 | login page for code/comfy, used by nginx `auth_request` |
-| `searxng.service` (Quadlet) | 0.0.0.0:8888 | web search for the agent |
+| `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled |
+| `mcp-searxng.service` (Quadlet) | 127.0.0.1:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
 
@@ -30,6 +31,22 @@ Add a model: drop the GGUF (and its `mmproj` if it has vision) on disk, add an e
 
 `--device CUDA0` pins a model to the V100. `--device CUDA0,CUDA1 --tensor-split 3,2` spreads it over both cards. The `llama-server` binary must be built for every card it touches: `build-multi/` was compiled with `-DCMAKE_CUDA_ARCHITECTURES="52;60;70"`; the older `build/` is Volta-only and aborts with "no kernel image" on the P100.
 
+## Web access for the agent
+
+OpenCode has three ways to reach the web; `opencode/opencode.json` sets which are on:
+
+| Tool | Where it goes | Setting |
+|---|---|---|
+| `searxng_web_search` (MCP) | local SearXNG on :8888, which fans out to Brave/Google | `mcp.searxng` remote `http://127.0.0.1:8899/mcp`, permission `searxng_*: allow` |
+| `webfetch` (built in) | fetches one URL straight from the VM and converts it to markdown | `allow` |
+| `websearch` (built in) | Exa's hosted MCP at mcp.exa.ai, a third party | `deny` |
+
+Search stays on the box, page reads are direct, nothing goes through a hosted search API. The MCP container runs on the host network so it can reach SearXNG on loopback; `SEARXNG_URL` and `MCP_HTTP_PORT` are the only knobs. SearXNG's own config lives in `~/llama/searxng/settings.yml` (`searxng/settings.yml.example` here, `secret_key` must be random); the `json` format must stay enabled or the MCP gets 403.
+
+Check: `opencode mcp list` shows `searxng connected`; `curl 127.0.0.1:8899/health`.
+
+The CLI installer profile (kebin.dev/cli) does not get the search tool: SearXNG is LAN-only and the MCP would run on the user's machine.
+
 ## GPU sharing
 
 The V100 is shared by the LLM and ComfyUI. llama-swap's `ttl` unloads an idle model, so ComfyUI gets the full card after a quiet period. To free it immediately: `curl -X POST http://127.0.0.1:8080/api/models/unload`. ComfyUI's device can be changed per launch (`--cuda-device 1` for the P100).
@@ -38,7 +55,8 @@ The V100 is shared by the LLM and ComfyUI. llama-swap's `ttl` unloads an idle mo
 
 1. `prep.sh` — stops legacy units, installs git/uv/OpenCode/llama-swap, Python 3.12.
 2. `llama-swap/` config + unit, `opencode/` config + unit, `tinyauth/` env template + Quadlet, `comfyui/install.sh` (venv, torch cu126, ComfyUI + Manager, SDXL base, unit).
-3. Public side: `infra/web/nginx/conf.d/{auth,code,comfy}.kebin.dev.conf` and `snippets/tinyauth.conf`; DNS A records for the same names.
+3. `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`).
+4. Public side: `infra/web/nginx/conf.d/{auth,code,comfy}.kebin.dev.conf` and `snippets/tinyauth.conf`; DNS A records for the same names.
 
 ## Storage note
 
