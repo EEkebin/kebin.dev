@@ -28,6 +28,6 @@ models:
       -m /home/user/models/Qwen3.8-27B-UD-Q3_K_XL.gguf
       --mmproj /home/user/models/mmproj-F16.gguf --image-max-tokens 2048
       --chat-template-file /home/user/models/chat_template.jinja
-      -c 32768 -ctk q8_0 -ctv q8_0 --reasoning-budget 2048
-      --device CUDA0,CUDA1 --tensor-split 3,2
+      -c 32768 -ctk f16 -ctv f16 --reasoning-budget 2048
+      --device CUDA0,CUDA1 --tensor-split 4,1 -fa off
     ttl: 900
