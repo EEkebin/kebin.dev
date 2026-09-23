@@ -149,12 +149,10 @@ h2 {
 
 footer {
   margin-top: 48px;
-  display: flex;
-  justify-content: space-between;
+  text-align: center;
   font-size: .8rem;
   color: var(--muted);
 }
-footer a:hover { color: var(--fg); }
 
 @media (max-width: 480px) {
   .wrap { padding-top: 36px; }
