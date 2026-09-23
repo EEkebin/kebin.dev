@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>VR links</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="https://kebin.dev/images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://kebin.dev/style.css">
+  <style>
+    .wrap { max-width: 760px; }
+    h1 { text-align: center; margin-top: 0; }
+    .lead { color: var(--muted); text-align: center; margin: 0 0 24px; }
+    .row { display: flex; align-items: center; gap: 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; }
+    .row img { width: 44px; height: 66px; object-fit: cover; border-radius: 6px; background: #15151b; flex: none; }
+    .info { flex: 1; min-width: 0; }
+    .title { font-weight: 600; }
+    .meta { color: var(--muted); font-size: .8rem; margin-top: 2px; }
+    .meta code { font-size: .75rem; }
+    .actions { display: flex; gap: 8px; flex: none; }
+    button { font: inherit; font-size: .82rem; padding: 7px 12px; border-radius: 9px; border: 1px solid var(--line); background: #15151b; color: var(--fg); cursor: pointer; }
+    button:hover { background: #1c1c24; }
+    button.danger { border-color: #4a1f1f; color: #ff8080; }
+    button.danger:hover { background: #2a1414; }
+    .empty { color: var(--muted); text-align: center; padding: 30px 0; }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: var(--muted); font-size: .85rem; }
+    .back { color: var(--muted); }
+    .back:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>VR links</h1>
+    <p class="lead">Active share links for VRChat players. Revoking one stops playback for anyone using it within a few seconds.</p>
+    <div class="toolbar">
+      <span id="count">loading…</span>
+      <div class="actions">
+        <button id="refresh">Refresh</button>
+        <button id="revoke-all" class="danger">Revoke all</button>
+      </div>
+    </div>
+    <div id="list"></div>
+    <a class="back" href="https://kebin.dev/">← back</a>
+  </main>
+  <script>
+    const api = (p, opt) => fetch('/admin/api' + p, opt).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+    const when = ts => { const d = new Date(ts * 1000); const h = Math.max(0, Math.round((ts * 1000 - Date.now()) / 36e5)); return d.toLocaleString() + ' (' + (h ? h + ' h left' : 'expiring') + ')'; };
+    async function load() {
+      const list = document.getElementById('list'); const count = document.getElementById('count');
+      count.textContent = 'loading…';
+      const { shares } = await api('/shares');
+      const ids = [...new Set(shares.map(s => s.media_id))];
+      let items = {};
+      if (ids.length) {
+        try { const r = await api('/items?Ids=' + ids.join(',') + '&Fields=ProductionYear'); (r.Items || []).forEach(i => items[i.Id] = i); } catch (e) {}
+      }
+      list.innerHTML = '';
+      if (!shares.length) { list.innerHTML = '<p class="empty">No active links.</p>'; count.textContent = '0 links'; return; }
+      count.textContent = shares.length + ' link' + (shares.length > 1 ? 's' : '');
+      for (const s of shares.sort((a, b) => b.created_at - a.created_at)) {
+        const it = items[s.media_id] || {};
+        const name = it.Type === 'Episode' ? `${it.SeriesName || ''} — ${it.Name || ''}` : (it.Name || s.media_id);
+        const year = it.ProductionYear ? ' (' + it.ProductionYear + ')' : '';
+        const url = `${location.origin}/vod.m3u8?m=${s.media_id}&token=${s.token}${s.profile ? '&profile=' + s.profile : ''}`;
+        const row = document.createElement('div'); row.className = 'row';
+        row.innerHTML = `<img src="/admin/api/thumbnail/${s.media_id}" alt="" onerror="this.style.visibility='hidden'">
+          <div class="info"><div class="title"></div><div class="meta">expires ${when(s.expires_at)} · profile <code>${s.profile || 'default'}</code> · ${s.mode}</div></div>
+          <div class="actions"><button class="copy">Copy link</button><button class="danger revoke">Revoke</button></div>`;
+        row.querySelector('.title').textContent = name + year;
+        row.querySelector('.copy').onclick = async e => { await navigator.clipboard.writeText(url); e.target.textContent = 'Copied'; setTimeout(() => e.target.textContent = 'Copy link', 1500); };
+        row.querySelector('.revoke').onclick = async () => { if (!confirm('Revoke this link?')) return; await api('/share/' + s.token, { method: 'DELETE' }); load(); };
+        list.appendChild(row);
+      }
+    }
+    document.getElementById('refresh').onclick = load;
+    document.getElementById('revoke-all').onclick = async () => {
+      const { shares } = await api('/shares'); if (!shares.length) return;
+      if (!confirm('Revoke all ' + shares.length + ' links?')) return;
+      for (const s of shares) await api('/share/' + s.token, { method: 'DELETE' });
+      load();
+    };
+    load();
+  </script>
+</body>
+</html>
