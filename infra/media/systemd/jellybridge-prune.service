@@ -1,0 +1,7 @@
+[Unit]
+Description=Remove owned titles from the JellyBridge Discover library
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /srv/media/jellybridge-prune.py

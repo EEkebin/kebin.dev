@@ -1,0 +1,9 @@
+[Unit]
+Description=Prune owned titles from Discover after JellyBridge sync
+
+[Timer]
+OnCalendar=*-*-* 00,06,12,18:48:00 America/Los_Angeles
+Persistent=true
+
+[Install]
+WantedBy=timers.target

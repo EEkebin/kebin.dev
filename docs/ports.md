@@ -1,0 +1,21 @@
+# Ports and names
+
+| Public name | Backend | Notes |
+|---|---|---|
+| kebin.dev | web VM, `/var/www/kebin.dev` + `127.0.0.1:8765` for `/api/status` | homepage |
+| stream.kebin.dev | 10.0.10.30:8096 | Jellyfin, WebSocket |
+| seerr.kebin.dev | 10.0.10.30:5055 | Seerr |
+| sonarr.kebin.dev | 10.0.10.30:8989 | admin |
+| radarr.kebin.dev | 10.0.10.30:7878 | admin |
+| lidarr.kebin.dev | 10.0.10.30:8686 | admin |
+| prowlarr.kebin.dev | 10.0.10.30:9696 | admin |
+| bazarr.kebin.dev | 10.0.10.30:6767 | admin |
+| qbittorrent.kebin.dev | 10.0.10.30:8080 | admin, peer port 6881 tcp/udp is not forwarded |
+| tdarr.kebin.dev | 10.0.10.30:8265 | admin, no login by default |
+| music.kebin.dev | 10.0.10.30:4533 | Navidrome |
+| files.kebin.dev | 10.0.10.30:8090 | FileBrowser Quantum, uploads unlimited |
+| cloud.kebin.dev | 10.0.10.30:8081 | Nextcloud, uploads unlimited, well-known redirects for CalDAV/CardDAV |
+
+Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
+
+Container-to-container names (inside the podman network): `jellyfin`, `seerr`, `sonarr`, `radarr`, `lidarr`, `prowlarr`, `bazarr`, `qbittorrent`, `flaresolverr:8191`, `nextcloud-db`, `nextcloud-redis`.

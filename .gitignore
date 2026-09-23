@@ -1,0 +1,20 @@
+# secrets and generated state — never commit
+.env
+*.env
+!.env.example
+CREDENTIALS.md
+porkbun.env
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+.export/
+
+# runtime config directories (app databases, API keys, plugin state)
+infra/media/config/**
+!infra/media/config/**/
+!infra/media/config/**/*.tmpl
+
+# local junk
+.DS_Store
+Thumbs.db

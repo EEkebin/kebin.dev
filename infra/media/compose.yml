@@ -1,0 +1,248 @@
+name: media
+
+x-env: &env
+  PUID: "1000"
+  PGID: "1000"
+  TZ: America/Los_Angeles
+
+services:
+
+  # ---------- playback ----------
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      <<: *env
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+      JELLYFIN_PublishedServerUrl: https://stream.kebin.dev
+    devices:
+      - nvidia.com/gpu=all
+    volumes:
+      - /srv/media/config/jellyfin:/config
+      - /srv/media/cache/jellyfin:/cache
+      - /mnt/storage/Media:/data:ro
+      - /srv/media/jellybridge:/jellybridge
+    ports:
+      - "8096:8096"
+    restart: always
+
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    container_name: seerr
+    init: true
+    environment:
+      TZ: America/Los_Angeles
+      PORT: "5055"
+    volumes:
+      - /srv/media/config/seerr:/app/config
+    ports:
+      - "5055:5055"
+    restart: always
+
+  # ---------- automation ----------
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment: *env
+    volumes:
+      - /srv/media/config/prowlarr:/config
+    ports:
+      - "9696:9696"
+    restart: always
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      TZ: America/Los_Angeles
+      LOG_LEVEL: info
+    restart: always
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment: *env
+    volumes:
+      - /srv/media/config/sonarr:/config
+      - /mnt/storage/Media:/data
+    ports:
+      - "8989:8989"
+    restart: always
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment: *env
+    volumes:
+      - /srv/media/config/radarr:/config
+      - /mnt/storage/Media:/data
+    ports:
+      - "7878:7878"
+    restart: always
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment: *env
+    volumes:
+      - /srv/media/config/lidarr:/config
+      - /mnt/storage/Media:/data
+    ports:
+      - "8686:8686"
+    restart: always
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment: *env
+    volumes:
+      - /srv/media/config/bazarr:/config
+      - /mnt/storage/Media:/data
+    ports:
+      - "6767:6767"
+    restart: always
+
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:8
+    container_name: recyclarr
+    user: "1000:1000"
+    environment:
+      TZ: America/Los_Angeles
+      CRON_SCHEDULE: "@daily"
+    volumes:
+      - /srv/media/config/recyclarr:/config
+    restart: always
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      <<: *env
+      WEBUI_PORT: "8080"
+      TORRENTING_PORT: "6881"
+    volumes:
+      - /srv/media/config/qbittorrent:/config
+      - /mnt/storage/Media/Downloads:/data/Downloads
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    restart: always
+
+  # ---------- transcoding ----------
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    environment:
+      <<: *env
+      UMASK_SET: "002"
+      serverIP: 0.0.0.0
+      serverPort: "8266"
+      webUIPort: "8265"
+      internalNode: "true"
+      inContainer: "true"
+      ffmpegVersion: "7"
+      nodeName: media-p100
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+    devices:
+      - nvidia.com/gpu=all
+    volumes:
+      - /srv/media/config/tdarr/server:/app/server
+      - /srv/media/config/tdarr/configs:/app/configs
+      - /srv/media/config/tdarr/logs:/app/logs
+      - /srv/media/cache/tdarr:/temp
+      - /mnt/storage/Media:/data
+    ports:
+      - "8265:8265"
+      - "8266:8266"
+    restart: always
+
+  # ---------- music ----------
+  navidrome:
+    image: docker.io/deluan/navidrome:latest
+    container_name: navidrome
+    user: "1000:1000"
+    environment:
+      ND_MUSICFOLDER: /music
+      ND_DATAFOLDER: /data
+      ND_SCANSCHEDULE: 1h
+      ND_LOGLEVEL: info
+      ND_BASEURL: ""
+    volumes:
+      - /srv/media/config/navidrome:/data
+      - /mnt/storage/Media/Music:/music:ro
+    ports:
+      - "4533:4533"
+    restart: always
+
+  # ---------- files ----------
+  filebrowser:
+    image: docker.io/gtstef/filebrowser:beta
+    container_name: filebrowser
+    environment:
+      TZ: America/Los_Angeles
+    sysctls:
+      - net.ipv4.ip_unprivileged_port_start=0
+    volumes:
+      - /srv/media/config/filebrowser:/home/filebrowser/data
+      - /mnt/storage:/storage
+    ports:
+      - "8090:80"
+    restart: always
+
+  nextcloud-db:
+    image: docker.io/library/postgres:17-alpine
+    container_name: nextcloud-db
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${NC_DB_PASSWORD}
+    volumes:
+      - /srv/media/config/nextcloud/db:/var/lib/postgresql/data
+    restart: always
+
+  nextcloud-redis:
+    image: docker.io/library/redis:7-alpine
+    container_name: nextcloud-redis
+    restart: always
+
+  nextcloud:
+    image: docker.io/library/nextcloud:apache
+    container_name: nextcloud
+    depends_on:
+      - nextcloud-db
+      - nextcloud-redis
+    environment:
+      POSTGRES_HOST: nextcloud-db
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${NC_DB_PASSWORD}
+      REDIS_HOST: nextcloud-redis
+      NEXTCLOUD_ADMIN_USER: kebin
+      NEXTCLOUD_ADMIN_PASSWORD: ${NC_ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.kebin.dev 10.0.10.30"
+      OVERWRITEPROTOCOL: https
+      OVERWRITEHOST: cloud.kebin.dev
+      OVERWRITECLIURL: https://cloud.kebin.dev
+      TRUSTED_PROXIES: 10.0.10.20
+      PHP_MEMORY_LIMIT: 1G
+      PHP_UPLOAD_LIMIT: 16G
+    volumes:
+      - /srv/media/config/nextcloud/html:/var/www/html
+      - /mnt/storage:/storage:ro
+    ports:
+      - "8081:80"
+    restart: always
+
+  nextcloud-cron:
+    image: docker.io/library/nextcloud:apache
+    container_name: nextcloud-cron
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud
+    volumes:
+      - /srv/media/config/nextcloud/html:/var/www/html
+      - /mnt/storage:/storage:ro
+    restart: always

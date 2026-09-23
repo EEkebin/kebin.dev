@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>kebin</title>
+  <meta name="description" content="kebin — systems and software engineer. Links, projects and self-hosted services.">
+  <meta name="author" content="kebin">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://kebin.dev/">
+  <meta property="og:title" content="kebin">
+  <meta property="og:description" content="Systems and software engineer. Links, projects and self-hosted services.">
+  <meta property="og:image" content="https://kebin.dev/images/banner.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="kebin">
+  <meta name="twitter:description" content="Systems and software engineer. Links, projects and self-hosted services.">
+  <meta name="twitter:image" content="https://kebin.dev/images/banner.png">
+
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+</head>
+<body>
+  <main class="wrap">
+
+    <header class="hero">
+      <div class="avatar-ring">
+        <img class="avatar" src="/images/avatar.png" alt="kebin's minion avatar" width="242" height="360">
+      </div>
+      <h1>kebin</h1>
+      <p class="tagline">Systems and software engineer with extensive knowledge in server and personal computer systems, architecture, and software development.</p>
+      <ul class="chips" aria-label="Experienced in">
+        <li>C/C++</li><li>C#</li><li>Verilog HDL</li><li>Java</li><li>Lua</li>
+        <li>Python</li><li>HTML + CSS</li><li>Node.js</li><li>MIPS</li>
+        <li>Virtualization</li><li>Containers</li>
+      </ul>
+    </header>
+
+    <section class="links" aria-labelledby="links-h">
+      <h2 id="links-h">Find me</h2>
+      <a class="btn" href="https://github.com/EEkebin" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/github.svg" alt="">GitHub</a>
+      <a class="btn" href="https://discord.gg/UP9kDeVJqs" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/discord.svg" alt="">Discord</a>
+      <a class="btn" href="mailto:kebinImports@gmail.com">
+        <img class="ico" src="/images/brands/email.svg" alt="">kebinImports@gmail.com</a>
+      <a class="btn" href="https://steamcommunity.com/id/_kebin/" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/steam.svg" alt="">Steam</a>
+      <a class="btn" href="https://vrchat.com/home/user/usr_8903abfc-d9a5-4801-9d22-03b360924e15" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/vrchat.svg" alt="">VRChat</a>
+      <a class="btn" href="https://paypal.me/kebinImports" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/paypal.svg" alt="">PayPal</a>
+      <a class="btn" href="https://cash.app/$kebinImports" target="_blank" rel="noopener">
+        <img class="ico" src="/images/brands/cashapp_dollar.svg" alt="">Cash App</a>
+    </section>
+
+    <section class="services" aria-labelledby="svc-h">
+      <h2 id="svc-h">Services</h2>
+      <div class="grid">
+        <a class="card" href="https://stream.kebin.dev" target="_blank" rel="noopener">
+          <span class="name">Stream</span>
+          <span class="desc">Movies, shows and music</span>
+          <span class="status" hx-get="/api/status?svc=stream" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://seerr.kebin.dev" target="_blank" rel="noopener">
+          <span class="name">Seerr</span>
+          <span class="desc">Request something new</span>
+          <span class="status" hx-get="/api/status?svc=seerr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://music.kebin.dev" target="_blank" rel="noopener">
+          <span class="name">Music</span>
+          <span class="desc">Navidrome player</span>
+          <span class="status" hx-get="/api/status?svc=music" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://files.kebin.dev" target="_blank" rel="noopener">
+          <span class="name">Files</span>
+          <span class="desc">Browse and share</span>
+          <span class="status" hx-get="/api/status?svc=files" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://cloud.kebin.dev" target="_blank" rel="noopener">
+          <span class="name">Cloud</span>
+          <span class="desc">Nextcloud sync and calendar</span>
+          <span class="status" hx-get="/api/status?svc=cloud" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="y">2026</span> kebin</span>
+      <a href="https://github.com/eekebin/kebin.dev" target="_blank" rel="noopener">source</a>
+    </footer>
+  </main>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
