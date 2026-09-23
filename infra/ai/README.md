@@ -19,7 +19,7 @@ Driver 580 is the last branch that supports all three (Maxwell, Pascal, Volta). 
 | `comfyui.service` | 0.0.0.0:8188 | ComfyUI, default device CUDA0, fp32 VAE (fp16 VAE produces black images on Volta) |
 | `tinyauth.service` (Quadlet) | 0.0.0.0:3000 | login page for code/comfy, used by nginx `auth_request` |
 | `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled |
-| `mcp-searxng.service` (Quadlet) | 127.0.0.1:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
+| `mcp-searxng.service` (Quadlet) | 0.0.0.0:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
 
@@ -41,11 +41,11 @@ OpenCode has three ways to reach the web; `opencode/opencode.json` sets which ar
 | `webfetch` (built in) | fetches one URL straight from the VM and converts it to markdown | `allow` |
 | `websearch` (built in) | Exa's hosted MCP at mcp.exa.ai, a third party | `deny` |
 
-Search stays on the box, page reads are direct, nothing goes through a hosted search API. The MCP container runs on the host network so it can reach SearXNG on loopback; `SEARXNG_URL` and `MCP_HTTP_PORT` are the only knobs. SearXNG's own config lives in `~/llama/searxng/settings.yml` (`searxng/settings.yml.example` here, `secret_key` must be random); the `json` format must stay enabled or the MCP gets 403.
+Search stays on the box, page reads are direct, nothing goes through a hosted search API. The MCP container runs on the host network so it can reach SearXNG on loopback. `MCP_HTTP_HOST=0.0.0.0` so the web VM can proxy it as search.kebin.dev; `MCP_HTTP_ALLOWED_HOSTS` lists that name plus the local addresses and `MCP_HTTP_TRUST_PROXY` honours nginx's X-Forwarded headers. SearXNG's own config lives in `~/llama/searxng/settings.yml` (`searxng/settings.yml.example` here, `secret_key` must be random); the `json` format must stay enabled or the MCP gets 403.
 
 Check: `opencode mcp list` shows `searxng connected`; `curl 127.0.0.1:8899/health`.
 
-The CLI installer profile (kebin.dev/cli) does not get the search tool: SearXNG is LAN-only and the MCP would run on the user's machine.
+Remote installs (kebin.dev/cli) get the same tool through `https://search.kebin.dev/mcp`, gated by the ai.kebin.dev bearer key and passed as an `Authorization` header in the `mcp.searxng` entry; nothing runs on the user's machine.
 
 ## GPU sharing
 

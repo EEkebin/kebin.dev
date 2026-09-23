@@ -16,12 +16,26 @@ if (Test-Path $Cfg) {
         Write-Host "restored your previous config from $($bak.Name)"
     } else {
         $d = Get-Content $Cfg -Raw | ConvertFrom-Json
+        $hit = $false
         if ($d.provider -and $d.provider.PSObject.Properties.Name -contains "aibox") {
+            $hit = $true
             $d.provider.PSObject.Properties.Remove("aibox")
             if ("$($d.model)".StartsWith("aibox/")) { $d.PSObject.Properties.Remove("model") }
             if ($d.provider.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("provider") }
+        }
+        if ($d.mcp -and $d.mcp.PSObject.Properties.Name -contains "searxng") {
+            $hit = $true
+            $d.mcp.PSObject.Properties.Remove("searxng")
+            if ($d.mcp.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("mcp") }
+        }
+        if ($d.permission -and $d.permission.PSObject.Properties.Name -contains "searxng_*") {
+            $hit = $true
+            $d.permission.PSObject.Properties.Remove("searxng_*")
+            if ($d.permission.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("permission") }
+        }
+        if ($hit) {
             $d | ConvertTo-Json -Depth 8 | Set-Content -Path $Cfg -Encoding utf8
-            Write-Host "removed the aibox provider from $Cfg"
+            Write-Host "removed the kebin.dev provider and search tool from $Cfg"
         } else { Write-Host "no kebin.dev profile found in $Cfg, left untouched" }
     }
 } else { Write-Host "no OpenCode config found" }

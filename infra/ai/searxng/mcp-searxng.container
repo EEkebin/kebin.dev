@@ -1,5 +1,5 @@
 [Unit]
-Description=mcp-searxng (MCP web search over the local SearXNG, streamable HTTP on 127.0.0.1:8899)
+Description=mcp-searxng (MCP web search over the local SearXNG, streamable HTTP on 0.0.0.0:8899, reachable from the web VM for search.kebin.dev)
 After=network-online.target searxng.service
 Wants=searxng.service
 
@@ -9,6 +9,9 @@ ContainerName=mcp-searxng
 Network=host
 Environment=SEARXNG_URL=http://127.0.0.1:8888
 Environment=MCP_HTTP_PORT=8899
+Environment=MCP_HTTP_HOST=0.0.0.0
+Environment=MCP_HTTP_TRUST_PROXY=true
+Environment=MCP_HTTP_ALLOWED_HOSTS=search.kebin.dev,localhost,127.0.0.1,10.0.10.100
 
 [Service]
 Restart=always

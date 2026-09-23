@@ -17,14 +17,24 @@ if [ -f "$CFG" ]; then
   elif python3 - "$CFG" <<'PY'
 import json, sys
 p = sys.argv[1]; d = json.load(open(p))
+hit = False
 prov = d.get("provider", {})
-if "aibox" not in prov: sys.exit(1)
-del prov["aibox"]
-if str(d.get("model", "")).startswith("aibox/"): d.pop("model", None)
-if not prov: d.pop("provider", None)
+if "aibox" in prov:
+    hit = True; del prov["aibox"]
+    if str(d.get("model", "")).startswith("aibox/"): d.pop("model", None)
+    if not prov: d.pop("provider", None)
+mcp = d.get("mcp", {})
+if "searxng" in mcp:
+    hit = True; del mcp["searxng"]
+    if not mcp: d.pop("mcp", None)
+perm = d.get("permission", {})
+if "searxng_*" in perm:
+    hit = True; del perm["searxng_*"]
+    if not perm: d.pop("permission", None)
+if not hit: sys.exit(1)
 json.dump(d, open(p, "w"), indent=2)
 PY
-  then echo "removed the aibox provider from $CFG"
+  then echo "removed the kebin.dev provider and search tool from $CFG"
   else echo "no kebin.dev profile found in $CFG, left untouched"
   fi
 else

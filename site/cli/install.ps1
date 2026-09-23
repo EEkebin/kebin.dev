@@ -3,6 +3,7 @@
 #   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression    (non-interactive)
 $ErrorActionPreference = "Stop"
 $Api = "https://ai.kebin.dev/v1"
+$Search = "https://search.kebin.dev"
 $CfgDir = Join-Path $HOME ".config\opencode"
 $Cfg = Join-Path $CfgDir "opencode.json"
 
@@ -28,6 +29,8 @@ if (-not $Key) { $Key = Read-Host "Paste the ai.kebin.dev API key" }
 if (-not $Key) { Write-Host "no key given" -ForegroundColor Red; exit 1 }
 try { Invoke-WebRequest -Uri "$Api/models" -Headers @{ Authorization = "Bearer $Key" } -UseBasicParsing | Out-Null; Write-Host "key accepted" }
 catch { Write-Host "key rejected by $Api" -ForegroundColor Red; exit 1 }
+try { Invoke-WebRequest -Uri "$Search/health" -Headers @{ Authorization = "Bearer $Key" } -UseBasicParsing | Out-Null; Write-Host "web search reachable" }
+catch { Write-Host "warning: $Search not reachable, web search may not work right now" -ForegroundColor DarkYellow }
 
 Say "3/3  config -> $Cfg"
 New-Item -ItemType Directory -Force -Path $CfgDir | Out-Null
@@ -44,9 +47,18 @@ $json = @{
             'qwen3.8-27b' = @{ name = "Qwen3.8 27B (vision, 32K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 32768; output = 8192 } }
         }
     } }
+    mcp = @{ searxng = @{
+        type = "remote"
+        url = "$Search/mcp"
+        headers = @{ Authorization = "Bearer $Key" }
+        oauth = $false
+        enabled = $true
+        timeout = 60000
+    } }
+    permission = @{ webfetch = "allow"; websearch = "deny"; 'searxng_*' = "allow" }
     lsp = $true
 }
 $json | ConvertTo-Json -Depth 8 | Set-Content -Path $Cfg -Encoding utf8
 Write-Host ""
 Say "done. open a project folder and run:  opencode"
-Write-Host "switch models inside OpenCode with /models. Re-run this script any time to update."
+Write-Host "switch models inside OpenCode with /models. Web search (searxng_web_search) and page fetch are on. Re-run this script any time to update."

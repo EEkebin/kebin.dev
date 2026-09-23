@@ -20,10 +20,11 @@
 | comfy.kebin.dev | 10.0.10.100:8188 | ComfyUI, behind Tinyauth |
 | pve.kebin.dev | https://10.0.0.200:8006 | Proxmox UI, behind Tinyauth, self-signed upstream |
 | ai.kebin.dev | 10.0.10.100:8080 | model API (llama-swap), bearer key from `/etc/nginx/secrets/ai-key` on the web VM |
+| search.kebin.dev | 10.0.10.100:8899 | web search MCP (mcp-searxng) for remote OpenCode installs, same bearer key as ai.kebin.dev |
 | kebin.dev/cli/ | static | OpenCode CLI installers; page behind Tinyauth with the API key filled in, scripts public |
 | vr.kebin.dev | 10.0.10.30:8000 | HLS for VRChat players, per-share tokens, no Tinyauth on purpose |
 
-Internal only on the ai VM: SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 127.0.0.1:8899 (loopback, used by OpenCode).
+Internal only on the ai VM: SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 10.0.10.100:8899 (LAN, used by OpenCode on the VM and by nginx for search.kebin.dev).
 
 Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
 

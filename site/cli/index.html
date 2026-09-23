@@ -32,7 +32,7 @@
   <main class="wrap">
     <a class="back" href="/">← kebin.dev</a>
     <h1>OpenCode CLI</h1>
-    <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev.</p>
+    <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev. Web search through search.kebin.dev is included.</p>
 
     <div class="step">
       <h3>API key</h3>
@@ -48,7 +48,7 @@
     <div data-os="unix">
       <div class="step">
         <h3>Install</h3>
-        <p>Installs OpenCode if needed and writes the config with the key above.</p>
+        <p>Installs OpenCode if needed and writes the config with the key above: models, web search and page fetch.</p>
         <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
       </div>
       <div class="step">
@@ -68,7 +68,7 @@ opencode</code></pre>
     <div data-os="win">
       <div class="step">
         <h3>Install</h3>
-        <p>PowerShell. Needs Node.js, Scoop or Chocolatey present so it can install OpenCode. Writes the config with the key above.</p>
+        <p>PowerShell. Needs Node.js, Scoop or Chocolatey present so it can install OpenCode. Writes the config with the key above: models, web search and page fetch.</p>
         <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression</code></pre>
       </div>
       <div class="step">
@@ -87,7 +87,7 @@ opencode</code></pre>
 
     <div class="step">
       <h3>Already have OpenCode?</h3>
-      <p>The scripts only add a provider named <strong>aibox</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, key required.</p>
+      <p>The scripts add a provider named <strong>aibox</strong> and an MCP named <strong>searxng</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, search MCP <code>https://search.kebin.dev/mcp</code>, both take the key as a bearer token.</p>
     </div>
   </main>
   <script>
