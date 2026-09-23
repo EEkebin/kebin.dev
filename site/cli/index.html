@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>kebin CLI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    .wrap { max-width: 720px; }
+    h1 { text-align: center; margin-top: 0; }
+    .lead { color: var(--muted); text-align: center; margin: 0 0 28px; }
+    .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
+    .step h3 { margin: 0 0 8px; font-size: 1rem; }
+    .step p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
+    pre { margin: 6px 0 0; background: #000; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+    .back { display: inline-block; margin-top: 24px; color: var(--muted); }
+    .back:hover { color: var(--fg); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>OpenCode CLI</h1>
+    <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev.</p>
+
+    <div class="step">
+      <h3>Linux / macOS</h3>
+      <p>Installs OpenCode if needed, asks for the API key, writes the config.</p>
+      <pre>curl -fsSL https://kebin.dev/cli/install.sh | bash</pre>
+    </div>
+
+    <div class="step">
+      <h3>Windows (PowerShell)</h3>
+      <p>Needs Node.js, Scoop or Chocolatey present to install OpenCode.</p>
+      <pre>irm https://kebin.dev/cli/install.ps1 | iex</pre>
+    </div>
+
+    <div class="step">
+      <h3>Then</h3>
+      <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
+      <pre>cd my-project
+opencode</pre>
+    </div>
+
+    <div class="step">
+      <h3>Already have OpenCode?</h3>
+      <p>The scripts only add a provider named <strong>aibox</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, key required.</p>
+    </div>
+
+    <a class="back" href="/">← back</a>
+  </main>
+</body>
+</html>
