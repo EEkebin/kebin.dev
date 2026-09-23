@@ -11,37 +11,70 @@
   <style>
     .wrap { max-width: 720px; }
     h1 { text-align: center; margin-top: 0; }
-    .lead { color: var(--muted); text-align: center; margin: 0 0 28px; }
+    .lead { color: var(--muted); text-align: center; margin: 0 0 22px; }
+    .toggle { display: flex; gap: 0; margin: 0 auto 22px; width: max-content; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
+    .toggle button { font: inherit; font-size: .88rem; font-weight: 600; padding: 8px 18px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
+    .toggle button.on { background: #1c1c24; color: var(--fg); }
     .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
     .step h3 { margin: 0 0 8px; font-size: 1rem; }
     .step p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
-    pre { margin: 6px 0 0; background: #000; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+    pre { position: relative; margin: 6px 0 0; background: #000; border: 1px solid var(--line); border-radius: 10px; padding: 12px 64px 12px 14px; overflow-x: auto; font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace; }
+    pre .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--line); background: #15151b; color: var(--muted); cursor: pointer; }
+    pre .copy:hover { color: var(--fg); }
+    [data-os] { display: none; }
+    body.os-unix [data-os="unix"], body.os-win [data-os="win"] { display: block; }
     .back { display: inline-block; margin-top: 24px; color: var(--muted); }
     .back:hover { color: var(--fg); }
   </style>
 </head>
-<body>
+<body class="os-unix">
   <main class="wrap">
     <h1>OpenCode CLI</h1>
     <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev.</p>
 
-    <div class="step">
-      <h3>Linux / macOS</h3>
-      <p>Installs OpenCode if needed, asks for the API key, writes the config.</p>
-      <pre>curl -fsSL https://kebin.dev/cli/install.sh | bash</pre>
+    <div class="toggle" role="tablist">
+      <button id="t-unix" class="on" onclick="setOS('unix')">Linux / macOS</button>
+      <button id="t-win" onclick="setOS('win')">Windows</button>
     </div>
 
-    <div class="step">
-      <h3>Windows (PowerShell)</h3>
-      <p>Needs Node.js, Scoop or Chocolatey present to install OpenCode.</p>
-      <pre>irm https://kebin.dev/cli/install.ps1 | iex</pre>
+    <div data-os="unix">
+      <div class="step">
+        <h3>Install</h3>
+        <p>Installs OpenCode if needed, asks for the API key, writes the config.</p>
+        <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | bash</code></pre>
+      </div>
+      <div class="step">
+        <h3>Then</h3>
+        <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
+        <pre><code>cd my-project
+opencode</code></pre>
+      </div>
+      <div class="step">
+        <h3>Uninstall</h3>
+        <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
+        <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash</code></pre>
+        <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash -s -- --all</code></pre>
+      </div>
     </div>
 
-    <div class="step">
-      <h3>Then</h3>
-      <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
-      <pre>cd my-project
-opencode</pre>
+    <div data-os="win">
+      <div class="step">
+        <h3>Install</h3>
+        <p>PowerShell. Needs Node.js, Scoop or Chocolatey present so it can install OpenCode.</p>
+        <pre><code>irm https://kebin.dev/cli/install.ps1 | iex</code></pre>
+      </div>
+      <div class="step">
+        <h3>Then</h3>
+        <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
+        <pre><code>cd my-project
+opencode</code></pre>
+      </div>
+      <div class="step">
+        <h3>Uninstall</h3>
+        <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
+        <pre><code>irm https://kebin.dev/cli/uninstall.ps1 | iex</code></pre>
+        <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; irm https://kebin.dev/cli/uninstall.ps1 | iex</code></pre>
+      </div>
     </div>
 
     <div class="step">
@@ -49,16 +82,26 @@ opencode</pre>
       <p>The scripts only add a provider named <strong>aibox</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, key required.</p>
     </div>
 
-    <div class="step">
-      <h3>Uninstall</h3>
-      <p>Removes the kebin.dev profile and restores your previous OpenCode config. Add <code>--all</code> (Linux/macOS) or set <code>$env:AIBOX_UNINSTALL_ALL = "1"</code> (Windows) to remove OpenCode itself as well.</p>
-      <pre>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash
-curl -fsSL https://kebin.dev/cli/uninstall.sh | bash -s -- --all</pre>
-      <pre>irm https://kebin.dev/cli/uninstall.ps1 | iex
-$env:AIBOX_UNINSTALL_ALL = "1"; irm https://kebin.dev/cli/uninstall.ps1 | iex</pre>
-    </div>
-
     <a class="back" href="/">← back</a>
   </main>
+  <script>
+    function setOS(os) {
+      document.body.className = 'os-' + os;
+      document.getElementById('t-unix').classList.toggle('on', os === 'unix');
+      document.getElementById('t-win').classList.toggle('on', os === 'win');
+      try { localStorage.setItem('cli-os', os); } catch (e) {}
+    }
+    (function () {
+      let os = null;
+      try { os = localStorage.getItem('cli-os'); } catch (e) {}
+      if (os !== 'unix' && os !== 'win') os = /Windows/i.test(navigator.userAgent) ? 'win' : 'unix';
+      setOS(os);
+      document.querySelectorAll('pre').forEach(pre => {
+        const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'copy';
+        b.onclick = async () => { await navigator.clipboard.writeText(pre.querySelector('code').textContent); b.textContent = 'copied'; setTimeout(() => b.textContent = 'copy', 1500); };
+        pre.appendChild(b);
+      });
+    })();
+  </script>
 </body>
 </html>
