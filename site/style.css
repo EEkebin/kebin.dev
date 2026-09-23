@@ -114,14 +114,15 @@ h2 {
 /* service cards */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  margin-top: 28px;
   gap: 10px;
 }
 .card {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 14px 16px;
+  padding: 18px 18px;
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: var(--radius);
