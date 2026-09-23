@@ -23,6 +23,8 @@ SERVICES = {
     "music":  f"{MEDIA}:4533/ping",
     "files":  f"{MEDIA}:8090/",
     "cloud":  f"{MEDIA}:8081/status.php",
+    "code":   "http://10.0.10.100:4096/",
+    "comfy":  "http://10.0.10.100:8188/system_stats",
 }
 
 _cache = {}

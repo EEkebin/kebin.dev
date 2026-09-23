@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenCode web UI + API on :4096
+After=network-online.target llama-swap.service
+
+[Service]
+ExecStart=/home/user/.opencode/bin/opencode web --hostname 0.0.0.0 --port 4096
+WorkingDirectory=/srv/code/projects
+Environment=HOME=/home/user
+Environment=PATH=/home/user/.opencode/bin:/home/user/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,13 @@
+[Unit]
+Description=ComfyUI on :8188 (default device: V100)
+After=network-online.target
+
+[Service]
+WorkingDirectory=/home/user/.local/share/comfyui/ComfyUI
+Environment=CUDA_DEVICE_ORDER=PCI_BUS_ID
+ExecStart=/home/user/.local/share/comfyui/ComfyUI/.venv/bin/python main.py --listen 0.0.0.0 --port 8188 --cuda-device 0 --fp32-vae --preview-method auto
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

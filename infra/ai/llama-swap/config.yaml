@@ -1,0 +1,33 @@
+# llama-swap: one OpenAI/Anthropic-compatible endpoint on :8080, loads whichever model is asked for.
+# Model names below are what OpenCode and any client use. "capstone-qwen" stays as an alias for the Capstone box.
+healthCheckTimeout: 300
+logLevel: info
+
+macros:
+  server: /home/user/.local/share/capstone-inference/llama.cpp/build-multi/bin/llama-server
+  common: >-
+    --host 127.0.0.1 --port ${PORT} -ngl all -fa auto --jinja -np 1 -t 6 -tb 6
+    --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
+
+models:
+  # default: everything on the V100 (device 0), vision on, 128K, thinking budget kept
+  qwen3.5-9b:
+    cmd: >-
+      ${server} ${common}
+      -m /home/user/.local/share/capstone-inference/Qwen3.5-9B-Q6_K.gguf
+      --mmproj /home/user/.local/share/capstone-inference/mmproj-F16.gguf --image-max-tokens 2048
+      -c 131072 -ctk f16 -ctv f16 --reasoning-budget 1536
+      --device CUDA0
+    aliases: ["capstone-qwen", "qwen"]
+    ttl: 1800
+
+  # bigger option already on disk: split across V100 + P100 so vision and 32K fit
+  qwen3.8-27b:
+    cmd: >-
+      ${server} ${common}
+      -m /home/user/models/Qwen3.8-27B-UD-Q3_K_XL.gguf
+      --mmproj /home/user/models/mmproj-F16.gguf --image-max-tokens 2048
+      --chat-template-file /home/user/models/chat_template.jinja
+      -c 32768 -ctk q8_0 -ctv q8_0 --reasoning-budget 2048
+      --device CUDA0,CUDA1 --tensor-split 3,2
+    ttl: 900

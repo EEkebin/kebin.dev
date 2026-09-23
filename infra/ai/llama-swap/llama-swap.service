@@ -1,0 +1,14 @@
+[Unit]
+Description=llama-swap model router (OpenAI/Anthropic compatible API on :8080)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/home/user/.local/share/llama-swap/llama-swap --config /home/user/.config/llama-swap/config.yaml --listen 0.0.0.0:8080
+WorkingDirectory=/home/user/.local/share/llama-swap
+Environment=CUDA_DEVICE_ORDER=PCI_BUS_ID
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

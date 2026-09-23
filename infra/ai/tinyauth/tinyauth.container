@@ -1,0 +1,16 @@
+[Unit]
+Description=Tinyauth SSO for code/comfy.kebin.dev
+After=network-online.target
+
+[Container]
+Image=ghcr.io/steveiliop56/tinyauth:v5
+ContainerName=tinyauth
+EnvironmentFile=%h/.config/tinyauth/env
+PublishPort=3000:3000
+Volume=%h/.local/share/tinyauth:/data:Z
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
