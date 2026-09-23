@@ -6,6 +6,8 @@ Homepage and the full self-hosted media stack behind it, as code.
 site/          the homepage served at https://kebin.dev (static HTML + htmx status)
 infra/web/     nginx reverse proxy with HTTP/3, TLS, and the tiny status endpoint
 infra/media/   podman-compose stack: Jellyfin, Seerr, *arr, qBittorrent, Tdarr, Navidrome, FileBrowser, Nextcloud
+infra/ai/      llama-swap model router, OpenCode web, ComfyUI, Tinyauth on the GPU VM
+site/cli/      one-line installers that set up the OpenCode CLI against ai.kebin.dev
 docs/          architecture, port map, runbooks
 ```
 

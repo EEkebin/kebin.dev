@@ -15,6 +15,12 @@
 | music.kebin.dev | 10.0.10.30:4533 | Navidrome |
 | files.kebin.dev | 10.0.10.30:8090 | FileBrowser Quantum, uploads unlimited |
 | cloud.kebin.dev | 10.0.10.30:8081 | Nextcloud, uploads unlimited, well-known redirects for CalDAV/CardDAV |
+| auth.kebin.dev | 10.0.10.100:3000 | Tinyauth login page |
+| code.kebin.dev | 10.0.10.100:4096 | OpenCode web, behind Tinyauth |
+| comfy.kebin.dev | 10.0.10.100:8188 | ComfyUI, behind Tinyauth |
+| pve.kebin.dev | https://10.0.0.200:8006 | Proxmox UI, behind Tinyauth, self-signed upstream |
+| ai.kebin.dev | 10.0.10.100:8080 | model API (llama-swap), bearer key from `/etc/nginx/secrets/ai-key` on the web VM |
+| kebin.dev/cli/ | static | OpenCode CLI installers (install.sh, install.ps1) |
 
 Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
 
