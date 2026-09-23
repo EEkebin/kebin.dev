@@ -25,12 +25,13 @@
     button.danger:hover { background: #2a1414; }
     .empty { color: var(--muted); text-align: center; padding: 30px 0; }
     .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; color: var(--muted); font-size: .85rem; }
-    .back { color: var(--muted); }
-    .back:hover { color: var(--fg); }
+    .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: .85rem; }
+    .back:hover { color: var(--fg); background: var(--card-hover); }
   </style>
 </head>
 <body>
   <main class="wrap">
+    <a class="back" href="https://kebin.dev/">← kebin.dev</a>
     <h1>VR links</h1>
     <p class="lead">Active share links for VRChat players. Revoking one stops playback for anyone using it within a few seconds.</p>
     <div class="toolbar">
@@ -41,7 +42,6 @@
       </div>
     </div>
     <div id="list"></div>
-    <a class="back" href="https://kebin.dev/">← back</a>
   </main>
   <script>
     const api = (p, opt) => fetch('/admin/api' + p, opt).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });

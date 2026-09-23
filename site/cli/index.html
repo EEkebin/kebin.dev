@@ -23,12 +23,13 @@
     pre .copy:hover { color: var(--fg); }
     [data-os] { display: none; }
     body.os-unix [data-os="unix"], body.os-win [data-os="win"] { display: block; }
-    .back { display: inline-block; margin-top: 24px; color: var(--muted); }
-    .back:hover { color: var(--fg); }
+    .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: .85rem; }
+    .back:hover { color: var(--fg); background: var(--card-hover); }
   </style>
 </head>
 <body class="os-unix">
   <main class="wrap">
+    <a class="back" href="/">← kebin.dev</a>
     <h1>OpenCode CLI</h1>
     <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev.</p>
 
@@ -81,8 +82,6 @@ opencode</code></pre>
       <h3>Already have OpenCode?</h3>
       <p>The scripts only add a provider named <strong>aibox</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, key required.</p>
     </div>
-
-    <a class="back" href="/">← back</a>
   </main>
   <script>
     function setOS(os) {
