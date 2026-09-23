@@ -1,6 +1,6 @@
 # Installs the OpenCode CLI on Windows and points it at the kebin.dev model server.
-#   irm https://kebin.dev/cli/install.ps1 | iex
-#   $env:AIBOX_KEY = "..."; irm https://kebin.dev/cli/install.ps1 | iex    (non-interactive)
+#   Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression
+#   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression    (non-interactive)
 $ErrorActionPreference = "Stop"
 $Api = "https://ai.kebin.dev/v1"
 $CfgDir = Join-Path $HOME ".config\opencode"

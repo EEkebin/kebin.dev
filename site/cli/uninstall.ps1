@@ -1,6 +1,6 @@
 # Removes what install.ps1 set up.
-#   irm https://kebin.dev/cli/uninstall.ps1 | iex                       # remove the kebin.dev profile only
-#   $env:AIBOX_UNINSTALL_ALL = "1"; irm https://kebin.dev/cli/uninstall.ps1 | iex   # also remove OpenCode itself
+#   Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression                       # remove the kebin.dev profile only
+#   $env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression   # also remove OpenCode itself
 $ErrorActionPreference = "Stop"
 $CfgDir = Join-Path $HOME ".config\opencode"
 $Cfg = Join-Path $CfgDir "opencode.json"
