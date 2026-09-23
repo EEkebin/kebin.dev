@@ -129,17 +129,14 @@ h2 {
   transition: transform .15s ease, background .15s ease, border-color .15s ease;
 }
 .card:hover { background: var(--card-hover); border-color: #2a2a33; transform: translateY(-1px); }
-.card .icon {
-  width: 40px; height: 40px;
-  display: grid; place-items: center;
+.card .logo {
+  width: 44px; height: 44px;
   border-radius: 10px;
-  background: #15151b;
-  color: var(--accent);
-  margin-bottom: 8px;
-  transition: background .15s ease, transform .15s ease;
+  object-fit: contain;
+  margin-bottom: 10px;
+  transition: transform .15s ease;
 }
-.card .icon svg { width: 22px; height: 22px; }
-.card:hover .icon { background: #1c1c24; transform: scale(1.05); }
+.card:hover .logo { transform: scale(1.06); }
 .card .name { font-weight: 600; font-size: 1.02rem; }
 .status {
   margin-top: 6px;
