@@ -27,6 +27,12 @@ Change the default in Jellyfin → Dashboard → Plugins → VRC Share → Defau
 - First play of a title takes a few seconds while the first segments encode; later viewers start instantly from cache.
 - Subtitles are burned in when a subtitle stream is selected in the share; audio defaults to the first track. Multi-language files: pick the audio index in the share dialog.
 
+## Managing links
+
+`https://vr.kebin.dev/admin/` (portal login, also the VR card on the homepage) lists every active link with title and poster, copies the URL, and revokes links. Revoking stops playback for anyone on that link within seconds. nginx injects the proxy admin key from `/etc/nginx/secrets/vrc-key.conf` on the web VM; the browser never sees it.
+
+The plugin pairs its own key with the proxy on first load (`.paired_admin_key.json` in the cache dir), so the effective admin key is the plugin's `AdminApiKey`, not necessarily the one in compose. If admin calls start returning 401, copy the plugin's key into `VRC_STREAM_KEY` and the nginx secrets file.
+
 ## Operating it
 
 - Cache lives at `/srv/media/cache/vrc-stream`, capped at 20 GB, idle streams cleared after 15 minutes.

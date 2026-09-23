@@ -27,6 +27,7 @@ SERVICES = {
     "code":   "http://10.0.10.100:4096/",
     "comfy":  "http://10.0.10.100:8188/system_stats",
     "pve":    "https://10.0.0.200:8006/",
+    "vr":     f"{MEDIA}:8000/health",
 }
 
 _cache = {}
