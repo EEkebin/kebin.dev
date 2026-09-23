@@ -11,6 +11,8 @@ cd "$REPO"
 # site
 mkdir -p "$WEBROOT"
 rsync -a --delete "$REPO/site/" "$WEBROOT/"
+# pre-compress text assets for gzip_static (level 9, keep originals)
+find "$WEBROOT" -type f \( -name "*.html" -o -name "*.css" -o -name "*.js" -o -name "*.svg" -o -name "*.txt" -o -name "*.sh" -o -name "*.ps1" -o -name "*.json" \) -exec gzip -9 -k -f {} \;
 chown -R nginx:nginx "$WEBROOT"
 
 # nginx: snippets + every server block in the repo
