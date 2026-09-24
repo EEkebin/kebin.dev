@@ -27,4 +27,6 @@ sudo systemctl start media-update.service && sudo tail -20 /var/log/media-update
 systemctl --user start ai-update.service && journalctl --user -u ai-update -n 30 --no-pager
 ```
 
-Config, databases, plugins, users and watch history live in the config volumes under `/srv/media/config`, not in the images. An update swaps the program underneath and nothing else. A container that fails to come back after an update: `podman-compose logs <name>`, and `podman-compose up -d --force-recreate --no-deps <name>` after fixing the cause.
+Config, databases, plugins, users and watch history live in the config volumes under `/srv/media/config`, not in the images. An update swaps the program underneath and nothing else. `update.sh` wraps every recreate in `systemd-run --scope`. Without it the containers' conmon supervisors live in the oneshot unit's cgroup and are killed when the unit ends, which leaves containers that look Up but are dead (the first run did exactly that). If that ever happens again: `sudo /srv/media/revive.sh`, which recreates every container whose conmon pid is gone.
+
+A container that fails to come back after an update: `podman-compose logs <name>`, and `podman-compose up -d --force-recreate --no-deps <name>` after fixing the cause.

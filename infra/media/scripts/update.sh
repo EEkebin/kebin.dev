@@ -7,17 +7,29 @@
 # and refuses to move MAJOR_GUARD services across a major version on their own (Jellyfin plugins are
 # built per major; do that one by hand after checking the plugin catalog). Nextcloud is pinned to a
 # major tag in compose.yml for the same reason. Old images are pruned at the end.
+#
+# Each recreate runs inside its own transient systemd scope (systemd-run --scope). Without that, the
+# containers' conmon supervisors land in media-update.service's cgroup and get killed when the oneshot
+# unit finishes, which leaves containers "Up" but dead. The unit writes stdout to /var/log/media-update.log.
 set -uo pipefail
 cd /srv/media || exit 1
 DRY=0; [ "${1:-}" = "--dry-run" ] && DRY=1
 MAJOR_GUARD="jellyfin"
-LOG=/var/log/media-update.log
-[ "$DRY" = 1 ] || exec > >(tee -a "$LOG") 2>&1
-echo "=== $(date -Is) media update${DRY:+ (dry run)}"
+echo "=== $(date -Is) media update$([ "$DRY" = 1 ] && echo ' (dry run)')"
 
 major() { echo "${1:-0}" | grep -oE '^[0-9]+' || echo 0; }
 ver_of_container() { podman inspect --format '{{index .Config.Labels "org.opencontainers.image.version"}}' "$1" 2>/dev/null; }
-ver_of_image()     { podman image inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "$1" 2>/dev/null; }
+ver_of_image() {
+  local v; v=$(podman image inspect --format '{{index .Labels "org.opencontainers.image.version"}}' "$1" 2>/dev/null)
+  [ -n "$v" ] && echo "$v" || podman image inspect --format '{{.Id}}' "$1" 2>/dev/null | cut -c1-12
+}
+recreate() {
+  if command -v systemd-run >/dev/null 2>&1; then
+    systemd-run --quiet --scope --collect --unit "media-recreate-$1-$RANDOM" podman-compose up -d --force-recreate --no-deps "$1"
+  else
+    podman-compose up -d --force-recreate --no-deps "$1"
+  fi
+}
 
 changed=0; skipped=0
 while read -r svc image; do
@@ -32,9 +44,9 @@ while read -r svc image; do
       skipped=$((skipped+1)); continue
     fi
   fi
-  if [ "$DRY" = 1 ]; then echo "  $svc: would update ($(ver_of_container "$svc" || echo '?') -> $(ver_of_image "$image" || echo '?'))"; changed=$((changed+1)); continue; fi
-  if podman-compose up -d --force-recreate --no-deps "$svc" >/dev/null 2>&1; then
-    echo "  $svc: updated -> $(ver_of_image "$image" || echo "$image")"; changed=$((changed+1))
+  if [ "$DRY" = 1 ]; then echo "  $svc: would update ($(ver_of_container "$svc" || echo '?') -> $(ver_of_image "$image"))"; changed=$((changed+1)); continue; fi
+  if recreate "$svc" >/dev/null 2>&1; then
+    echo "  $svc: updated -> $(ver_of_image "$image")"; changed=$((changed+1))
   else
     echo "  $svc: recreate FAILED, check 'podman-compose logs $svc'"
   fi

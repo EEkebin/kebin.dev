@@ -6,4 +6,6 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=/srv/media/update.sh
+StandardOutput=append:/var/log/media-update.log
+StandardError=append:/var/log/media-update.log
 TimeoutStartSec=2h

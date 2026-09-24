@@ -26,3 +26,5 @@ Symptoms: a subdomain returns 502, or `podman ps` shows a container "Up" that do
    ```
 
 Autostart ordering is handled by `systemd/podman-restart.service.d/wait-for-storage.conf` (waits for `mnt-storage.mount`). A UPS on the NAS and this VM is the real fix.
+
+Shortcut for the zombie sweep: `sudo /srv/media/revive.sh` (`--check` to only list). It tests the conmon pid of every container, which is the only reliable liveness signal; `podman exec` still succeeds on a dead one.
