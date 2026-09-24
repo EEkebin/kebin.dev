@@ -39,3 +39,7 @@ The plugin pairs its own key with the proxy on first load (`.paired_admin_key.js
 - Status: `curl -H "X-Admin-Key: $VRC_STREAM_KEY" http://127.0.0.1:8000/streams` on the media VM.
 - Revoke a link: `DELETE /share/<token>` with the admin key. List: `GET /shares`.
 - The proxy's Jellyfin API key is named `vrc-stream` in Jellyfin → Dashboard → API Keys.
+
+## Admin key: keep three places equal
+
+The proxy's admin key is whatever `JELLYFIN_API_KEY` the container was *created* with (`VRC_STREAM_KEY` in `/srv/media/.env`); the `.paired_admin_key.json` file is only read when that variable is empty. It must equal the VRC Share plugin's `AdminApiKey` (Jellyfin dashboard, plugin settings) and the key in `/etc/nginx/secrets/vrc-key.conf` on the web VM. Symptoms when they drift: vr.kebin.dev/admin/ shows nothing or 401, and the plugin's share/copy button in Jellyfin fails (`POST /share 401` in `podman logs vrc-stream`). After changing `.env`, recreate the container: `podman-compose up -d --force-recreate --no-deps vrc-stream`. A plain restart keeps the old value.
