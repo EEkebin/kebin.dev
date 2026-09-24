@@ -23,7 +23,7 @@ Driver 580 is the last branch that supports all three (Maxwell, Pascal, Volta). 
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
 
-Weekly updates: `ai-update.timer` (Sunday 04:45) runs `update/ai-update.sh`, which does `podman auto-update` for the Quadlets marked `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth) and `opencode upgrade`. llama.cpp, ComfyUI and the models are manual, see `docs/runbooks/updates.md`. The llama-swap dashboard is public at https://ai.kebin.dev/ui/ behind a Tinyauth login (the API under `/v1/` keeps the bearer key).
+Weekly updates: `ai-update.timer` (Sunday 04:45 Pacific, 11:45 on the VM's UTC clock) runs `update/ai-update.sh`, which does `podman auto-update` for the Quadlets marked `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth) and `opencode upgrade`. llama.cpp, ComfyUI and the models are manual, see `docs/runbooks/updates.md`. The llama-swap dashboard is public at https://ai.kebin.dev/ui/ behind a Tinyauth login (the API under `/v1/` keeps the bearer key).
 
 ## Model routing (llama-swap)
 

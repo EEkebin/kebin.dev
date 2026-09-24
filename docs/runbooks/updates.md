@@ -5,7 +5,7 @@ Everything container-based updates itself once a week, early Sunday morning. Not
 | Where | Unit | When | What it does |
 |---|---|---|---|
 | media VM | `media-update.timer` → `/srv/media/update.sh` | Sun 04:30 | pulls every image in `compose.yml`, recreates only containers whose image changed, prunes old images. Log: `/var/log/media-update.log` |
-| ai VM (user units) | `ai-update.timer` → `~/.config/ai-update.sh` | Sun 04:45 | `podman auto-update` for Quadlets with `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth), then `opencode upgrade` and a web UI restart if the version changed |
+| ai VM (user units) | `ai-update.timer` → `~/.config/ai-update.sh` | Sun 04:45 Pacific (11:45 UTC, the VM runs on UTC) | `podman auto-update` for Quadlets with `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth), then `opencode upgrade` and a web UI restart if the version changed |
 | web VM | nothing automatic | | nginx comes from the nginx.org apt repo, `apt upgrade` by hand. Certificates renew via acme.sh's own cron. |
 
 ## What is held back and why
