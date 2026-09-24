@@ -9,6 +9,7 @@ ContainerName=mcp-searxng
 Network=host
 Environment=SEARXNG_URL=http://127.0.0.1:8888
 Environment=MCP_HTTP_PORT=8899
+AutoUpdate=registry
 Environment=MCP_HTTP_HOST=0.0.0.0
 Environment=MCP_HTTP_TRUST_PROXY=true
 Environment=MCP_HTTP_ALLOWED_HOSTS=search.kebin.dev,localhost,127.0.0.1,10.0.10.100

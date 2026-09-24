@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>kebin</title>
-  <meta name="description" content="kebin's corner of the internet. Stream, music, files, cloud, code, comfy and VR.">
+  <meta name="description" content="kebin's corner of the internet. Media, AI and the machines behind them.">
   <meta name="author" content="kebin">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,7 +13,7 @@
   <meta property="og:site_name" content="kebin.dev">
   <meta property="og:url" content="https://kebin.dev/">
   <meta property="og:title" content="kebin.dev">
-  <meta property="og:description" content="kebin's corner of the internet. Stream, music, files, cloud, code, comfy and VR.">
+  <meta property="og:description" content="kebin's corner of the internet. Media, AI and the machines behind them.">
   <meta property="og:image" content="https://kebin.dev/images/banner.png">
   <meta property="og:image:secure_url" content="https://kebin.dev/images/banner.png">
   <meta property="og:image:type" content="image/png">
@@ -22,7 +22,7 @@
   <meta property="og:image:alt" content="kebin's minion next to the words kebin.dev">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="kebin.dev">
-  <meta name="twitter:description" content="kebin's corner of the internet. Stream, music, files, cloud, code, comfy and VR.">
+  <meta name="twitter:description" content="kebin's corner of the internet. Media, AI and the machines behind them.">
   <meta name="twitter:image" content="https://kebin.dev/images/banner.png">
 
   <link rel="icon" type="image/png" href="/images/favicon.png">
@@ -45,60 +45,26 @@
       <h1>kebin</h1>
     </header>
 
-    <section class="apps" aria-label="Apps">
-      <div class="grid">
-        <a class="card" href="https://stream.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/stream.png" alt="" width="40" height="40">
-          <span class="name">Stream</span>
-          <span class="status" hx-get="/api/status?svc=stream" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://seerr.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/seerr.svg" alt="" width="40" height="40">
-          <span class="name">Seerr</span>
-          <span class="status" hx-get="/api/status?svc=seerr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://music.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/music.png" alt="" width="40" height="40">
-          <span class="name">Music</span>
-          <span class="status" hx-get="/api/status?svc=music" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://files.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/files.svg" alt="" width="40" height="40">
-          <span class="name">Files</span>
-          <span class="status" hx-get="/api/status?svc=files" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://cloud.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/cloud.png" alt="" width="40" height="40">
-          <span class="name">Cloud</span>
-          <span class="status" hx-get="/api/status?svc=cloud" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://code.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/code.svg" alt="" width="40" height="40">
-          <span class="name">Code</span>
-          <span class="status" hx-get="/api/status?svc=code" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://comfy.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/comfy.svg" alt="" width="40" height="40">
-          <span class="name">Comfy</span>
-          <span class="status" hx-get="/api/status?svc=comfy" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://pve.kebin.dev" target="_blank" rel="noopener">
-          <img class="logo" src="/images/apps/pve.png" alt="" width="40" height="40">
-          <span class="name">Proxmox</span>
-          <span class="status" hx-get="/api/status?svc=pve" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="https://vr.kebin.dev/admin/">
-          <img class="logo" src="/images/apps/vr.svg" alt="" width="40" height="40">
-          <span class="name">VR</span>
-          <span class="status" hx-get="/api/status?svc=vr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
-        </a>
-        <a class="card" href="/cli/">
-          <img class="logo" src="/images/apps/cli.svg" alt="" width="40" height="40">
-          <span class="name">CLI</span>
-          <span class="status"><span class="dot up"></span>install</span>
-        </a>
-      </div>
-    </section>
+    <nav class="groups" aria-label="Sections">
+      <a class="gcard" href="/media/">
+        <svg class="gicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3 9h18M8 5v4M16 5v4M10 12.5v4l3.5-2z"/></svg>
+        <span class="gname">Media</span>
+        <span class="gdesc">Stream, Seerr, Music, Files, Cloud, VR and the arr stack</span>
+        <span class="status" hx-get="/api/status?group=media-all" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+      </a>
+      <a class="gcard" href="/ai/">
+        <svg class="gicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8zM5 16l.6 1.4 1.4.6-1.4.6L5 20l-.6-1.4L3 18l1.4-.6z"/></svg>
+        <span class="gname">AI</span>
+        <span class="gdesc">Code, Comfy, Search, Models and the CLI installer</span>
+        <span class="status" hx-get="/api/status?group=ai" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+      </a>
+      <a class="gcard" href="/system/">
+        <svg class="gicon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01M11 7.5h6M11 16.5h6"/></svg>
+        <span class="gname">System</span>
+        <span class="gdesc">Proxmox and the portal login</span>
+        <span class="status" hx-get="/api/status?group=system" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+      </a>
+    </nav>
 
     <footer>
       <span>© <span id="y">2026</span> kebin</span>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Media · kebin</title>
+  <meta name="description" content="kebin.dev media: stream, requests, music, files, cloud, VR and the arr stack.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffd23f">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+</head>
+<body class="page">
+  <main class="wrap">
+    <a class="back" href="/">← kebin.dev</a>
+    <h1>Media</h1>
+    <p class="lead">Watch, listen, request, store. The arr stack that feeds it lives one level down.</p>
+
+    <section aria-label="Media apps">
+      <div class="grid">
+        <a class="card" href="https://stream.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/stream.png" alt="" width="40" height="40">
+          <span class="name">Stream</span>
+          <span class="status" hx-get="/api/status?svc=stream" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://seerr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/seerr.svg" alt="" width="40" height="40">
+          <span class="name">Seerr</span>
+          <span class="status" hx-get="/api/status?svc=seerr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://music.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/music.png" alt="" width="40" height="40">
+          <span class="name">Music</span>
+          <span class="status" hx-get="/api/status?svc=music" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://files.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/files.svg" alt="" width="40" height="40">
+          <span class="name">Files</span>
+          <span class="status" hx-get="/api/status?svc=files" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://cloud.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/cloud.png" alt="" width="40" height="40">
+          <span class="name">Cloud</span>
+          <span class="status" hx-get="/api/status?svc=cloud" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://vr.kebin.dev/admin/">
+          <img class="logo" src="/images/apps/vr.svg" alt="" width="40" height="40">
+          <span class="name">VR</span>
+          <span class="status" hx-get="/api/status?svc=vr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card card-group" href="/media/arr/">
+          <img class="logo" src="/images/apps/arr.svg" alt="" width="40" height="40">
+          <span class="name">Arr stack</span>
+          <span class="status" hx-get="/api/status?group=arr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="y">2026</span> kebin</span>
+    </footer>
+  </main>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>

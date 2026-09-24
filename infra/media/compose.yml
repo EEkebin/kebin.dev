@@ -228,7 +228,7 @@ services:
     restart: always
 
   nextcloud:
-    image: docker.io/library/nextcloud:apache
+    image: docker.io/library/nextcloud:34-apache  # major pinned on purpose: Nextcloud cannot skip majors, bump by hand
     container_name: nextcloud
     depends_on:
       - nextcloud-db
@@ -256,7 +256,7 @@ services:
     restart: always
 
   nextcloud-cron:
-    image: docker.io/library/nextcloud:apache
+    image: docker.io/library/nextcloud:34-apache  # major pinned on purpose: Nextcloud cannot skip majors, bump by hand
     container_name: nextcloud-cron
     entrypoint: /cron.sh
     depends_on:

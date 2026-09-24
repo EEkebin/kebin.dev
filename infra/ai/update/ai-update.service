@@ -1,0 +1,8 @@
+[Unit]
+Description=Weekly ai VM update (container images with AutoUpdate=registry, OpenCode)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/ai-update.sh
+TimeoutStartSec=1h

@@ -1,0 +1,9 @@
+[Unit]
+Description=Weekly image update for the media stack (/srv/media/update.sh)
+After=network-online.target mnt-storage.mount
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/srv/media/update.sh
+TimeoutStartSec=2h

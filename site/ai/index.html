@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AI · kebin</title>
+  <meta name="description" content="kebin.dev AI: OpenCode, ComfyUI, SearXNG, the model router and the CLI installer.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffd23f">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+</head>
+<body class="page">
+  <main class="wrap">
+    <a class="back" href="/">← kebin.dev</a>
+    <h1>AI</h1>
+    <p class="lead">Everything on the V100. Portal login for the pages, API key for the CLI.</p>
+
+    <section aria-label="AI apps">
+      <div class="grid">
+        <a class="card" href="https://code.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/code.svg" alt="" width="40" height="40">
+          <span class="name">Code</span>
+          <span class="status" hx-get="/api/status?svc=code" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://comfy.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/comfy.svg" alt="" width="40" height="40">
+          <span class="name">Comfy</span>
+          <span class="status" hx-get="/api/status?svc=comfy" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://search.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/searxng.svg" alt="" width="40" height="40">
+          <span class="name">Search</span>
+          <span class="status" hx-get="/api/status?svc=search" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://ai.kebin.dev/ui/" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/models.svg" alt="" width="40" height="40">
+          <span class="name">Models</span>
+          <span class="status" hx-get="/api/status?svc=models" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="/cli/">
+          <img class="logo" src="/images/apps/cli.svg" alt="" width="40" height="40">
+          <span class="name">CLI</span>
+          <span class="status"><span class="dot up"></span>install</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="y">2026</span> kebin</span>
+    </footer>
+  </main>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>

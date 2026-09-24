@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>System · kebin</title>
+  <meta name="description" content="kebin.dev system: Proxmox and the portal login.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffd23f">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+</head>
+<body class="page">
+  <main class="wrap">
+    <a class="back" href="/">← kebin.dev</a>
+    <h1>System</h1>
+    <p class="lead">The machines under all of it, and the login that guards the admin pages.</p>
+
+    <section aria-label="System">
+      <div class="grid">
+        <a class="card" href="https://pve.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/pve.png" alt="" width="40" height="40">
+          <span class="name">Proxmox</span>
+          <span class="status" hx-get="/api/status?svc=pve" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://auth.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/tinyauth.svg" alt="" width="40" height="40">
+          <span class="name">Login</span>
+          <span class="status" hx-get="/api/status?svc=auth" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="y">2026</span> kebin</span>
+    </footer>
+  </main>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>

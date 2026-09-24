@@ -4,6 +4,7 @@ After=network-online.target
 
 [Container]
 Image=ghcr.io/steveiliop56/tinyauth:v5
+AutoUpdate=registry
 ContainerName=tinyauth
 EnvironmentFile=%h/.config/tinyauth/env
 PublishPort=3000:3000

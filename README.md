@@ -3,7 +3,7 @@
 Homepage and the full self-hosted media stack behind it, as code.
 
 ```
-site/          the homepage served at https://kebin.dev (static HTML + htmx status)
+site/          the homepage served at https://kebin.dev (static HTML + htmx status), sections /media/, /media/arr/, /ai/, /system/
 infra/web/     nginx reverse proxy with HTTP/3, TLS, and the tiny status endpoint
 infra/media/   podman-compose stack: Jellyfin, Seerr, *arr, qBittorrent, Tdarr, Navidrome, FileBrowser, Nextcloud
 infra/ai/      llama-swap model router, OpenCode web, ComfyUI, Tinyauth on the GPU VM
@@ -42,4 +42,4 @@ sudo infra/media/scripts/wire.sh --credentials
 
 ## Secrets
 
-Nothing sensitive lives in this repo. `bootstrap.sh` generates `/srv/media/.env` on first run; the *arr API keys are created by the apps themselves. `.gitignore` blocks `.env`, `CREDENTIALS.md`, databases and runtime config directories. See [docs/runbooks/credentials.md](docs/runbooks/credentials.md).
+Nothing sensitive lives in this repo. `bootstrap.sh` generates `/srv/media/.env` on first run; the *arr API keys are created by the apps themselves. `.gitignore` blocks `.env`, `CREDENTIALS.md`, databases and runtime config directories. Where each secret lives on the web VM is in [infra/web/README.md](infra/web/README.md). Weekly automatic updates: [docs/runbooks/updates.md](docs/runbooks/updates.md).

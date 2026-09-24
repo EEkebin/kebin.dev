@@ -32,6 +32,18 @@ mkdir -p /etc/nginx/ssl/kebin.dev
 
 acme.sh installs its own cron entry and renews about 30 days before expiry. The Porkbun keys are stored by acme.sh in `/root/.acme.sh/account.conf` and nowhere in this repo.
 
+## Secrets on the web VM (not in the repo)
+
+`/etc/nginx/secrets/`, root:nginx 640:
+
+| File | Used by | Content |
+|---|---|---|
+| `ai-key-map.conf` | `00-map.conf` (http context) | `map $http_authorization $ai_key_ok { default 0; "Bearer <key>" 1; }` — the ai.kebin.dev / search.kebin.dev API key |
+| `ai-key-subfilter.conf` | `kebin.dev.conf`, the `/cli/` page | `sub_filter "__AIBOX_KEY__" "<key>"; sub_filter_once off; sub_filter_types text/html;` |
+| `vrc-key.conf` | `vr.kebin.dev.conf` `/admin/api/` | `proxy_set_header X-Admin-Key "<key>"; proxy_set_header Authorization 'MediaBrowser Token="<key>"';` |
+
+Rotate the API key by editing the first two files and `systemctl reload nginx`; the CLI page shows the new key after a fresh login.
+
 ## Layout
 
 - `nginx/conf.d/00-default.conf` drops any hostname without its own block (returns 444) on 80 and 443.

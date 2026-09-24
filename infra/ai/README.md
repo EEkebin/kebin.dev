@@ -18,10 +18,12 @@ Driver 580 is the last branch that supports all three (Maxwell, Pascal, Volta). 
 | `opencode-web.service` | 0.0.0.0:4096 | OpenCode web UI + API, workspace `/srv/code/projects` |
 | `comfyui.service` | 0.0.0.0:8188 | ComfyUI, default device CUDA0, fp32 VAE (fp16 VAE produces black images on Volta) |
 | `tinyauth.service` (Quadlet) | 0.0.0.0:3000 | login page for code/comfy, used by nginx `auth_request` |
-| `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled |
+| `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled; its page is search.kebin.dev behind Tinyauth |
 | `mcp-searxng.service` (Quadlet) | 0.0.0.0:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
+
+Weekly updates: `ai-update.timer` (Sunday 04:45) runs `update/ai-update.sh`, which does `podman auto-update` for the Quadlets marked `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth) and `opencode upgrade`. llama.cpp, ComfyUI and the models are manual, see `docs/runbooks/updates.md`. The llama-swap dashboard is public at https://ai.kebin.dev/ui/ behind a Tinyauth login (the API under `/v1/` keeps the bearer key).
 
 ## Model routing (llama-swap)
 
@@ -55,7 +57,7 @@ The V100 is shared by the LLM and ComfyUI. llama-swap's `ttl` unloads an idle mo
 
 1. `prep.sh` — stops legacy units, installs git/uv/OpenCode/llama-swap, Python 3.12.
 2. `llama-swap/` config + unit, `opencode/` config + unit, `tinyauth/` env template + Quadlet, `comfyui/install.sh` (venv, torch cu126, ComfyUI + Manager, SDXL base, unit).
-3. `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`).
+3. `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`); `update/` script + user units (`ai-update.sh` goes to `~/.config/`, the units to `~/.config/systemd/user/`, then `systemctl --user enable --now ai-update.timer`).
 4. Public side: `infra/web/nginx/conf.d/{auth,code,comfy}.kebin.dev.conf` and `snippets/tinyauth.conf`; DNS A records for the same names.
 
 ## Storage note

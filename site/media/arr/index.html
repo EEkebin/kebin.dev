@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Arr stack · kebin</title>
+  <meta name="description" content="kebin.dev arr stack: Sonarr, Radarr, Lidarr, Prowlarr, Bazarr, qBittorrent and Tdarr.">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffd23f">
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.4/htmx.min.js" defer></script>
+</head>
+<body class="page">
+  <main class="wrap">
+    <a class="back" href="/media/">← Media</a>
+    <h1>Arr stack</h1>
+    <p class="lead">Automation behind the media. All of these ask for the portal login first.</p>
+
+    <section aria-label="Arr apps">
+      <div class="grid">
+        <a class="card" href="https://sonarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/sonarr.svg" alt="" width="40" height="40">
+          <span class="name">Sonarr</span>
+          <span class="status" hx-get="/api/status?svc=sonarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://radarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/radarr.svg" alt="" width="40" height="40">
+          <span class="name">Radarr</span>
+          <span class="status" hx-get="/api/status?svc=radarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://lidarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/lidarr.svg" alt="" width="40" height="40">
+          <span class="name">Lidarr</span>
+          <span class="status" hx-get="/api/status?svc=lidarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://prowlarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/prowlarr.svg" alt="" width="40" height="40">
+          <span class="name">Prowlarr</span>
+          <span class="status" hx-get="/api/status?svc=prowlarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://bazarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/bazarr.svg" alt="" width="40" height="40">
+          <span class="name">Bazarr</span>
+          <span class="status" hx-get="/api/status?svc=bazarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://qbittorrent.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/qbittorrent.svg" alt="" width="40" height="40">
+          <span class="name">qBittorrent</span>
+          <span class="status" hx-get="/api/status?svc=qbittorrent" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://tdarr.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/tdarr.svg" alt="" width="40" height="40">
+          <span class="name">Tdarr</span>
+          <span class="status" hx-get="/api/status?svc=tdarr" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© <span id="y">2026</span> kebin</span>
+    </footer>
+  </main>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>

@@ -171,3 +171,54 @@ footer {
   .avatar { height: 240px; }
   h1 { font-size: 1.7rem; }
 }
+
+/* section cards on the home page */
+.groups {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 30px;
+}
+.gcard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 22px 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.gcard:hover { background: var(--card-hover); border-color: #2a2a33; transform: translateY(-2px); }
+.gicon { width: 34px; height: 34px; color: var(--accent); margin-bottom: 6px; transition: transform .15s ease; }
+.gcard:hover .gicon { transform: scale(1.08); }
+.gname { font-weight: 700; font-size: 1.05rem; }
+.gdesc { font-size: .78rem; color: var(--muted); line-height: 1.35; min-height: 2.7em; }
+.gcard .status { margin-top: 8px; }
+.dot.part { background: var(--accent); box-shadow: 0 0 6px rgba(255, 210, 63, .6); }
+@media (max-width: 560px) {
+  .groups { grid-template-columns: 1fr; }
+  .gdesc { min-height: 0; }
+}
+
+/* sub pages */
+.page .wrap { max-width: 720px; }
+.page h1 { text-align: center; margin-top: 0; }
+.page .lead { color: var(--muted); text-align: center; margin: 0 0 6px; }
+.page .grid { margin-top: 22px; }
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 18px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--muted);
+  font-size: .85rem;
+}
+.back:hover { color: var(--fg); background: var(--card-hover); }
+.card-group .logo { padding: 2px; }
