@@ -234,7 +234,7 @@ footer {
 
 /* kebinImports page */
 .ki-hero { text-align: center; }
-.ki-banner { width: 100%; height: auto; display: block; border-radius: var(--radius); border: 1px solid var(--line); margin-bottom: 18px; }
+.ki-banner { width: 100%; height: auto; display: block; margin-bottom: 18px; }
 .ki-release { font-size: .8rem; color: var(--muted); margin: 6px 0 0; min-height: 1.2em; visibility: hidden; }
 .ki-release.on { visibility: visible; }
 .ki-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 22px; }
