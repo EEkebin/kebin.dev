@@ -247,7 +247,7 @@ footer {
 .ki-feature p, .ki-lists p { margin: 0; font-size: .88rem; color: var(--muted); }
 .ki-shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .ki-shots figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-.ki-shots img { width: 100%; height: auto; display: block; }
+.ki-shots img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; object-position: top; display: block; }
 .ki-shots figcaption { font-size: .8rem; color: var(--muted); padding: 8px 12px; }
 .ki-shots figure.empty img { display: none; }
 .ki-shots figure.empty::before {
