@@ -226,6 +226,7 @@ footer {
 /* projects row on the home page */
 .projects { margin-top: 12px; }
 .pcard { gap: 14px; padding: 12px 16px; }
+.pcard picture { display: flex; flex: none; }
 .pcard .plogo { width: 44px; height: 44px; border-radius: 50%; flex: none; }
 .pcard .ptext { display: flex; flex-direction: column; line-height: 1.3; }
 .pcard .pname { font-weight: 700; }
