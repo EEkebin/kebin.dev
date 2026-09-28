@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>kebinImports · kebin</title>
+  <meta name="description" content="kebinImports: a Unity menu that installs, updates and fixes the tools VRChat avatar and world creators use.">
+  <meta name="author" content="kebin">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffd23f">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="kebin.dev">
+  <meta property="og:url" content="https://kebinimports.kebin.dev/">
+  <meta property="og:title" content="kebinImports">
+  <meta property="og:description" content="A Unity menu that installs, updates and fixes the tools VRChat avatar and world creators use.">
+  <meta property="og:image" content="https://kebinimports.kebin.dev/img/banner.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1000">
+  <meta property="og:image:height" content="500">
+  <meta property="og:image:alt" content="kebin's minion next to the word kebinImports">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://kebinimports.kebin.dev/img/banner.png">
+
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body class="page ki">
+  <main class="wrap">
+    <a class="back" href="https://kebin.dev/">← kebin.dev</a>
+
+    <header class="ki-hero">
+      <img class="ki-banner" src="/img/banner.png" alt="kebinImports" width="1000" height="500" fetchpriority="high">
+      <p class="lead">One Unity menu that installs, updates and fixes the tools VRChat avatar and world creators use.</p>
+      <ul class="chips">
+        <li>Unity 2022.3.22f1</li>
+        <li>VRChat Creator Companion &amp; ALCOM</li>
+        <li>Windows</li>
+        <li>Free &amp; open source (GPL-3.0)</li>
+      </ul>
+      <p class="ki-release" id="release">Latest release on GitHub</p>
+    </header>
+
+    <div class="ki-actions">
+      <a class="btn ki-primary" href="vcc://vpm/addRepo?url=https%3A%2F%2Feekebin.github.io%2FkebinImports%2Findex.json">Add to VCC / ALCOM</a>
+      <a class="btn" href="https://github.com/EEkebin/kebinImports/releases/latest/download/kebinImports.unitypackage">Download .unitypackage</a>
+      <a class="btn" href="https://github.com/EEkebin/kebinImports" target="_blank" rel="noopener">GitHub</a>
+    </div>
+
+    <h2>What it does</h2>
+    <div class="ki-features">
+      <div class="ki-feature">
+        <h3>Essentials</h3>
+        <p>Avatar Essentials and World Essentials install your whole starter set in one click. Pick what goes in it with Customize Essentials.</p>
+      </div>
+      <div class="ki-feature">
+        <h3>Project Doctor</h3>
+        <p>Finds what's wrong and offers a fix. Pink materials? It tells you they use lilToon and installs it. Missing scripts? It names the tool they came from.</p>
+      </div>
+      <div class="ki-feature">
+        <h3>Ask kebinAI</h3>
+        <p>An AI that works inside your project: materials, shaders, PhysBones, installs and fixes. It asks before changing anything, and every change can be undone.</p>
+      </div>
+      <div class="ki-feature">
+        <h3>Real installs</h3>
+        <p>Tools come from their official VPM listings, verified and added to your manifest, so the Creator Companion can keep updating them.</p>
+      </div>
+      <div class="ki-feature">
+        <h3>Quick Fixes</h3>
+        <p>Fix Materials, Remove Missing Scripts, Fix Scripting Define Symbols, and a panic button that resets everything.</p>
+      </div>
+      <div class="ki-feature">
+        <h3>Load AssetBundle</h3>
+        <p>Right-click a .vrca, .vrcw or .vrcp file to preview what's inside, without saving anything into the project.</p>
+      </div>
+    </div>
+
+    <h2>Screenshots</h2>
+    <div class="ki-shots">
+      <figure><img src="/shots/menu.png" alt="The kebinImports menu in Unity" loading="lazy"><figcaption>The kebinImports menu</figcaption></figure>
+      <figure><img src="/shots/doctor.png" alt="The Project Doctor window" loading="lazy"><figcaption>Project Doctor</figcaption></figure>
+      <figure><img src="/shots/kebinai.png" alt="The kebinAI chat window" loading="lazy"><figcaption>Ask kebinAI</figcaption></figure>
+      <figure><img src="/shots/essentials.png" alt="The Customize Essentials window" loading="lazy"><figcaption>Customize Essentials</figcaption></figure>
+    </div>
+
+    <h2>Install</h2>
+    <p class="ki-note">Pick one. All three put kebinImports in <code>Packages/</code>, not <code>Assets/</code>, and give you the same <b>kebinImports</b> menu in Unity.</p>
+
+    <details class="ki-step" open>
+      <summary>VRChat Creator Companion / ALCOM <span class="ki-tag">recommended</span></summary>
+      <ol>
+        <li>Click <b>Add to VCC / ALCOM</b> above. Or open <b>Settings › Packages › Add Repository</b> and paste this link:
+          <div class="ki-copy"><code id="listing">https://eekebin.github.io/kebinImports/index.json</code><button type="button" data-copy="listing">Copy</button></div>
+        </li>
+        <li>Open your project's <b>Manage Project</b> page, find <b>kebinImports</b> and click <b>+</b>.</li>
+        <li>Open the project in Unity. The <b>kebinImports</b> menu is in the menu bar, and updates show up in the Creator Companion.</li>
+      </ol>
+    </details>
+
+    <details class="ki-step">
+      <summary>Unity Package Manager</summary>
+      <ol>
+        <li>Download <code>dev.kebin.kebinimports-&lt;version&gt;.tgz</code> from the <a href="https://github.com/EEkebin/kebinImports/releases/latest" target="_blank" rel="noopener">latest release</a>.</li>
+        <li>In Unity open <b>Window › Package Manager</b>, click <b>+</b> and choose <b>Add package from tarball…</b></li>
+        <li>Pick the <code>.tgz</code> file.</li>
+      </ol>
+    </details>
+
+    <details class="ki-step">
+      <summary>.unitypackage</summary>
+      <ol>
+        <li><a href="https://github.com/EEkebin/kebinImports/releases/latest/download/kebinImports.unitypackage">Download kebinImports.unitypackage</a>.</li>
+        <li>Drag it into Unity's Project window, or double-click it with the project open.</li>
+        <li>Click <b>Import</b>. If an old copy is still in <code>Assets/kebinImports</code>, the Project Doctor offers to remove it.</li>
+      </ol>
+    </details>
+
+    <h2>What it can install</h2>
+    <div class="ki-lists">
+      <div><h3>Shaders</h3><p>Unity Toon Shader 3 · lilToon · Poiyomi Toon Shader · Unity-Chan Toon Shader 2 · Xiexe's Unity Shaders · Mochie's Unity Shaders · reroStandard</p></div>
+      <div><h3>Avatar tools</h3><p>Modular Avatar · VRCFury · DressingTools · Pumkin's Avatar Tools · ComboGestureExpressions · Avatar Performance Tools · Gesture Manager · Av3Emulator · Muscle Animation Editor*</p></div>
+      <div><h3>World tools</h3><p>VRWorld Toolkit · AudioLink</p></div>
+      <div><h3>VRChat SDK</h3><p>Avatars and Worlds SDK, for plain Unity projects</p></div>
+    </div>
+    <p class="ki-note">* Paid asset: you need to own it. If one of these tools is yours and you'd rather it not be offered here, reach out on <a href="https://discord.com/users/668262984463810590" target="_blank" rel="noopener">Discord</a>.</p>
+
+    <h2>Links</h2>
+    <a class="btn" href="https://github.com/EEkebin/kebinImports/releases" target="_blank" rel="noopener">All releases &amp; changelog</a>
+    <a class="btn" href="https://github.com/EEkebin/kebinImports/issues" target="_blank" rel="noopener">Report a problem</a>
+    <a class="btn" href="https://discord.com/users/668262984463810590" target="_blank" rel="noopener">Discord · eekebin</a>
+    <a class="btn" href="https://paypal.me/kebinImports" target="_blank" rel="noopener">Donate · PayPal</a>
+    <a class="btn" href="https://cash.app/$kebinImports" target="_blank" rel="noopener">Donate · Cash App</a>
+
+    <footer>
+      <p class="ki-legal">Not affiliated with Unity Technologies or VRChat Inc. Unity and VRChat are trademarks of their owners.</p>
+      <span>© <span id="y">2026</span> kebin</span>
+    </footer>
+  </main>
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+    // screenshots that haven't been added yet show as an empty slot
+    document.querySelectorAll('.ki-shots img').forEach(function (img) {
+      function empty() { img.closest('figure').classList.add('empty'); }
+      if (img.complete && !img.naturalWidth) empty(); else img.addEventListener('error', empty);
+    });
+    document.querySelectorAll('[data-copy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent).then(function () {
+          b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+        });
+      });
+    });
+    fetch('https://api.github.com/repos/EEkebin/kebinImports/releases/latest')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (r) {
+        if (!r || !r.tag_name) return;
+        var el = document.getElementById('release');
+        el.textContent = 'Latest: ' + (r.name ? r.name + ' · ' : '') + r.tag_name;
+        el.classList.add('on');
+      })
+      .catch(function () {});
+  </script>
+</body>
+</html>

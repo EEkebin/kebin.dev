@@ -3,6 +3,7 @@
 | Public name | Backend | Notes |
 |---|---|---|
 | kebin.dev | web VM, `/var/www/kebin.dev` + `127.0.0.1:8765` for `/api/status` | homepage; sections at `/media/`, `/media/arr/`, `/ai/`, `/system/` |
+| kebinimports.kebin.dev | web VM, `/var/www/kebin.dev/kebinimports` | kebinImports project page, static; `kebin.dev/kebinimports` redirects here |
 | stream.kebin.dev | 10.0.10.30:8096 | Jellyfin, WebSocket |
 | seerr.kebin.dev | 10.0.10.30:5055 | Seerr |
 | sonarr.kebin.dev | 10.0.10.30:8989 | admin, behind Tinyauth, then the app's own login |

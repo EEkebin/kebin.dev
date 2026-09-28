@@ -48,7 +48,7 @@ Rotate the API key by editing the first two files and `systemctl reload nginx`; 
 
 - `nginx/conf.d/00-default.conf` drops any hostname without its own block (returns 444) on 80 and 443.
 - `nginx/conf.d/00-map.conf` WebSocket upgrade map.
-- `nginx/conf.d/<name>.kebin.dev.conf` one file per subdomain, all reverse proxies to the media VM except `kebin.dev.conf` which serves `site/` and proxies `/api/status` to the status service.
+- `nginx/conf.d/<name>.kebin.dev.conf` one file per subdomain, reverse proxies except `kebin.dev.conf`, which serves `site/` and proxies `/api/status` to the status service, and `kebinimports.kebin.dev.conf`, which serves `site/kebinimports/` (screenshots go in `site/kebinimports/shots/`, named as in its `index.html`).
 - `nginx/snippets/tls.conf` protocols, ciphers, Alt-Svc for HTTP/3, HSTS. `snippets/proxy.conf` headers and timeouts for the proxies.
 - `status/status.py` reachability endpoint on 127.0.0.1:8765, run by `kebin-status.service` as `nobody`. Add a service by editing the `SERVICES` dict.
 - `deploy.sh` idempotent deploy of everything above.

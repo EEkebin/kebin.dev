@@ -222,3 +222,55 @@ footer {
 }
 .back:hover { color: var(--fg); background: var(--card-hover); }
 .card-group .logo { padding: 2px; }
+
+/* projects row on the home page */
+.projects { margin-top: 12px; }
+.pcard { gap: 14px; padding: 12px 16px; }
+.pcard .plogo { width: 44px; height: 44px; border-radius: 50%; flex: none; }
+.pcard .ptext { display: flex; flex-direction: column; line-height: 1.3; }
+.pcard .pname { font-weight: 700; }
+.pcard .pdesc { font-size: .8rem; color: var(--muted); font-weight: 400; }
+.pcard .parrow { margin-left: auto; color: var(--muted); }
+
+/* kebinImports page */
+.ki-hero { text-align: center; }
+.ki-banner { width: 100%; height: auto; display: block; border-radius: var(--radius); border: 1px solid var(--line); margin-bottom: 18px; }
+.ki-release { font-size: .8rem; color: var(--muted); margin: 6px 0 0; min-height: 1.2em; visibility: hidden; }
+.ki-release.on { visibility: visible; }
+.ki-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 22px; }
+.ki-actions .btn { justify-content: center; margin: 0; text-align: center; }
+.ki-primary { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+.ki-primary:hover { background: #ffdc66; border-color: #ffdc66; }
+.ki h3 { font-size: 1rem; margin: 0 0 4px; }
+.ki-features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ki-feature, .ki-lists > div { padding: 14px 16px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); }
+.ki-feature p, .ki-lists p { margin: 0; font-size: .88rem; color: var(--muted); }
+.ki-shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ki-shots figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.ki-shots img { width: 100%; height: auto; display: block; }
+.ki-shots figcaption { font-size: .8rem; color: var(--muted); padding: 8px 12px; }
+.ki-shots figure.empty img { display: none; }
+.ki-shots figure.empty::before {
+  content: "Screenshot coming soon";
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 16 / 10; margin: 10px 10px 0;
+  border: 1px dashed #2a2a33; border-radius: 10px;
+  font-size: .8rem; color: var(--wait);
+}
+.ki-note { font-size: .88rem; color: var(--muted); }
+.ki code { font-size: .85em; background: var(--card-hover); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+.ki a:not(.btn):not(.back) { color: var(--accent); }
+.ki-step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 10px; }
+.ki-step summary { cursor: pointer; padding: 13px 16px; font-weight: 600; }
+.ki-step ol { margin: 0; padding: 0 20px 14px 38px; color: var(--muted); font-size: .92rem; }
+.ki-step li { margin-bottom: 6px; }
+.ki-step b { color: var(--fg); }
+.ki-tag { font-size: .7rem; font-weight: 600; color: #000; background: var(--accent); border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; }
+.ki-copy { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+.ki-copy code { word-break: break-all; }
+.ki-copy button { font: inherit; font-size: .78rem; color: var(--fg); background: var(--card-hover); border: 1px solid #2a2a33; border-radius: 8px; padding: 3px 10px; cursor: pointer; }
+.ki-lists { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.ki-legal { font-size: .75rem; margin: 0 0 6px; }
+@media (max-width: 560px) {
+  .ki-actions, .ki-features, .ki-shots, .ki-lists { grid-template-columns: 1fr; }
+}
