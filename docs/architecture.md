@@ -31,7 +31,7 @@ Navidrome indexes `Media/Music` hourly. FileBrowser and Nextcloud see the whole 
 
 ## Discover inside Jellyfin
 
-JellyBridge (Jellyfin plugin) pulls streaming-catalog titles from Seerr into a "Discover" library made of placeholder clips. Favoriting one sends a Seerr request. Jellyfin 12 ignores `.ignore` files, so a systemd timer (`jellybridge-prune`) removes titles already owned. See the runbook.
+JellyBridge (Jellyfin plugin) pulls streaming-catalog titles from Seerr into a "Discover" library made of placeholder clips. Jellyfin Enhanced (plugin) puts live Seerr results with a Request button into Jellyfin's own search; see `runbooks/jellyfin-plugins.md`. Favoriting one sends a Seerr request. Jellyfin 12 ignores `.ignore` files, so a systemd timer (`jellybridge-prune`) removes titles already owned. See the runbook.
 
 ## Transcoding
 
