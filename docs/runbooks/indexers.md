@@ -16,6 +16,12 @@ All indexers are public, added in Prowlarr (prowlarr.kebin.dev) and pushed to So
 
 Anime in Sonarr: set the series type to **Anime** when adding a show. Sonarr then searches the anime category (5070) with absolute episode numbers, plus the standard SxxEyy form (Prowlarr's "Sync Anime Standard Format Search" is on).
 
+## How often the apps poll
+
+Once a day. The built-in "RSS Sync Interval" in Sonarr, Radarr and Lidarr is set to **0 (off)**; it only accepts 10 to 120 minutes, and at the 15 and 30 minute defaults three apps sent about 930 page loads a day to a single indexer, which got the home IPv4 address banned by 1337x.to on 2026-10-01 (IPv6 was unaffected, which is why a desktop browser still reached it). `media-rss-daily.timer` (05:00) runs `/srv/media/rss-daily.sh`, which asks each app for one `RssSync`; log in `/var/log/media-rss-daily.log`. Requests from Seerr and manual searches are unaffected: they search immediately.
+
+Do not raise the built-in interval again. To check more often, change `OnCalendar` in the timer.
+
 ## Adding one
 
 Prowlarr → Indexers → Add. Leave tags empty first; if the test says Cloudflare, add the `flaresolverr` tag (the FlareSolverr proxy is bound to that tag). If the first base URL fails, pick another from the dropdown. After saving, Prowlarr syncs it to the apps within a minute; an app refuses an indexer whose test feed has no results in that app's categories.

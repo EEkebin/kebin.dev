@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily feed check for Sonarr, Radarr and Lidarr (/srv/media/rss-daily.sh)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/srv/media/rss-daily.sh
+StandardOutput=append:/var/log/media-rss-daily.log
+StandardError=append:/var/log/media-rss-daily.log

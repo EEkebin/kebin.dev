@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily feed check for the arr apps (05:00)
+
+[Timer]
+OnCalendar=*-*-* 05:00:00
+RandomizedDelaySec=20m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

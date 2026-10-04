@@ -51,6 +51,10 @@ run install -m 644 "$HERE/systemd/podman-restart.service.d/wait-for-storage.conf
 run systemctl daemon-reload
 run systemctl enable --now podman-restart.service
 run systemctl enable --now jellybridge-prune.timer
+run install -m 755 "$HERE/scripts/rss-daily.sh" "$DEST/rss-daily.sh"
+run install -m 644 "$HERE/systemd/media-rss-daily.service" "$HERE/systemd/media-rss-daily.timer" /etc/systemd/system/
+run systemctl daemon-reload
+run systemctl enable --now media-rss-daily.timer
 
 echo "== ownership"
 run chown -R 1000:1000 "$DEST/config" "$DEST/cache" "$DEST/jellybridge"
