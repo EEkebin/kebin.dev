@@ -265,3 +265,16 @@ services:
       - /srv/media/config/nextcloud/html:/var/www/html
       - /mnt/storage:/storage:ro
     restart: always
+
+# Dual-stack container network: containers reach the internet over IPv6 as well (NAT66 behind the VM's address).
+# The internal IPv6 subnet is deliberately NOT a private fd00::/8 (ULA) range: browsers and libc rank a ULA source
+# below IPv4, so FlareSolverr's Chromium would use IPv4 while Prowlarr uses IPv6, and Cloudflare clearance cookies
+# (bound to the solving address) would stop matching. 2001:db8::/32 is the documentation range, never routed,
+# and it sorts like ordinary global IPv6. The host needs netplan `accept-ra: true` (forwarding gets enabled).
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 10.89.0.0/24
+        - subnet: 2001:db8:89::/64

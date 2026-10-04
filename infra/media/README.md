@@ -69,6 +69,8 @@ Every *arr container and qBittorrent mount `/mnt/storage/Media` at `/data`, so p
 
 ## Day to day
 
+- IPv6: the container network is dual-stack and the VM needs `accept-ra: true` in netplan. Details and the reason for the odd internal subnet are in `docs/runbooks/ipv6.md`.
+
 - Restart one service: `cd /srv/media && podman-compose up -d <name>`. Never run `podman-compose up -d` without a name, it recreates every container.
 - Updates run weekly on their own (`media-update.timer`, Sunday 04:30, `/srv/media/update.sh`, log in `/var/log/media-update.log`). By hand: `sudo /srv/media/update.sh --dry-run` then `sudo /srv/media/update.sh`. Jellyfin never crosses a major automatically and Nextcloud is pinned to a major tag, see `docs/runbooks/updates.md`.
 - Podman needs fully qualified image names (`docker.io/...`). FileBrowser needs the `ip_unprivileged_port_start=0` sysctl in the compose file to bind port 80 as uid 1000.

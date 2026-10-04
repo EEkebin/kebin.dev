@@ -4,7 +4,7 @@ All indexers are public, added in Prowlarr (prowlarr.kebin.dev) and pushed to So
 
 | Indexer | Route | For | Notes |
 |---|---|---|---|
-| 1337x | FlareSolverr | movies, TV | base URL is the mirror `https://1337x.st/`. `1337x.to` banned the home IP (Cloudflare error 1006, 2026-10-04); mirrors only show a normal challenge |
+| 1337x | FlareSolverr | movies, TV | `https://1337x.to/`, reached over IPv6. The home **IPv4** address is banned there (Cloudflare error 1006 since 2026-10-01); if IPv6 is ever lost, switch the base URL to the mirror `https://1337x.st/` |
 | YTS | direct | movies | small encodes |
 | The Pirate Bay | direct | movies, TV | "Top100" set to Movies/TV, otherwise Radarr rejects it on sync ("No results in configured categories") |
 | LimeTorrents | direct | TV | sorted by seeders. Its keywordless feed is all category "Other", so Radarr refuses it; it stays TV-only |
@@ -32,6 +32,7 @@ Prowlarr → Indexers → Add. Leave tags empty first; if the test says Cloudfla
 
 - Cloudflare challenge: add the `flaresolverr` tag.
 - `error code: 1006` or FlareSolverr says "your IP is banned": switch the base URL to a mirror.
+- "blocked by CloudFlare Protection" on an indexer that has the `flaresolverr` tag: Prowlarr and FlareSolverr are leaving on different address families. See `ipv6.md`.
 - Site moved: update Prowlarr (weekly updater does it) or choose a new base URL.
 
 Check a search by hand from the media VM: `curl "http://127.0.0.1:9696/<indexer id>/api?t=tvsearch&q=<title>&season=1&ep=1&apikey=<prowlarr key>"`.
