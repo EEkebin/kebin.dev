@@ -8,6 +8,9 @@ export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 OC="$HOME/.opencode/bin/opencode"
 echo "=== $(date -Is) ai update"
 
+echo "-- postgres dump before any image update"
+if systemctl --user is-active --quiet postgres.service; then "$HOME/.config/pg-backup.sh" | sed "s/^/  /" || echo "  dump failed, NOT updating containers"; [ "${PIPESTATUS[0]}" = 0 ] || exit 1; else echo "  postgres not running, skipped"; fi
+
 echo "-- containers"
 podman auto-update 2>&1 | grep -vE '^\s*$' | sed 's/^/  /'
 podman image prune -f >/dev/null 2>&1 || true

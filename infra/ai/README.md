@@ -19,6 +19,7 @@ Driver 580 is the last branch that supports all three (Maxwell, Pascal, Volta). 
 | `comfyui.service` | 0.0.0.0:8188 | ComfyUI, default device CUDA0, fp32 VAE (fp16 VAE produces black images on Volta) |
 | `tinyauth.service` (Quadlet) | 0.0.0.0:3000 | login page for code/comfy, used by nginx `auth_request` |
 | `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled; its page is search.kebin.dev behind Tinyauth |
+| `postgres.service` (Quadlet) | 0.0.0.0:5432 | PostgreSQL, `pgautoupgrade` image (latest major, upgrades its own data folder), logins only from 10.0.0.0/24, 10.0.10.0/24, 10.0.20.0/24 |
 | `mcp-searxng.service` (Quadlet) | 0.0.0.0:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
@@ -49,6 +50,14 @@ Check: `opencode mcp list` shows `searxng connected`; `curl 127.0.0.1:8899/healt
 
 Remote installs (kebin.dev/cli) get the same tool through `https://search.kebin.dev/mcp`, gated by the ai.kebin.dev bearer key and passed as an `Authorization` header in the `mcp.searxng` entry; nothing runs on the user's machine.
 
+## PostgreSQL
+
+`postgres/postgres.container` runs `docker.io/pgautoupgrade/pgautoupgrade:latest`: the official PostgreSQL image plus an automatic `pg_upgrade` on start when the data folder belongs to an older major. That is what makes a `latest` tag safe here; a plain `postgres:latest` would refuse to start after a major release. Data lives in `~/.local/share/postgres` (the parent of PGDATA, so two majors can coexist during an upgrade), credentials in `~/.config/postgres/env` (`postgres/env.example`), allowed client networks in `~/.config/postgres/pg_hba.conf` (mounted read-only, change it and `systemctl --user restart postgres`). Connect: host 10.0.10.100, port 5432, user `admin`, database `postgres`, password required (scram). JSONB needs nothing extra. No extensions are installed; `pgvector` would mean switching to the `pgvector/pgvector` image, which does not auto-upgrade.
+
+Backups: `pg-backup.timer` dumps everything daily (10:30 UTC) to `~/.local/share/postgres-backups`, keeps 7, and `ai-update.sh` takes one more dump before any image update and aborts the update if the dump fails. Restore: `zcat <dump> | podman exec -i postgres psql -U admin -d postgres`.
+
+OPNsense: WLAN clients need a rule allowing 10.0.20.0/24 to 10.0.10.100 tcp 5432; LAN to VM LAN is already open.
+
 ## GPU sharing
 
 The V100 is shared by the LLM and ComfyUI. llama-swap's `ttl` unloads an idle model, so ComfyUI gets the full card after a quiet period. To free it immediately: `curl -X POST http://127.0.0.1:8080/api/models/unload`. ComfyUI's device can be changed per launch (`--cuda-device 1` for the P100).
@@ -57,7 +66,7 @@ The V100 is shared by the LLM and ComfyUI. llama-swap's `ttl` unloads an idle mo
 
 1. `prep.sh` — stops legacy units, installs git/uv/OpenCode/llama-swap, Python 3.12.
 2. `llama-swap/` config + unit, `opencode/` config + unit, `tinyauth/` env template + Quadlet, `comfyui/install.sh` (venv, torch cu126, ComfyUI + Manager, SDXL base, unit).
-3. `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`); `update/` script + user units (`ai-update.sh` goes to `~/.config/`, the units to `~/.config/systemd/user/`, then `systemctl --user enable --now ai-update.timer`).
+3. `postgres/` (Quadlet, `env.example` -> `~/.config/postgres/env`, `pg_hba.conf` -> `~/.config/postgres/`, `pg-backup.sh` -> `~/.config/`, the two backup units -> `~/.config/systemd/user/`, then `systemctl --user enable --now pg-backup.timer`); `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`); `update/` script + user units (`ai-update.sh` goes to `~/.config/`, the units to `~/.config/systemd/user/`, then `systemctl --user enable --now ai-update.timer`).
 4. Public side: `infra/web/nginx/conf.d/{auth,code,comfy}.kebin.dev.conf` and `snippets/tinyauth.conf`; DNS A records for the same names.
 
 ## Storage note

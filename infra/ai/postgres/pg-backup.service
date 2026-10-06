@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily PostgreSQL dump (pg_dumpall, keep 7)
+After=postgres.service
+Requisite=postgres.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/pg-backup.sh

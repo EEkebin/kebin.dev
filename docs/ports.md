@@ -25,7 +25,7 @@
 | kebin.dev/cli/ | static | OpenCode CLI installers; page behind Tinyauth with the API key filled in, scripts public |
 | vr.kebin.dev | 10.0.10.30:8000 | HLS for VRChat players, per-share tokens, no Tinyauth on purpose |
 
-Internal only on the ai VM: SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 10.0.10.100:8899 (LAN, used by OpenCode on the VM and by nginx for search.kebin.dev).
+Internal only on the ai VM: PostgreSQL 10.0.10.100:5432 (LAN, VM LAN and WLAN, password), SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 10.0.10.100:8899 (LAN, used by OpenCode on the VM and by nginx for search.kebin.dev).
 
 Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
 

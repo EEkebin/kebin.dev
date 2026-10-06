@@ -1,0 +1,27 @@
+[Unit]
+Description=PostgreSQL (pgautoupgrade: tracks the latest major, runs pg_upgrade itself when the data folder is older)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/pgautoupgrade/pgautoupgrade:latest
+ContainerName=postgres
+AutoUpdate=registry
+# POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB, see env.example
+EnvironmentFile=%h/.config/postgres/env
+# the parent folder, not PGDATA itself: majors live side by side (18/docker, 19/docker) during pg_upgrade
+Volume=%h/.local/share/postgres:/var/lib/postgresql:Z
+# which networks may log in (password, scram-sha-256); edit pg_hba.conf and restart to change
+Volume=%h/.config/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro,Z
+Exec=postgres -c hba_file=/etc/postgresql/pg_hba.conf
+PublishPort=5432:5432
+HealthCmd=pg_isready -U admin -d postgres
+HealthInterval=30s
+HealthStartPeriod=90s
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target

@@ -5,14 +5,14 @@ Everything container-based updates itself once a week, early Sunday morning. Not
 | Where | Unit | When | What it does |
 |---|---|---|---|
 | media VM | `media-update.timer` → `/srv/media/update.sh` | Sun 04:30 | pulls every image in `compose.yml`, recreates only containers whose image changed, prunes old images. Log: `/var/log/media-update.log` |
-| ai VM (user units) | `ai-update.timer` → `~/.config/ai-update.sh` | Sun 04:45 Pacific (11:45 UTC, the VM runs on UTC) | `podman auto-update` for Quadlets with `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth), then `opencode upgrade` and a web UI restart if the version changed |
+| ai VM (user units) | `ai-update.timer` → `~/.config/ai-update.sh` | Sun 04:45 Pacific (11:45 UTC, the VM runs on UTC) | dumps PostgreSQL first (aborts if that fails), then `podman auto-update` for Quadlets with `AutoUpdate=registry` (postgres, searxng, mcp-searxng, tinyauth), then `opencode upgrade` and a web UI restart if the version changed |
 | web VM | nothing automatic | | nginx comes from the nginx.org apt repo, `apt upgrade` by hand. Certificates renew via acme.sh's own cron. |
 
 ## What is held back and why
 
 - **Jellyfin** floats on `latest`, but `update.sh` refuses to cross a major version (`MAJOR_GUARD`). Plugins are built per major (JellyBridge, Local Intros, File Transformation). When the log says a major was skipped: check the plugin catalog inside Jellyfin for builds against the new major, then run the command the log prints.
 - **Nextcloud** is pinned to a major tag (`nextcloud:35-apache`). Nextcloud refuses to skip majors, so bump the tag one major at a time in `compose.yml`, run `update.sh`, open cloud.kebin.dev and let it finish its upgrade, then update the apps from its admin page.
-- **Postgres** (`postgres:17-alpine`) and **Redis** (`redis:7-alpine`) are pinned to majors; a Postgres major needs a dump/restore, do not float it.
+- **Nextcloud's Postgres** (`postgres:17-alpine`) and **Redis** (`redis:7-alpine`) on the media VM are pinned to majors; that Postgres major needs a dump/restore, do not float it. The **ai VM's PostgreSQL** is different: it uses `pgautoupgrade`, which converts the data folder itself when a new major arrives, and a dump is taken right before every update (`~/.local/share/postgres-backups`).
 - **Recyclarr** (`:8`) and **Tinyauth** (`:v5`) are pinned to majors and move within them.
 - **llama.cpp, ComfyUI, the models, the NVIDIA driver** on the ai VM are never touched automatically. llama.cpp is a custom CUDA build for three GPU generations; ComfyUI pins torch `cu126`. Update those by hand following `infra/ai/README.md`.
 
