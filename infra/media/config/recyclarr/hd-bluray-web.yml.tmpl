@@ -10,8 +10,8 @@ radarr:
     base_url: http://radarr:7878
     api_key: __API_KEY__
 
-    quality_definition:
-      type: movie
+    # quality_definition deliberately NOT synced: TRaSH's movie minimum sizes (e.g. 50.8 MB/min for Bluray-1080p)
+    # reject the small YTS/YIFY encodes the user wants; Radarr's min sizes are set to 0 by hand (2026-10-06).
 
     quality_profiles:
       - trash_id: d1d67249d3890e49bc12e275d989a7e9  # HD Bluray + WEB
@@ -50,8 +50,8 @@ radarr:
             # - 0a3f082873eb454bde444150b70253cc  # Extras
             # - e6886871085226c3da1830830146846c  # Generated Dynamic HDR
             # - c465ccc73923871b3eb1802042331306  # Line/Mic Dubbed
-            # - 90a6f9a284dff5103f6346090e6280c8  # LQ
-            # - e204b80c87be9497a8a6eaff48f72905  # LQ (Release Title)
+            - 90a6f9a284dff5103f6346090e6280c8  # LQ  (excluded on purpose: TRaSH scores YTS/YIFY -10000, user wants them)
+            - e204b80c87be9497a8a6eaff48f72905  # LQ (Release Title)
             # - 712d74cd88bceb883ee32f773656b1f5  # Sing-Along Versions
             # - bfd8eb01832d646a0a89c4deb46f8564  # Upscaled
           select:

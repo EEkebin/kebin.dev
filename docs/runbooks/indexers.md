@@ -36,3 +36,7 @@ Prowlarr → Indexers → Add. Leave tags empty first; if the test says Cloudfla
 - Site moved: update Prowlarr (weekly updater does it) or choose a new base URL.
 
 Check a search by hand from the media VM: `curl "http://127.0.0.1:9696/<indexer id>/api?t=tvsearch&q=<title>&season=1&ep=1&apikey=<prowlarr key>"`.
+
+## Small releases (YTS/YIFY) in Radarr
+
+Recyclarr syncs TRaSH's "HD Bluray + WEB" profile. Two parts of that guide reject small encodes: the **LQ** / **LQ (Release Title)** custom formats score YTS/YIFY at -10000 (seen as -9995 together with Repack +5), and the TRaSH **movie quality definitions** set minimum sizes like 50.8 MB/min for Bluray-1080p (4.3 GB for an 86 minute film). The user wants YTS releases, so (2026-10-06): both LQ formats are excluded in `config/recyclarr/hd-bluray-web.yml.tmpl` (Recyclarr resets their score to 0), the `quality_definition` block is removed from that config, and Radarr's minimum sizes are 0 for every quality. Recyclarr runs daily; because the block is gone it no longer touches sizes. Sonarr's config still syncs TRaSH series sizes.
