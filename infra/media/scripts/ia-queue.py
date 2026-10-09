@@ -45,13 +45,52 @@ def queue(item, files):
     return gids
 
 
+def overview():
+    """One row per queued archive.org link: everything aria2 knows about, grouped by the item folder."""
+    tasks = rpc("aria2.tellActive") + rpc("aria2.tellWaiting", 0, 10000) + rpc("aria2.tellStopped", 0, 10000)
+    items = {}
+    for t in tasks:
+        d = t.get("dir", "")
+        if not d.startswith("/downloads/") or not t.get("files"):
+            continue
+        item = d[len("/downloads/"):].split("/", 1)[0]
+        it = items.setdefault(item, {"files": 0, "done": 0, "total": 0, "complete": 0, "speed": 0, "errors": 0, "active": 0})
+        total, comp = int(t.get("totalLength", 0)), int(t.get("completedLength", 0))
+        it["files"] += 1
+        it["total"] += total
+        it["done"] += comp
+        it["speed"] += int(t.get("downloadSpeed", 0))
+        it["complete"] += t["status"] == "complete"
+        it["errors"] += t["status"] == "error"
+        it["active"] += t["status"] == "active"
+    if not items:
+        return ""
+    rows = ""
+    for item, it in sorted(items.items()):
+        pct = 100 * it["done"] / it["total"] if it["total"] else 0
+        left = it["total"] - it["done"]
+        eta = f"{left / it['speed'] / 3600:.1f} h" if it["speed"] > 1e5 else ("done" if left == 0 else "-")
+        state = "done" if it["complete"] == it["files"] else ("downloading" if it["active"] else "queued")
+        err = f' · <b>{it["errors"]} failed</b>' if it["errors"] else ""
+        rows += (f'<tr><td><a href="https://archive.org/details/{html.escape(item)}" target="_blank">{html.escape(item)}</a></td>'
+                 f'<td>{it["complete"]}/{it["files"]}</td><td>{it["done"]/2**30:,.1f} / {it["total"]/2**30:,.1f} GB</td>'
+                 f'<td><div class="bar"><div style="width:{pct:.1f}%"></div></div>{pct:.1f}%</td>'
+                 f'<td>{it["speed"]/2**20:.1f} MB/s</td><td>{eta}</td><td>{state}{err}</td></tr>')
+    return f'<h2>Queued links</h2><table><tr><th>item</th><th>files</th><th>size</th><th>progress</th><th>speed</th><th>ETA</th><th>state</th></tr>{rows}</table><p class="small">Refreshes every 10 s. Totals cover what aria2 still lists; clearing finished tasks in the portal drops them from here.</p>'
+
+
 def page(msg="", rows=""):
-    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>archive.org · downloads</title>
+    try:
+        status = overview()
+    except Exception as e:
+        status = f'<p class="msg">portal not reachable: {html.escape(str(e))}</p>'
+    return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="10"><title>archive.org · downloads</title>
 <style>body{{font:15px/1.5 system-ui,sans-serif;background:#111;color:#eee;margin:auto;padding:24px;max-width:860px}}input[type=text]{{width:100%;padding:10px;font-size:15px;background:#1c1c1c;color:#eee;border:1px solid #333;border-radius:6px}}
-button{{padding:10px 16px;margin:10px 8px 0 0;font-size:15px;border:0;border-radius:6px;background:#ffd23f;color:#111;cursor:pointer}}button.alt{{background:#333;color:#eee}}p.msg{{color:#ffd23f}}table{{border-collapse:collapse;width:100%;font-size:13px}}td,th{{text-align:left;padding:3px 8px 3px 0;border-bottom:1px solid #222;color:#aaa}}a{{color:#ffd23f}}</style></head><body>
+button{{padding:10px 16px;margin:10px 8px 0 0;font-size:15px;border:0;border-radius:6px;background:#ffd23f;color:#111;cursor:pointer}}button.alt{{background:#333;color:#eee}}p.msg{{color:#ffd23f}}table{{border-collapse:collapse;width:100%;font-size:13px}}td,th{{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid #222;color:#aaa;vertical-align:middle}}a{{color:#ffd23f}}
+h2{{font-size:17px;margin:32px 0 8px}}.bar{{background:#2a2a2a;border-radius:4px;height:8px;overflow:hidden;min-width:120px;margin-bottom:3px}}.bar div{{background:#ffd23f;height:100%}}b{{color:#ff6b6b}}p.small{{font-size:12px;color:#777}}</style></head><body>
 <h1>Queue an archive.org item</h1><p>Paste an archive.org link (details, download or metadata page) or just the identifier. Every original file of the item goes to aria2 with its MD5, into <code>Downloads/&lt;item&gt;/</code>. Watch and control it in the <a href="/">portal</a>.</p>
 <form method="post"><input type="text" name="item" placeholder="https://archive.org/details/some-item" required><button type="submit">Queue all files</button><button class="alt" type="submit" name="dry" value="1">Preview only</button></form>
-{f'<p class="msg">{msg}</p>' if msg else ''}{rows}</body></html>"""
+{f'<p class="msg">{msg}</p>' if msg else ''}{rows}{status}</body></html>"""
 
 
 class H(BaseHTTPRequestHandler):
