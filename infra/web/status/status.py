@@ -29,6 +29,7 @@ SERVICES = {
     "files":       f"{MEDIA}:8090/",
     "cloud":       f"{MEDIA}:8081/status.php",
     "vr":          f"{MEDIA}:8000/health",
+    "books":       f"{MEDIA}:13378/healthcheck",
     # arr stack
     "sonarr":      f"{MEDIA}:8989/ping",
     "radarr":      f"{MEDIA}:7878/ping",
@@ -37,6 +38,7 @@ SERVICES = {
     "bazarr":      f"{MEDIA}:6767/",
     "qbittorrent": f"{MEDIA}:8080/",
     "tdarr":       f"{MEDIA}:8265/",
+    "shelfmark":   f"{MEDIA}:8084/api/health",
     # ai
     "code":        f"{AI}:4096/",
     "comfy":       f"{AI}:8188/system_stats",
@@ -48,8 +50,8 @@ SERVICES = {
 }
 
 GROUPS = {
-    "arr":    ["sonarr", "radarr", "lidarr", "prowlarr", "bazarr", "qbittorrent", "tdarr"],
-    "media":  ["stream", "seerr", "music", "files", "cloud", "vr"],
+    "arr":    ["sonarr", "radarr", "lidarr", "prowlarr", "bazarr", "qbittorrent", "tdarr", "shelfmark"],
+    "media":  ["stream", "seerr", "music", "files", "cloud", "books", "vr"],
     "ai":     ["code", "comfy", "search", "models"],
     "system": ["pve", "auth"],
 }

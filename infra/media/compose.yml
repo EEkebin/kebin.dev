@@ -178,6 +178,38 @@ services:
       - "8000:8000"
     restart: always
 
+  # ---------- books ----------
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    user: "1000:1000"
+    environment:
+      TZ: America/Los_Angeles
+    volumes:
+      - /srv/media/config/audiobookshelf/config:/config
+      - /srv/media/config/audiobookshelf/metadata:/metadata
+      - /mnt/storage/Media/Books:/books
+      - /mnt/storage/Media/Downloads/books:/incoming
+    ports:
+      - "13378:80"
+    restart: always
+
+  shelfmark:
+    image: ghcr.io/calibrain/shelfmark:latest
+    container_name: shelfmark
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Los_Angeles
+      INGEST_DIR: /books
+      SEARCH_MODE: universal
+    volumes:
+      - /srv/media/config/shelfmark:/config
+      - /mnt/storage/Media/Downloads/books:/books
+    ports:
+      - "8084:8084"
+    restart: always
+
   # ---------- music ----------
   navidrome:
     image: docker.io/deluan/navidrome:latest

@@ -16,6 +16,8 @@
 | music.kebin.dev | 10.0.10.30:4533 | Navidrome |
 | files.kebin.dev | 10.0.10.30:8090 | FileBrowser Quantum, uploads unlimited |
 | cloud.kebin.dev | 10.0.10.30:8081 | Nextcloud, uploads unlimited, well-known redirects for CalDAV/CardDAV |
+| books.kebin.dev | 10.0.10.30:13378 | Audiobookshelf, own user accounts |
+| shelfmark.kebin.dev | 10.0.10.30:8084 | Shelfmark book/audiobook downloader, behind Tinyauth |
 | auth.kebin.dev | 10.0.10.100:3000 | Tinyauth login page |
 | code.kebin.dev | 10.0.10.100:4096 | OpenCode web, behind Tinyauth |
 | comfy.kebin.dev | 10.0.10.100:8188 | ComfyUI, behind Tinyauth |

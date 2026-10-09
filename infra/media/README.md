@@ -66,6 +66,8 @@ Every *arr container and qBittorrent mount `/mnt/storage/Media` at `/data`, so p
 | Navidrome | 4533 | music.kebin.dev |
 | FileBrowser Quantum | 8090 | files.kebin.dev |
 | Nextcloud | 8081 | cloud.kebin.dev |
+| Audiobookshelf | 13378 | books.kebin.dev |
+| Shelfmark | 8084 | shelfmark.kebin.dev |
 
 ## Day to day
 

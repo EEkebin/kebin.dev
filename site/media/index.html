@@ -18,7 +18,7 @@
   <main class="wrap">
     <a class="back" href="/">← kebin.dev</a>
     <h1>Media</h1>
-    <p class="lead">Watch, listen, request, store. The arr stack that feeds it lives one level down.</p>
+    <p class="lead">Watch, listen, read, request, store. The arr stack that feeds it lives one level down.</p>
 
     <section aria-label="Media apps">
       <div class="grid">
@@ -46,6 +46,11 @@
           <img class="logo" src="/images/apps/cloud.png" alt="" width="40" height="40">
           <span class="name">Cloud</span>
           <span class="status" hx-get="/api/status?svc=cloud" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://books.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/audiobookshelf.svg" alt="" width="40" height="40">
+          <span class="name">Books</span>
+          <span class="status" hx-get="/api/status?svc=books" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
         </a>
         <a class="card" href="https://vr.kebin.dev/admin/">
           <img class="logo" src="/images/apps/vr.svg" alt="" width="40" height="40">
