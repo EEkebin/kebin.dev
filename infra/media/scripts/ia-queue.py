@@ -10,6 +10,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 PORT, RPC = 8097, "http://127.0.0.1:6800/jsonrpc"
 SECRET = re.search(r'^ARIA2_RPC_SECRET=(.*)$', open("/srv/media/.env").read(), re.M).group(1).strip().strip('"\'')
 UA = {"User-Agent": "kebin.dev ia-queue (python-urllib)"}
+SIZES = {}   # item -> {file name: size} from the manifest, for tasks aria2 has not started yet
 
 
 def rpc(method, *params):
@@ -56,6 +57,14 @@ def overview():
         item = d[len("/downloads/"):].split("/", 1)[0]
         it = items.setdefault(item, {"files": 0, "done": 0, "total": 0, "complete": 0, "speed": 0, "errors": 0, "active": 0})
         total, comp = int(t.get("totalLength", 0)), int(t.get("completedLength", 0))
+        if total == 0:                      # a queued task has no size yet; take it from the item's manifest
+            if item not in SIZES:
+                try:
+                    SIZES[item] = {f["name"]: int(f.get("size", 0) or 0) for f in manifest(item)}
+                except Exception:
+                    SIZES[item] = {}
+            rel = t["files"][0].get("path", "")[len(f"/downloads/{item}/"):]
+            total = SIZES[item].get(rel, 0)
         it["files"] += 1
         it["total"] += total
         it["done"] += comp
@@ -69,8 +78,8 @@ def overview():
     for item, it in sorted(items.items()):
         pct = 100 * it["done"] / it["total"] if it["total"] else 0
         left = it["total"] - it["done"]
-        eta = f"{left / it['speed'] / 3600:.1f} h" if it["speed"] > 1e5 else ("done" if left == 0 else "-")
         state = "done" if it["complete"] == it["files"] else ("downloading" if it["active"] else "queued")
+        eta = "done" if state == "done" else (f"{left / it['speed'] / 3600:.1f} h" if it["speed"] > 1e5 else "-")
         err = f' · <b>{it["errors"]} failed</b>' if it["errors"] else ""
         rows += (f'<tr><td><a href="https://archive.org/details/{html.escape(item)}" target="_blank">{html.escape(item)}</a></td>'
                  f'<td>{it["complete"]}/{it["files"]}</td><td>{it["done"]/2**30:,.1f} / {it["total"]/2**30:,.1f} GB</td>'
