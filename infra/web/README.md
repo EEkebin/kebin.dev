@@ -39,6 +39,7 @@ acme.sh installs its own cron entry and renews about 30 days before expiry. The 
 | File | Used by | Content |
 |---|---|---|
 | `ai-key-map.conf` | `00-map.conf` (http context) | `map $http_authorization $ai_key_ok { default 0; "Bearer <key>" 1; }` — the ai.kebin.dev / search.kebin.dev API key |
+| `aria2-subfilter.conf` | `downloads.kebin.dev.conf` | `sub_filter "<head>" "<head><script>...rpc/set/https/downloads.kebin.dev/443/jsonrpc/<base64 secret>...</script>"; sub_filter_once on;` configures AriaNg in the browser on first visit |
 | `ai-key-subfilter.conf` | `kebin.dev.conf`, the `/cli/` page | `sub_filter "__AIBOX_KEY__" "<key>"; sub_filter_once off; sub_filter_types text/html;` |
 | `vrc-key.conf` | `vr.kebin.dev.conf` `/admin/api/` | `proxy_set_header X-Admin-Key "<key>"; proxy_set_header Authorization 'MediaBrowser Token="<key>"';` |
 
