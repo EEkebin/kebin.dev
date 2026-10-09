@@ -48,13 +48,14 @@ SERVICES = {
     "pve":         "https://10.0.0.200:8006/",
     "auth":        f"{AI}:3000/",
     "downloads":   f"{MEDIA}:6880/",
+    "archive":     f"{MEDIA}:8097/ia/health",
 }
 
 GROUPS = {
     "arr":    ["sonarr", "radarr", "lidarr", "prowlarr", "bazarr", "qbittorrent", "tdarr", "shelfmark"],
     "media":  ["stream", "seerr", "music", "files", "cloud", "books", "vr"],
     "ai":     ["code", "comfy", "search", "models"],
-    "system": ["pve", "auth", "downloads"],
+    "system": ["pve", "auth", "downloads", "archive"],
 }
 GROUPS["media-all"] = GROUPS["media"] + GROUPS["arr"]   # the home page card for Media counts the arr stack too
 

@@ -37,6 +37,11 @@
           <span class="name">Downloads</span>
           <span class="status" hx-get="/api/status?svc=downloads" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
         </a>
+        <a class="card" href="https://downloads.kebin.dev/ia/" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/archive.svg" alt="" width="40" height="40">
+          <span class="name">archive.org</span>
+          <span class="status" hx-get="/api/status?svc=archive" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
       </div>
     </section>
 
