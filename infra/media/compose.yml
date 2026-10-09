@@ -185,13 +185,15 @@ services:
     user: "1000:1000"
     environment:
       TZ: America/Los_Angeles
+      PORT: "13378"            # unprivileged user cannot bind the image default (80)
+      ROUTER_BASE_PATH: ""
     volumes:
       - /srv/media/config/audiobookshelf/config:/config
       - /srv/media/config/audiobookshelf/metadata:/metadata
       - /mnt/storage/Media/Books:/books
       - /mnt/storage/Media/Downloads/books:/incoming
     ports:
-      - "13378:80"
+      - "13378:13378"
     restart: always
 
   shelfmark:
