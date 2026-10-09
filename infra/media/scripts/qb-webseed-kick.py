@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Un-stall torrents whose only sources are web seeds (archive.org). Run by media-qb-webseed.timer every 5 min.
+"""Un-stall torrents whose only sources are web seeds (archive.org). Run by media-qb-webseed.timer every 2 min.
 
 archive.org answers every file request with a redirect to a data node, and those nodes return the odd
 "500 Internal Server Error". libtorrent then remembers the original seed as not having that file and the

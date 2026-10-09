@@ -1,9 +1,9 @@
 [Unit]
-Description=Every 5 minutes: un-stall web-seeded (archive.org) torrents
+Description=Every 2 minutes: un-stall web-seeded (archive.org) torrents
 
 [Timer]
-OnBootSec=5m
-OnUnitActiveSec=5m
+OnBootSec=2m
+OnUnitActiveSec=2m
 
 [Install]
 WantedBy=timers.target
