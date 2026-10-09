@@ -1,0 +1,9 @@
+[Unit]
+Description=Re-add web seeds on stalled qBittorrent downloads (/srv/media/qb-webseed-kick.py)
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /srv/media/qb-webseed-kick.py
+StandardOutput=append:/var/log/media-qb-webseed.log
+StandardError=append:/var/log/media-qb-webseed.log
