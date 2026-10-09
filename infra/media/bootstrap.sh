@@ -28,7 +28,7 @@ echo "== secrets (generated once, kept forever)"
 if [ ! -f "$DEST/.env" ]; then
   if [ "$DRY" = "--dry-run" ]; then echo "+ generate $DEST/.env"; else
     {
-      for k in NC_DB_PASSWORD NC_ADMIN_PASSWORD FB_ADMIN_PASSWORD QBT_PASSWORD JF_ADMIN_PASSWORD ND_ADMIN_PASSWORD ARR_PASSWORD; do echo "$k=$(gen)"; done
+      for k in NC_DB_PASSWORD NC_ADMIN_PASSWORD FB_ADMIN_PASSWORD QBT_PASSWORD JF_ADMIN_PASSWORD ND_ADMIN_PASSWORD ARR_PASSWORD ARIA2_RPC_SECRET; do echo "$k=$(gen)"; done
       echo "JF_ADMIN_USER=admin"
     } > "$DEST/.env"
     chmod 600 "$DEST/.env"
@@ -59,11 +59,10 @@ run install -m 755 "$HERE/scripts/qb-webseed-kick.py" "$DEST/qb-webseed-kick.py"
 run install -m 644 "$HERE/systemd/media-qb-webseed.service" "$HERE/systemd/media-qb-webseed.timer" /etc/systemd/system/
 run systemctl daemon-reload
 run systemctl enable --now media-qb-webseed.timer
-run install -m 755 "$HERE/scripts/ia-fetch.py" "$DEST/ia-fetch.py"
-[ -f "$DEST/ia-fetch.items" ] || run install -m 644 "$HERE/config/ia-fetch.items.example" "$DEST/ia-fetch.items"
-run install -m 644 "$HERE/systemd/media-ia-fetch.service" /etc/systemd/system/
+run install -m 755 "$HERE/scripts/ia-queue.py" "$DEST/ia-queue.py"
+run install -m 644 "$HERE/systemd/media-ia-queue.service" /etc/systemd/system/
 run systemctl daemon-reload
-run systemctl enable --now media-ia-fetch.service
+run systemctl enable --now media-ia-queue.service
 
 echo "== ownership"
 run chown -R 1000:1000 "$DEST/config" "$DEST/cache" "$DEST/jellybridge"

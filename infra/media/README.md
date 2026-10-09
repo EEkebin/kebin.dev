@@ -68,7 +68,8 @@ Every *arr container and qBittorrent mount `/mnt/storage/Media` at `/data`, so p
 | Nextcloud | 8081 | cloud.kebin.dev |
 | Audiobookshelf | 13378 | books.kebin.dev |
 | Shelfmark | 8084 | shelfmark.kebin.dev |
-| ia-fetch (archive.org downloader, host service) | 8097 | downloads.kebin.dev |
+| aria2 + AriaNg (download portal) | 6800 (RPC), 6880 (UI), 6888 (peers) | downloads.kebin.dev |
+| ia-queue (archive.org helper, host service) | 8097 | downloads.kebin.dev/ia/ |
 
 ## Day to day
 

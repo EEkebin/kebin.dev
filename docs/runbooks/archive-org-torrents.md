@@ -8,11 +8,10 @@ Internet Archive torrents have no real peers; the only sources are archive.org's
 
 Check an item for changes: `https://archive.org/metadata/<item>` lists current file sizes; compare with the torrent's file list. The `<item>_archive.torrent` on the item is regenerated too, but its infohash was unchanged in every case seen, so re-adding the torrent does not help.
 
-## Skip the torrent: pull the item over HTTP (2026-10-09)
+## Skip the torrent: the download portal (2026-10-09)
 
-Even with the kick timer the torrents averaged 1-10 MB/s on a line that pulls 110 MB/s from archive.org with a few parallel connections, because libtorrent keeps one connection per seed and waits 30 s after every 500. So big archive.org items are fetched by `media-ia-fetch.service` (`/srv/media/ia-fetch.py`) instead:
+Even with the kick timer the torrents averaged 1-10 MB/s on a line that pulls 110-130 MB/s from archive.org with a few parallel connections, because libtorrent keeps one connection per seed and waits 30 s after every 500. Big archive.org items, and any other direct link, go through the download portal instead:
 
-- Queue: `/srv/media/ia-fetch.items`, one identifier per line; re-read every 10 minutes, so append and wait.
-- Each "original" file of the item goes to `/mnt/storage/Media/Downloads/<item>/`, as 24 parallel 32 MB ranges into `<file>.part`, then MD5-checked against the item's manifest and renamed into place. Verified files are recorded in `Downloads/.ia-fetch-state.json` and never re-fetched; a present file with a wrong MD5 is re-downloaded.
-- Status: https://downloads.kebin.dev (Tinyauth), JSON at `/status.json`. Log: `/var/log/media-ia-fetch.log`.
-- Restart-safe: the service restarts on failure and after reboot; a file that was mid-download starts over (at most a few minutes).
+- **downloads.kebin.dev** (Tinyauth) is AriaNg on top of **aria2** (`aria2` and `ariang` containers in `compose.yml`, downloads in `/mnt/storage/Media/Downloads`, config in `/srv/media/config/aria2/aria2.conf`). Add links, torrents or magnets; pause, resume, cancel one or all; set the global speed limit under AriaNg Settings → aria2 Settings → Max Overall Download Limit. Files are fetched with up to 16 connections each and resume after restarts.
+- First use in a browser: open the one-click settings link from the handoff document, which fills in the RPC address and secret (`ARIA2_RPC_SECRET` in `/srv/media/.env`). Nothing else to configure.
+- **downloads.kebin.dev/ia/** (`media-ia-queue.service`, `/srv/media/ia-queue.py`): paste an archive.org link or identifier and every original file of the item is queued with its MD5 from the manifest, so aria2 verifies each file after download (a mismatch shows as an error in the portal). "Preview only" lists the files and total size without queueing.

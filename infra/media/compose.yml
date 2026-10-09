@@ -211,6 +211,35 @@ services:
       - "8084:8084"
     restart: always
 
+  # ---------- downloads: any direct link, torrents, archive.org items; portal at downloads.kebin.dev ----------
+  aria2:
+    image: docker.io/p3terx/aria2-pro:latest
+    container_name: aria2
+    environment:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: America/Los_Angeles
+      UMASK_SET: "022"
+      RPC_SECRET: ${ARIA2_RPC_SECRET}
+      RPC_PORT: "6800"
+      LISTEN_PORT: "6888"
+      DISK_CACHE: 64M
+      IPV6_MODE: "true"
+      UPDATE_TRACKERS: "false"
+    volumes:
+      - /srv/media/config/aria2:/config
+      - /mnt/storage/Media/Downloads:/downloads
+    ports:
+      - "6800:6800"
+    restart: always
+
+  ariang:
+    image: docker.io/p3terx/ariang:latest
+    container_name: ariang
+    ports:
+      - "6880:6880"
+    restart: always
+
   # ---------- music ----------
   navidrome:
     image: docker.io/deluan/navidrome:latest

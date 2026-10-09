@@ -47,7 +47,7 @@ SERVICES = {
     # system
     "pve":         "https://10.0.0.200:8006/",
     "auth":        f"{AI}:3000/",
-    "downloads":   f"{MEDIA}:8097/health",
+    "downloads":   f"{MEDIA}:6880/",
 }
 
 GROUPS = {
