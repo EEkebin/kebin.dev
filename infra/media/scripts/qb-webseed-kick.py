@@ -19,8 +19,11 @@ def call(path, data=None):
     try: return json.loads(text)
     except ValueError: return text
 
-if call("/api/v2/auth/login", {"username": "admin", "password": pw}) != "Ok.":
-    sys.exit("qbittorrent login failed")
+call("/api/v2/auth/login", {"username": "admin", "password": pw})
+try:
+    call("/api/v2/app/version")          # 403 here means the login did not take
+except urllib.error.HTTPError as e:
+    sys.exit(f"qbittorrent login failed: HTTP {e.code}")
 for t in call("/api/v2/torrents/info?filter=stalled_downloading"):
     urls = [w["url"] for w in call(f"/api/v2/torrents/webseeds?hash={t['hash']}")]
     if not urls:
