@@ -182,13 +182,18 @@ def item_files(item):
 def run_pass():
     state = load_state()
     S["pass"] += 1
-    for item in read_items():
+    manifests = {}
+    for item in read_items():          # all manifests first, so the totals and the ETA are right from the start
         try:
-            files = item_files(item)
+            manifests[item] = item_files(item)
+            entry = S["items"].setdefault(item, {"files": {}, "size": 0})
+            entry["size"] = sum(f["size"] for f in manifests[item])
+            for f in manifests[item]:
+                entry["files"].setdefault(f["name"], {"size": f["size"], "done": 0, "state": "pending"})
         except Exception as e:
             log(f"{item}: metadata failed: {e}")
             S["items"][item] = {"error": str(e), "files": {}, "size": 0}
-            continue
+    for item, files in manifests.items():
         st = state.setdefault(item, {})
         entry = S["items"].setdefault(item, {"files": {}, "size": 0})
         entry["size"] = sum(f["size"] for f in files)
