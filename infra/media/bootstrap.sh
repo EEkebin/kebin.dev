@@ -63,6 +63,7 @@ run install -m 755 "$HERE/scripts/ia-queue.py" "$DEST/ia-queue.py"
 run install -m 644 "$HERE/systemd/media-ia-queue.service" /etc/systemd/system/
 run systemctl daemon-reload
 run systemctl enable --now media-ia-queue.service
+# aria2 generates /srv/media/config/aria2/{aria2.conf,script.conf} on first start; apply the settings listed in docs/runbooks/archive-org-torrents.md afterwards.
 
 echo "== ownership"
 run chown -R 1000:1000 "$DEST/config" "$DEST/cache" "$DEST/jellybridge"

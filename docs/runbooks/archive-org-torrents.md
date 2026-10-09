@@ -15,3 +15,10 @@ Even with the kick timer the torrents averaged 1-10 MB/s on a line that pulls 11
 - **downloads.kebin.dev** (Tinyauth) is AriaNg on top of **aria2** (`aria2` and `ariang` containers in `compose.yml`, downloads in `/mnt/storage/Media/Downloads`, config in `/srv/media/config/aria2/aria2.conf`). Add links, torrents or magnets; pause, resume, cancel one or all; set the global speed limit under AriaNg Settings → aria2 Settings → Max Overall Download Limit. Files are fetched with up to 16 connections each and resume after restarts.
 - First use in a browser: open the one-click settings link from the handoff document, which fills in the RPC address and secret (`ARIA2_RPC_SECRET` in `/srv/media/.env`). Nothing else to configure.
 - **downloads.kebin.dev/ia/** (`media-ia-queue.service`, `/srv/media/ia-queue.py`): paste an archive.org link or identifier and every original file of the item is queued with its MD5 from the manifest, so aria2 verifies each file after download (a mismatch shows as an error in the portal). "Preview only" lists the files and total size without queueing.
+
+### aria2 settings that differ from the image defaults
+
+Set once after the first start, in `/srv/media/config/aria2/` (the image generates both files; a sed in a fresh install must run after `podman-compose up`):
+
+- `aria2.conf`: `max-connection-per-server=16`, `split=16`, `min-split-size=8M`, `file-allocation=none` (NFS), `follow-torrent=false`, `follow-metalink=false` (a downloaded `.torrent` is just a file; to download via BitTorrent upload the .torrent in AriaNg or paste a magnet).
+- `script.conf`: `delete-empty-dir=false` (the default **deleted every empty folder under Downloads**, including qBittorrent's `incomplete/` and category folders, 2026-10-09), `delete-dot-torrent=false` (archive.org items contain .torrent files as content), `delete-on-error=false` (keep partial files so a failed task can be retried). `delete-on-removed=true` stays: cancelling a download removes its partial file.
