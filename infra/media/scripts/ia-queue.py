@@ -27,11 +27,16 @@ def identifier(text):
     return m.group(1) if m else re.sub(r"[^A-Za-z0-9._-]", "", text)
 
 
+IA_OWN = re.compile(r"_(files\.xml|meta\.xml|meta\.sqlite|reviews\.xml|archive\.torrent)$")   # archive.org's own bookkeeping
+
+
 def manifest(item):
     meta = json.load(urllib.request.urlopen(urllib.request.Request(f"https://archive.org/metadata/{urllib.parse.quote(item)}", headers=UA), timeout=120))
     if not meta.get("files"):
         raise RuntimeError("no such item, or it has no files")
-    return [f for f in meta["files"] if f.get("source") == "original"]
+    # archive.org rewrites its own index files whenever the item is touched, so their manifest MD5 never matches
+    # what is served (seen 2026-10-09: _files.xml failed with checksum error 32). They are not the upload; skip them.
+    return [f for f in meta["files"] if f.get("source") == "original" and not IA_OWN.search(f["name"])]
 
 
 def queue(item, files):
