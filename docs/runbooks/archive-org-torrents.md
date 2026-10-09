@@ -7,3 +7,12 @@ Internet Archive torrents have no real peers; the only sources are archive.org's
 2. **archive.org rewrites its own metadata files** (`*_meta.xml`, `*_meta.sqlite`, sometimes `*_files.xml`) after the torrent was made. The pieces holding them can never pass the hash check, so the torrent stops at 99.9x%. Fix: set those files to "Do not download". In these items each sits in its own piece, so nothing else is affected. When a changed file shares a piece with content you want (small items with small pieces), skip the sharing files too and download them straight from `https://archive.org/download/<item>/<file>` into the torrent's folder; compare sizes with the torrent's file list first.
 
 Check an item for changes: `https://archive.org/metadata/<item>` lists current file sizes; compare with the torrent's file list. The `<item>_archive.torrent` on the item is regenerated too, but its infohash was unchanged in every case seen, so re-adding the torrent does not help.
+
+## Skip the torrent: pull the item over HTTP (2026-10-09)
+
+Even with the kick timer the torrents averaged 1-10 MB/s on a line that pulls 110 MB/s from archive.org with a few parallel connections, because libtorrent keeps one connection per seed and waits 30 s after every 500. So big archive.org items are fetched by `media-ia-fetch.service` (`/srv/media/ia-fetch.py`) instead:
+
+- Queue: `/srv/media/ia-fetch.items`, one identifier per line; re-read every 10 minutes, so append and wait.
+- Each "original" file of the item goes to `/mnt/storage/Media/Downloads/<item>/`, as 24 parallel 32 MB ranges into `<file>.part`, then MD5-checked against the item's manifest and renamed into place. Verified files are recorded in `Downloads/.ia-fetch-state.json` and never re-fetched; a present file with a wrong MD5 is re-downloaded.
+- Status: https://downloads.kebin.dev (Tinyauth), JSON at `/status.json`. Log: `/var/log/media-ia-fetch.log`.
+- Restart-safe: the service restarts on failure and after reboot; a file that was mid-download starts over (at most a few minutes).

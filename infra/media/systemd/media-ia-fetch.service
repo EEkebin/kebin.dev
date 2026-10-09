@@ -1,0 +1,14 @@
+[Unit]
+Description=archive.org downloader with status page on :8097 (/srv/media/ia-fetch.py)
+After=network-online.target mnt-storage.mount
+Requires=mnt-storage.mount
+
+[Service]
+ExecStart=/usr/bin/python3 /srv/media/ia-fetch.py
+Restart=always
+RestartSec=30
+StandardOutput=append:/var/log/media-ia-fetch.log
+StandardError=append:/var/log/media-ia-fetch.log
+
+[Install]
+WantedBy=multi-user.target
