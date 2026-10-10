@@ -22,6 +22,7 @@ MEDIA = "http://10.0.10.30"
 AI = "http://10.0.10.100"
 
 SERVICES = {
+    "share":       "http://127.0.0.1:8766/api/health",
     # media
     "stream":      f"{MEDIA}:8096/health",
     "seerr":       f"{MEDIA}:5055/api/v1/status",
@@ -53,7 +54,7 @@ SERVICES = {
 
 GROUPS = {
     "arr":    ["sonarr", "radarr", "lidarr", "prowlarr", "bazarr", "qbittorrent", "tdarr", "shelfmark"],
-    "media":  ["stream", "seerr", "music", "files", "cloud", "books", "vr"],
+    "media":  ["stream", "seerr", "music", "files", "cloud", "books", "vr", "share"],
     "ai":     ["code", "comfy", "search", "models"],
     "system": ["pve", "auth", "downloads", "archive"],
 }

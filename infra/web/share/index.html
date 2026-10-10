@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#ffd23f">
+<title>Share · kebin</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='9' fill='%23ffd23f'/%3E%3Cpath d='M12 22l8-8 8 8M20 14v16' fill='none' stroke='%23111' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#f6f6f4;--card:#fff;--fg:#151515;--muted:#666;--line:#e3e3e0;--accent:#ffd23f;--accent-fg:#111;--bad:#d64545;--good:#2f9e5b}
+@media (prefers-color-scheme:dark){:root{--bg:#111;--card:#1b1b1b;--fg:#eee;--muted:#999;--line:#2a2a2a;--bad:#ff6b6b;--good:#5fd38d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:24px;margin:0 0 4px}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:32px 0 10px}
+p.lead{color:var(--muted);margin:0 0 20px}
+.me{display:flex;align-items:center;gap:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;flex-wrap:wrap}
+.me .who{flex:1;min-width:180px}
+.me .label{font-size:12px;color:var(--muted)}
+.me .name{font-size:20px;font-weight:600;cursor:pointer;border-bottom:1px dashed transparent}
+.me .name:hover{border-bottom-color:var(--muted)}
+.pin{font:700 30px/1 ui-monospace,Consolas,monospace;letter-spacing:.18em;background:var(--accent);color:var(--accent-fg);padding:10px 14px;border-radius:10px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--muted);margin-right:6px}
+.dot.on{background:var(--good)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.peer{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.peer:hover,.peer.drag{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.peer .n{font-weight:600;display:block}
+.peer .p{color:var(--muted);font-size:13px}
+.empty{color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:16px}
+.bypin{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.bypin input{font:600 22px ui-monospace,Consolas,monospace;letter-spacing:.2em;width:7.5em;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg)}
+button.btn{font:inherit;font-weight:600;padding:10px 16px;border-radius:8px;border:0;background:var(--accent);color:var(--accent-fg);cursor:pointer}
+button.btn.alt{background:transparent;color:var(--fg);border:1px solid var(--line)}
+button.btn:disabled{opacity:.5;cursor:default}
+.hint{color:var(--muted);font-size:13px;width:100%}
+.err{color:var(--bad);font-size:14px;width:100%}
+.xfer{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:10px}
+.xfer .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.xfer .t{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.xfer .s{color:var(--muted);font-size:13px}
+.xfer .s.bad{color:var(--bad)}.xfer .s.good{color:var(--good)}
+.bar{height:6px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:8px}
+.bar div{height:100%;width:0;background:var(--accent);transition:width .3s}
+.xfer .links{margin-top:6px;font-size:13px}.xfer .links a{color:inherit;margin-right:12px}
+.xfer button{font:inherit;font-size:13px;background:none;border:0;color:var(--muted);cursor:pointer;text-decoration:underline}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--fg);padding:20px;max-width:480px;width:calc(100% - 32px)}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h3{margin:0 0 6px}
+dialog ul{max-height:240px;overflow:auto;padding-left:18px;margin:10px 0;color:var(--muted);font-size:14px}
+dialog .row{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+footer{margin-top:40px;color:var(--muted);font-size:12px}
+.dropall{position:fixed;inset:0;background:rgba(255,210,63,.18);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;font-size:22px;font-weight:700;z-index:5;pointer-events:none}
+body.dragging .dropall{display:flex}
+</style>
+</head>
+<body>
+<main>
+  <h1>Share</h1>
+  <p class="lead">Send files to anyone with this page open. Devices on your network show up below; anyone else, use their PIN. Nothing is stored on the server.</p>
+
+  <div class="me">
+    <div class="who">
+      <div class="label"><span class="dot" id="conn"></span><span id="connText">connecting</span> · you are</div>
+      <div class="name" id="myName" title="Click to rename">…</div>
+    </div>
+    <div>
+      <div class="label">your PIN</div>
+      <div class="pin" id="myPin">····</div>
+    </div>
+  </div>
+
+  <h2>On your network</h2>
+  <div class="grid" id="peers"></div>
+
+  <h2>Send by PIN</h2>
+  <div class="bypin">
+    <input id="pinIn" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off" aria-label="Their PIN">
+    <button class="btn" id="pinSend">Choose files…</button>
+    <div class="hint">Or drop files anywhere on the page after typing a PIN.</div>
+    <div class="err" id="pinErr"></div>
+  </div>
+
+  <h2>Transfers</h2>
+  <div id="xfers"><div class="empty">Nothing yet.</div></div>
+
+  <footer>Files go directly between the two browsers when possible. If that fails, or a file is over 1 GB, it is streamed through share.kebin.dev without being saved. Keep this page open until a transfer finishes.</footer>
+</main>
+
+<div class="dropall">Drop to send</div>
+<input type="file" id="picker" multiple hidden>
+
+<dialog id="incoming">
+  <h3 id="inTitle"></h3>
+  <div id="inSub" class="s"></div>
+  <ul id="inList"></ul>
+  <div class="row"><button class="btn alt" id="inNo">Decline</button><button class="btn" id="inYes">Accept</button></div>
+</dialog>
+
+<script>
+"use strict";
+const ICE = {iceServers: [{urls: ["stun:stun.cloudflare.com:3478", "stun:stun.l.google.com:19302"]}]};
+const P2P_MAX = 1024 ** 3;          // files above this go through the relay (browser memory)
+const CHUNK = 64 * 1024;
+const $ = id => document.getElementById(id);
+let ident = null, me = null, es = null, failures = 0;
+const xfers = {};                    // tid -> transfer
+const inbox = [];                    // incoming offers waiting for a decision
+
+try { ident = JSON.parse(localStorage.getItem("share.ident") || "null"); } catch (e) {}
+
+function fmt(n) { const u = ["B", "KB", "MB", "GB", "TB"]; let i = 0; while (n >= 1024 && i < 4) { n /= 1024; i++; } return (i ? n.toFixed(1) : n) + " " + u[i]; }
+function hex(n) { return [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, "0")).join(""); }
+async function post(path, body) {
+  const r = await fetch(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  let j = {}; try { j = await r.json(); } catch (e) {}
+  if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
+const auth = () => ({id: ident.id, token: ident.token});
+const signal = (to, msg) => post("/api/signal", {...auth(), to, msg});
+
+// ---------- identity + presence ----------
+async function join() {
+  const r = await post("/api/join", ident || {});
+  ident = {id: r.id, token: r.token};
+  try { localStorage.setItem("share.ident", JSON.stringify(ident)); } catch (e) {}
+  setMe(r);
+  connect();
+}
+function setMe(m) { me = m; $("myName").textContent = m.name; $("myPin").textContent = m.pin; }
+function setConn(on) { $("conn").className = "dot" + (on ? " on" : ""); $("connText").textContent = on ? "online" : "reconnecting"; }
+function connect() {
+  if (es) es.close();
+  es = new EventSource(`/api/events?id=${encodeURIComponent(ident.id)}&token=${encodeURIComponent(ident.token)}`);
+  es.onopen = () => { failures = 0; setConn(true); };
+  es.onmessage = e => handle(JSON.parse(e.data));
+  es.onerror = () => {
+    setConn(false);
+    if (es.readyState === EventSource.CLOSED || ++failures > 4) { es.close(); failures = 0; setTimeout(() => join().catch(() => setTimeout(connect, 5000)), 2000); }
+  };
+}
+$("myName").onclick = async () => {
+  const n = prompt("Your name on this page:", me ? me.name : "");
+  if (!n) return;
+  try { setMe(await post("/api/rename", {...auth(), name: n})); } catch (e) { alert(e.message); }
+};
+
+function handle(ev) {
+  if (ev.type === "hello") setMe(ev.me);
+  else if (ev.type === "peers") renderPeers(ev.peers);
+  else if (ev.type === "signal") onSignal(ev.from, ev.msg).catch(e => console.error(e));
+}
+
+function renderPeers(peers) {
+  const box = $("peers"); box.textContent = "";
+  if (!peers.length) { const d = document.createElement("div"); d.className = "empty"; d.textContent = "No one else here yet. Open share.kebin.dev on another device on the same network."; box.appendChild(d); return; }
+  for (const p of peers) {
+    const b = document.createElement("button"); b.className = "peer";
+    const n = document.createElement("span"); n.className = "n"; n.textContent = p.name;
+    const s = document.createElement("span"); s.className = "p"; s.textContent = "PIN " + p.pin + " · click or drop files";
+    b.append(n, s);
+    b.onclick = () => pick(files => send(p.id, files));
+    b.ondragover = e => { e.preventDefault(); e.stopPropagation(); b.classList.add("drag"); };
+    b.ondragleave = () => b.classList.remove("drag");
+    b.ondrop = e => { e.preventDefault(); e.stopPropagation(); b.classList.remove("drag"); document.body.classList.remove("dragging"); if (e.dataTransfer.files.length) send(p.id, e.dataTransfer.files); };
+    box.appendChild(b);
+  }
+}
+
+// ---------- picking files ----------
+function pick(cb) { const p = $("picker"); p.value = ""; p.onchange = () => { if (p.files.length) cb(p.files); }; p.click(); }
+$("pinIn").oninput = e => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 4); $("pinErr").textContent = ""; };
+$("pinSend").onclick = () => {
+  const pin = $("pinIn").value;
+  if (!/^\d{4}$/.test(pin)) { $("pinErr").textContent = "Type their 4-digit PIN first."; return; }
+  pick(files => send(pin, files));
+};
+let dragDepth = 0;
+addEventListener("dragenter", e => { if ([...e.dataTransfer.types].includes("Files")) { dragDepth++; document.body.classList.add("dragging"); } });
+addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove("dragging"); } });
+addEventListener("dragover", e => e.preventDefault());
+addEventListener("drop", e => {
+  e.preventDefault(); dragDepth = 0; document.body.classList.remove("dragging");
+  if (!e.dataTransfer.files.length) return;
+  const pin = $("pinIn").value;
+  if (!/^\d{4}$/.test(pin)) { $("pinErr").textContent = "Type their PIN first, or drop onto a device above."; return; }
+  send(pin, e.dataTransfer.files);
+});
+
+// ---------- transfer rows ----------
+function row(t) {
+  const box = $("xfers"); if (box.querySelector(".empty")) box.textContent = "";
+  const d = document.createElement("div"); d.className = "xfer";
+  d.innerHTML = '<div class="top"><span class="t"></span><span class="s"></span><button hidden>Cancel</button></div><div class="bar"><div></div></div>';
+  box.prepend(d);
+  t.el = d;
+  d.querySelector("button").onclick = () => cancel(t, true);
+  paint(t);
+}
+function paint(t) {
+  if (!t.el) return;
+  const total = t.meta.reduce((a, f) => a + f.size, 0);
+  const names = t.meta.length === 1 ? t.meta[0].name : `${t.meta.length} files`;
+  t.el.querySelector(".t").textContent = (t.dir === "out" ? "To " : "From ") + (t.peer ? t.peer.name : "PIN " + t.to) + ": " + names + " (" + fmt(total) + ")";
+  const s = t.el.querySelector(".s"); s.textContent = t.status; s.className = "s" + (t.state === "bad" ? " bad" : t.state === "good" ? " good" : "");
+  t.el.querySelector(".bar div").style.width = (total ? Math.min(100, 100 * (t.bytes || 0) / total) : 0) + "%";
+  t.el.querySelector("button").hidden = !!t.state;
+}
+function status(t, text, state) { t.status = text; if (state) t.state = state; paint(t); }
+function cancel(t, local) {
+  if (t.state) return;
+  t.cancelled = true;
+  if (t.pc) try { t.pc.close(); } catch (e) {}
+  if (t.xhr) try { t.xhr.abort(); } catch (e) {}
+  if (local && t.peer) signal(t.peer.id, {type: "cancel", tid: t.tid}).catch(() => {});
+  status(t, local ? "cancelled" : "cancelled by the other side", "bad");
+}
+
+// ---------- sending ----------
+async function send(to, fileList) {
+  const files = [...fileList];
+  const t = {tid: hex(16), dir: "out", to, files, meta: files.map(f => ({name: f.name, size: f.size, type: f.type || ""})), bytes: 0, status: "asking…"};
+  xfers[t.tid] = t; row(t);
+  try {
+    const r = await signal(to, {type: "offer", tid: t.tid, files: t.meta});
+    t.peer = r.to;
+    status(t, "waiting for them to accept");
+    $("pinErr").textContent = "";
+  } catch (e) { status(t, e.message, "bad"); if (/^\d{4}$/.test(String(to))) $("pinErr").textContent = e.message; }
+}
+
+async function startSend(t) {
+  status(t, "connecting…");
+  if (t.files.some(f => f.size > P2P_MAX)) return relaySend(t);
+  try {
+    const dc = await openChannel(t, true);
+    await sendOverChannel(t, dc);
+  } catch (e) {
+    if (t.cancelled) return;
+    console.warn("direct failed, using relay", e);
+    if (t.pc) try { t.pc.close(); } catch (x) {}
+    t.pc = null; t.bytes = 0;
+    return relaySend(t);
+  }
+}
+
+function openChannel(t, initiator) {
+  return new Promise((resolve, reject) => {
+    const pc = t.pc = new RTCPeerConnection(ICE);
+    t.pending = t.pending || [];
+    const timer = setTimeout(() => reject(new Error("direct connection timed out")), 12000);
+    pc.onicecandidate = e => { if (e.candidate) signal(t.peer.id, {type: "rtc", tid: t.tid, ice: e.candidate.toJSON()}).catch(() => {}); };
+    pc.onconnectionstatechange = () => { if (pc.connectionState === "failed") { clearTimeout(timer); reject(new Error("direct connection failed")); } };
+    const ready = dc => { dc.binaryType = "arraybuffer"; dc.onopen = () => { clearTimeout(timer); resolve(dc); }; if (dc.readyState === "open") { clearTimeout(timer); resolve(dc); } };
+    if (initiator) {
+      ready(pc.createDataChannel("files", {ordered: true}));
+      pc.createOffer().then(o => pc.setLocalDescription(o)).then(() => signal(t.peer.id, {type: "rtc", tid: t.tid, sdp: pc.localDescription.toJSON()})).catch(reject);
+    } else {
+      pc.ondatachannel = e => { ready(e.channel); t.onChannel && t.onChannel(e.channel); };
+    }
+  });
+}
+
+async function onRtc(t, msg) {
+  if (!t.pc && t.dir === "in") openChannel(t, false).catch(() => {});      // receiver side is created by the first message
+  const pc = t.pc; if (!pc) return;
+  if (msg.sdp) {
+    await pc.setRemoteDescription(msg.sdp);
+    for (const c of t.pending.splice(0)) await pc.addIceCandidate(c).catch(() => {});
+    if (msg.sdp.type === "offer") {
+      await pc.setLocalDescription(await pc.createAnswer());
+      await signal(t.peer.id, {type: "rtc", tid: t.tid, sdp: pc.localDescription.toJSON()});
+    }
+  } else if (msg.ice) {
+    if (pc.remoteDescription) await pc.addIceCandidate(msg.ice).catch(() => {}); else t.pending.push(msg.ice);
+  }
+}
+
+function drained(dc, below) {
+  if (dc.bufferedAmount <= below) return Promise.resolve();
+  return new Promise(res => { dc.bufferedAmountLowThreshold = below; dc.onbufferedamountlow = () => { dc.onbufferedamountlow = null; res(); }; });
+}
+
+async function sendOverChannel(t, dc) {
+  status(t, "sending directly");
+  t.direct = true;
+  const acked = new Promise((res, rej) => { dc.onmessage = e => { if (typeof e.data === "string" && JSON.parse(e.data).h === "ack") res(); }; dc.onclose = () => rej(new Error("channel closed")); });
+  let started = false;
+  for (let i = 0; i < t.files.length; i++) {
+    const f = t.files[i];
+    dc.send(JSON.stringify({h: "file", i, name: f.name, size: f.size, type: f.type || ""}));
+    for (let off = 0; off < f.size; off += CHUNK) {
+      if (t.cancelled) throw new Error("cancelled");
+      await drained(dc, 8 * 1024 * 1024);
+      const buf = await f.slice(off, off + CHUNK).arrayBuffer();
+      dc.send(buf); t.bytes += buf.byteLength; started = true;
+      if ((off / CHUNK) % 32 === 0) paint(t);
+    }
+    dc.send(JSON.stringify({h: "end", i}));
+  }
+  dc.send(JSON.stringify({h: "all"}));
+  try { await acked; } catch (e) { if (!started) throw e; }
+  status(t, "sent", "good");
+  signal(t.peer.id, {type: "done", tid: t.tid}).catch(() => {});
+  setTimeout(() => { try { t.pc.close(); } catch (e) {} }, 2000);
+}
+
+async function relaySend(t) {
+  status(t, "sending through share.kebin.dev");
+  let base = 0;
+  for (let i = 0; i < t.files.length; i++) {
+    if (t.cancelled) return;
+    await signal(t.peer.id, {type: "relay", tid: t.tid, i});
+    let tries = 0;
+    for (;;) {
+      const code = await new Promise(res => {
+        const x = t.xhr = new XMLHttpRequest();
+        x.open("PUT", `/api/relay/${t.tid}/${i}`);
+        x.setRequestHeader("X-Share-Id", ident.id); x.setRequestHeader("X-Share-Token", ident.token);
+        x.upload.onprogress = e => { t.bytes = base + e.loaded; paint(t); };
+        x.onload = () => res(x.status); x.onerror = () => res(0); x.onabort = () => res(-1);
+        x.send(t.files[i]);
+      });
+      if (code === 200) break;
+      if (code === -1 || t.cancelled) return;
+      if (code === 503 && ++tries < 20) { status(t, "relay busy, retrying…"); await new Promise(r => setTimeout(r, 5000)); continue; }
+      return status(t, "relay failed (" + code + ")", "bad");
+    }
+    base += t.files[i].size; t.bytes = base; paint(t);
+  }
+  status(t, "sent", "good");
+  signal(t.peer.id, {type: "done", tid: t.tid}).catch(() => {});
+}
+
+// ---------- receiving ----------
+function receiveOverChannel(t, dc) {
+  status(t, "receiving directly");
+  let cur = null;
+  dc.onmessage = e => {
+    if (typeof e.data === "string") {
+      const m = JSON.parse(e.data);
+      if (m.h === "file") cur = {name: m.name, size: m.size, type: m.type, parts: [], got: 0};
+      else if (m.h === "end" && cur) { save(new Blob(cur.parts, {type: cur.type || "application/octet-stream"}), cur.name); cur = null; }
+      else if (m.h === "all") { dc.send(JSON.stringify({h: "ack"})); status(t, "received, saved to your downloads", "good"); }
+    } else if (cur) { cur.parts.push(e.data); cur.got += e.data.byteLength; t.bytes += e.data.byteLength; if (cur.parts.length % 32 === 0) paint(t); }
+  };
+}
+function save(blob, name) {
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+}
+function relayReceive(t, i) {
+  // The browser downloads the file itself (straight to disk). Browsers only let a page start one download on its own,
+  // so every file also gets a link in the row: if file 2+ does not start, click it (or allow multiple downloads).
+  status(t, `file ${i + 1} of ${t.meta.length} is coming through share.kebin.dev, see your browser's downloads` + (i ? " (nothing? click its link below)" : ""));
+  let box = t.el.querySelector(".links");
+  if (!box) { box = document.createElement("div"); box.className = "links"; t.el.appendChild(box); }
+  const a = document.createElement("a"); a.href = `/api/relay/${t.tid}/${i}`; a.download = t.meta[i].name; a.textContent = "↓ " + t.meta[i].name;
+  a.onclick = () => { a.removeAttribute("href"); a.style.opacity = .5; };
+  box.appendChild(a);
+  const auto = document.createElement("a"); auto.href = a.href; auto.download = a.download;
+  document.body.appendChild(auto); auto.click(); auto.remove();
+  t.bytes = t.meta.slice(0, i).reduce((s, f) => s + f.size, 0); paint(t);
+}
+
+function showNext() {
+  const d = $("incoming");
+  if (d.open || !inbox.length) return;
+  const t = inbox[0];
+  const total = t.meta.reduce((a, f) => a + f.size, 0);
+  $("inTitle").textContent = `${t.peer.name} wants to send you ${t.meta.length === 1 ? "a file" : t.meta.length + " files"}`;
+  $("inSub").textContent = `PIN ${t.peer.pin} · ${fmt(total)}`;
+  const ul = $("inList"); ul.textContent = "";
+  for (const f of t.meta) { const li = document.createElement("li"); li.textContent = `${f.name} (${fmt(f.size)})`; ul.appendChild(li); }
+  const decide = async yes => {
+    d.close(); inbox.shift();
+    if (t.cancelled) { showNext(); return; }
+    row(t);
+    try {
+      if (yes) { status(t, "accepted, connecting…"); t.onChannel = dc => receiveOverChannel(t, dc); await signal(t.peer.id, {type: "accept", tid: t.tid}); }
+      else { await signal(t.peer.id, {type: "decline", tid: t.tid}); status(t, "declined", "bad"); }
+    } catch (e) { status(t, e.message, "bad"); }
+    showNext();
+  };
+  $("inYes").onclick = () => decide(true);
+  $("inNo").onclick = () => decide(false);
+  d.oncancel = e => { e.preventDefault(); };
+  d.showModal();
+  if (document.hidden && "Notification" in window && Notification.permission === "granted") new Notification("Share", {body: $("inTitle").textContent});
+}
+
+async function onSignal(from, msg) {
+  let t = xfers[msg.tid];
+  if (msg.type === "offer") {
+    if (t) return;
+    t = xfers[msg.tid] = {tid: msg.tid, dir: "in", peer: from, meta: msg.files, bytes: 0, status: "incoming", pending: []};
+    inbox.push(t); showNext();
+    return;
+  }
+  if (!t || (t.peer && t.peer.id !== from.id)) return;
+  if (msg.type === "accept" && t.dir === "out") return startSend(t);
+  if (msg.type === "decline") return status(t, "declined", "bad");
+  if (msg.type === "cancel") { const i = inbox.indexOf(t); if (i >= 0) { inbox.splice(i, 1); if ($("incoming").open && i === 0) { $("incoming").close(); showNext(); } } return cancel(t, false); }
+  if (msg.type === "rtc") return onRtc(t, msg);
+  if (msg.type === "relay" && t.dir === "in") { if (t.pc) try { t.pc.close(); } catch (e) {} return relayReceive(t, msg.i); }
+  if (msg.type === "done" && t.dir === "in" && !t.state) { t.bytes = t.meta.reduce((a, f) => a + f.size, 0); status(t, t.direct === false ? "received" : "received, saved to your downloads", "good"); }
+}
+
+addEventListener("beforeunload", e => { if (Object.values(xfers).some(t => !t.state && t.status !== "incoming")) { e.preventDefault(); e.returnValue = ""; } });
+if ("Notification" in window && Notification.permission === "default") addEventListener("click", () => Notification.requestPermission(), {once: true});
+join().catch(e => { $("connText").textContent = "could not connect: " + e.message; });
+</script>
+</body>
+</html>

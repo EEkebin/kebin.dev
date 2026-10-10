@@ -1,0 +1,19 @@
+[Unit]
+Description=share.kebin.dev browser-to-browser file sending (127.0.0.1:8766)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /srv/kebin.dev/infra/web/share/share.py
+Restart=always
+RestartSec=3
+DynamicUser=yes
+StateDirectory=kebin-share
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

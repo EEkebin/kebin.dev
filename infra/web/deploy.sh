@@ -27,4 +27,10 @@ systemctl daemon-reload
 systemctl enable --now kebin-status.service >/dev/null
 systemctl restart kebin-status.service
 
+# share.kebin.dev service
+install -m 644 "$REPO/infra/web/share/kebin-share.service" /etc/systemd/system/kebin-share.service
+systemctl daemon-reload
+systemctl enable --now kebin-share.service >/dev/null
+systemctl restart kebin-share.service
+
 echo "deployed $(git rev-parse --short HEAD)"

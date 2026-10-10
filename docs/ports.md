@@ -25,6 +25,7 @@
 | ai.kebin.dev | 10.0.10.100:8080 | llama-swap: `/v1/` needs the bearer key (`$ai_key_ok` from `/etc/nginx/secrets/ai-key-map.conf`), the dashboard at `/ui/` takes the key or a Tinyauth login |
 | search.kebin.dev | 10.0.10.100:8888 and :8899 | SearXNG's page behind Tinyauth; `/mcp` and `/health` go to mcp-searxng with the same bearer key as ai.kebin.dev |
 | kebin.dev/cli/ | static | OpenCode CLI installers; page behind Tinyauth with the API key filled in, scripts public |
+| share.kebin.dev | web VM 127.0.0.1:8766 | send files between browsers (kebin-share.service), public, rate-limited |
 | downloads.kebin.dev | 10.0.10.30:6880 (AriaNg), :6800 /jsonrpc (aria2 RPC), :8097 /ia/ (archive.org helper) | download portal, Tinyauth |
 | vr.kebin.dev | 10.0.10.30:8000 | HLS for VRChat players, per-share tokens, no Tinyauth on purpose |
 
