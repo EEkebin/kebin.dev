@@ -154,47 +154,54 @@ def verify_summary(item):
 
 
 def overview():
-    """One row per queued archive.org link: everything aria2 knows about, grouped by the item folder."""
-    tasks = rpc("aria2.tellActive") + rpc("aria2.tellWaiting", 0, 10000) + rpc("aria2.tellStopped", 0, 10000)
-    items = {}
-    for t in tasks:
+    """One row per queued archive.org link. Progress is measured on disk against the item's manifest, so it does
+    not depend on what aria2 still lists; speed, activity and errors come from aria2's live tasks."""
+    live = {}
+    for t in rpc("aria2.tellActive") + rpc("aria2.tellWaiting", 0, 10000) + rpc("aria2.tellStopped", 0, 10000):
         d = t.get("dir", "")
         if not d.startswith("/downloads/") or not t.get("files"):
             continue
         item = d[len("/downloads/"):].split("/", 1)[0]
-        it = items.setdefault(item, {"files": 0, "done": 0, "total": 0, "complete": 0, "speed": 0, "errors": 0, "active": 0})
-        total, comp = int(t.get("totalLength", 0)), int(t.get("completedLength", 0))
-        if total == 0:                      # a queued task has no size yet; take it from the item's manifest
-            if item not in SIZES:
-                try:
-                    SIZES[item] = {f["name"]: int(f.get("size", 0) or 0) for f in manifest(item)}
-                except Exception:
-                    SIZES[item] = {}
-            rel = t["files"][0].get("path", "")[len(f"/downloads/{item}/"):]
-            total = SIZES[item].get(rel, 0)
-        it["files"] += 1
-        it["total"] += total
-        it["done"] += comp
-        it["speed"] += int(t.get("downloadSpeed", 0))
-        it["complete"] += t["status"] == "complete"
-        it["errors"] += t["status"] == "error"
-        it["active"] += t["status"] == "active"
+        lv = live.setdefault(item, {"partial": 0, "speed": 0, "active": 0, "waiting": 0, "errors": 0})
+        if t["status"] == "active":
+            lv["partial"] += int(t.get("completedLength", 0))
+            lv["speed"] += int(t.get("downloadSpeed", 0))
+            lv["active"] += 1
+        lv["waiting"] += t["status"] in ("waiting", "paused")
+        lv["errors"] += t["status"] == "error"
+    items = sorted(set(vstate()["items"]) | set(live))
     if not items:
         return ""
     rows = ""
-    for item, it in sorted(items.items()):
-        pct = 100 * it["done"] / it["total"] if it["total"] else 0
-        left = it["total"] - it["done"]
-        state = "done" if it["complete"] == it["files"] else ("downloading" if it["active"] else "queued")
-        eta = "done" if state == "done" else (f"{left / it['speed'] / 3600:.1f} h" if it["speed"] > 1e5 else "-")
-        err = f' · <b>{it["errors"]} failed</b>' if it["errors"] else ""
+    for item in items:
+        if item not in MD5S:
+            try:
+                MD5S[item] = {f["name"]: (f.get("md5"), int(f.get("size", 0) or 0)) for f in manifest(item)}
+            except Exception:
+                MD5S[item] = {}
+        names = MD5S[item]
+        total = sum(s for _, s in names.values())
+        on_disk = 0
+        done_bytes = 0
+        for name, (_, size) in names.items():
+            p = os.path.join(HOST_ROOT, item, name)
+            if os.path.isfile(p) and os.path.getsize(p) == size and not os.path.exists(p + ".aria2"):
+                on_disk += 1
+                done_bytes += size
+        lv = live.get(item, {"partial": 0, "speed": 0, "active": 0, "waiting": 0, "errors": 0})
+        done_bytes += lv["partial"]
+        pct = 100 * done_bytes / total if total else 0
+        left = max(total - done_bytes, 0)
+        state = ("downloading" if lv["active"] else "queued" if lv["waiting"] else "done" if names and on_disk == len(names) else "stopped")
+        eta = "done" if state == "done" else (f"{left / lv['speed'] / 3600:.1f} h" if lv["speed"] > 1e5 else "-")
+        err = f' · <b>{lv["errors"]} failed</b>' if lv["errors"] else ""
         vok, vtotal, vbad = verify_summary(item)
         ver = f"{vok}/{vtotal}" + (f' <b>{len(vbad)} bad: {html.escape(", ".join(vbad)[:80])}</b>' if vbad else "")
         rows += (f'<tr><td><a href="https://archive.org/details/{html.escape(item)}" target="_blank">{html.escape(item)}</a></td>'
-                 f'<td>{it["complete"]}/{it["files"]}</td><td>{ver}</td><td>{it["done"]/2**30:,.1f} / {it["total"]/2**30:,.1f} GB</td>'
+                 f'<td>{on_disk}/{len(names)}</td><td>{ver}</td><td>{done_bytes/2**30:,.1f} / {total/2**30:,.1f} GB</td>'
                  f'<td><div class="bar"><div style="width:{pct:.1f}%"></div></div>{pct:.1f}%</td>'
-                 f'<td>{it["speed"]/2**20:.1f} MB/s</td><td>{eta}</td><td>{state}{err}</td></tr>')
-    return f'<h2>Queued links</h2><table><tr><th>item</th><th>downloaded</th><th>verified</th><th>size</th><th>progress</th><th>speed</th><th>ETA</th><th>state</th></tr>{rows}</table><p class="small">Refreshes every 10 s. "verified" = finished files whose MD5 matched archive.org\'s manifest; a mismatch is deleted and re-queued, twice at most, then shown in red. Totals cover what aria2 still lists; clearing finished tasks in the portal drops them from here.</p>'
+                 f'<td>{lv["speed"]/2**20:.1f} MB/s</td><td>{eta}</td><td>{state}{err}</td></tr>')
+    return f'<h2>Queued links</h2><table><tr><th>item</th><th>on disk</th><th>verified</th><th>size</th><th>progress</th><th>speed</th><th>ETA</th><th>state</th></tr>{rows}</table><p class="small">Refreshes every 10 s. "on disk" = files fully downloaded; "verified" = those whose MD5 matched archive.org\'s manifest (checked one at a time after download, so it trails). A mismatch is deleted and re-queued, twice at most, then shown in red.</p>'
 
 
 def page(msg="", rows=""):
