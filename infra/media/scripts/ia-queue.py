@@ -2,7 +2,7 @@
 """archive.org helper for the download portal (downloads.kebin.dev/ia/). Runs as media-ia-queue.service on :8097.
 
 Paste an archive.org item link or identifier; every "original" file of the item is queued into aria2 (RPC on
-127.0.0.1:6800). A verifier thread MD5-checks each finished file against the item's manifest (3 in parallel,
+127.0.0.1:6800). A verifier thread MD5-checks each finished file against the item's manifest (one at a time,
 state in /srv/media/ia-verify.json) and re-queues a mismatch. Files land
 in /downloads/<item>/... which is /mnt/storage/Media/Downloads/<item>/ on the host. ?dry=1 only lists them."""
 import hashlib, html, json, os, re, threading, time, urllib.parse, urllib.request
@@ -115,7 +115,7 @@ def verify_one(item, name, want):
 
 def verify_loop():
     import concurrent.futures as cf
-    pool = cf.ThreadPoolExecutor(3)
+    pool = cf.ThreadPoolExecutor(1)      # one at a time: three parallel readers stalled aria2's event loop on the NAS
     busy = set()
     while True:
         try:
