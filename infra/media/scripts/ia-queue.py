@@ -2,9 +2,10 @@
 """archive.org helper for the download portal (downloads.kebin.dev/ia/). Runs as media-ia-queue.service on :8097.
 
 Paste an archive.org item link or identifier; every "original" file of the item is queued into aria2 (RPC on
-127.0.0.1:6800) with its MD5 from the item's manifest, so aria2 verifies each file after download. Files land
+127.0.0.1:6800). A verifier thread MD5-checks each finished file against the item's manifest (3 in parallel,
+state in /srv/media/ia-verify.json) and re-queues a mismatch. Files land
 in /downloads/<item>/... which is /mnt/storage/Media/Downloads/<item>/ on the host. ?dry=1 only lists them."""
-import html, json, re, urllib.parse, urllib.request
+import hashlib, html, json, os, re, threading, time, urllib.parse, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 PORT, RPC = 8097, "http://127.0.0.1:6800/jsonrpc"
@@ -39,16 +40,117 @@ def manifest(item):
     return [f for f in meta["files"] if f.get("source") == "original" and not IA_OWN.search(f["name"])]
 
 
+def add_task(item, name):
+    sub, base = (name.rsplit("/", 1) if "/" in name else ("", name))
+    opts = {"dir": f"/downloads/{item}" + (f"/{sub}" if sub else ""), "out": base}
+    return rpc("aria2.addUri", [f"https://archive.org/download/{urllib.parse.quote(item)}/{urllib.parse.quote(name)}"], opts)
+
+
 def queue(item, files):
-    gids = []
-    for f in files:
-        name = f["name"]
-        sub, base = (name.rsplit("/", 1) if "/" in name else ("", name))
-        opts = {"dir": f"/downloads/{item}" + (f"/{sub}" if sub else ""), "out": base}
-        if f.get("md5"):
-            opts["checksum"] = f"md5={f['md5']}"
-        gids.append(rpc("aria2.addUri", [f"https://archive.org/download/{urllib.parse.quote(item)}/{urllib.parse.quote(name)}"], opts))
-    return gids
+    """Queue every file. No checksum option: aria2 verifies one file at a time at ~90 MB/s and finished files then
+    sit in download slots waiting their turn, which starved the downloads (2026-10-09). The verifier thread below
+    hashes finished files in parallel instead."""
+    with VLOCK:
+        st = vstate()
+        if item not in st["items"]:
+            st["items"].append(item)
+        vsave(st)
+    return [add_task(item, f["name"]) for f in files]
+
+
+# ---- verification: every finished file is MD5-checked against the manifest, in parallel, outside aria2 ----
+VERIFY_STATE = "/srv/media/ia-verify.json"
+HOST_ROOT = "/mnt/storage/Media/Downloads"
+VLOCK = threading.Lock()
+MD5S = {}          # item -> {file name: md5}
+
+
+def vstate():
+    try:
+        return json.load(open(VERIFY_STATE))
+    except Exception:
+        return {"items": [], "files": {}}
+
+
+def vsave(st):
+    tmp = VERIFY_STATE + ".tmp"
+    json.dump(st, open(tmp, "w"), indent=1)
+    os.replace(tmp, VERIFY_STATE)
+
+
+def md5_file(path):
+    h = hashlib.md5()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(8 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def verify_one(item, name, want):
+    path = os.path.join(HOST_ROOT, item, name)
+    key = f"{item}/{name}"
+    got = md5_file(path) if want else None
+    with VLOCK:
+        st = vstate()
+        rec = st["files"].get(key, {"attempts": 0})
+        if not want or got == want:
+            rec.update({"ok": True, "md5": got, "at": time.time(), "note": None if want else "no checksum published"})
+            print(time.strftime("%H:%M:%S"), "ok  ", key, flush=True)
+        else:
+            rec["attempts"] += 1
+            rec.update({"ok": False, "md5": got, "at": time.time()})
+            print(time.strftime("%H:%M:%S"), f"BAD {key}: {got} != {want}, attempt {rec['attempts']}", flush=True)
+            if rec["attempts"] <= 2:
+                try:
+                    os.remove(path)
+                    add_task(item, name)
+                    rec["note"] = "re-queued"
+                except Exception as e:
+                    rec["note"] = f"re-queue failed: {e}"
+            else:
+                rec["note"] = "failed twice, left for a human"
+        st["files"][key] = rec
+        vsave(st)
+
+
+def verify_loop():
+    import concurrent.futures as cf
+    pool = cf.ThreadPoolExecutor(3)
+    busy = set()
+    while True:
+        try:
+            st = vstate()
+            for item in list(st["items"]):
+                if item not in MD5S:
+                    try:
+                        MD5S[item] = {f["name"]: (f.get("md5"), int(f.get("size", 0) or 0)) for f in manifest(item)}
+                    except Exception as e:
+                        print("manifest failed for", item, e, flush=True)
+                        continue
+                for name, (want, size) in MD5S[item].items():
+                    key = f"{item}/{name}"
+                    rec = st["files"].get(key)
+                    if (rec and rec.get("ok")) or key in busy:
+                        continue
+                    if rec and not rec.get("ok") and rec.get("attempts", 0) > 2:
+                        continue
+                    path = os.path.join(HOST_ROOT, item, name)
+                    if not os.path.isfile(path) or os.path.exists(path + ".aria2") or os.path.getsize(path) != size:
+                        continue          # not finished yet (or size wrong: aria2 will finish/re-get it)
+                    busy.add(key)
+                    pool.submit(lambda i=item, n=name, w=want, k=key: (verify_one(i, n, w), busy.discard(k)))
+        except Exception as e:
+            print("verify loop:", e, flush=True)
+        time.sleep(20)
+
+
+def verify_summary(item):
+    """(verified, total files in manifest, failed names, pending count) for the status table."""
+    st = vstate()
+    names = MD5S.get(item, {})
+    ok = sum(1 for n in names if st["files"].get(f"{item}/{n}", {}).get("ok"))
+    bad = [n for n in names if st["files"].get(f"{item}/{n}") and not st["files"][f"{item}/{n}"].get("ok") and st["files"][f"{item}/{n}"].get("attempts", 0) > 2]
+    return ok, len(names), bad
 
 
 def overview():
@@ -86,11 +188,13 @@ def overview():
         state = "done" if it["complete"] == it["files"] else ("downloading" if it["active"] else "queued")
         eta = "done" if state == "done" else (f"{left / it['speed'] / 3600:.1f} h" if it["speed"] > 1e5 else "-")
         err = f' · <b>{it["errors"]} failed</b>' if it["errors"] else ""
+        vok, vtotal, vbad = verify_summary(item)
+        ver = f"{vok}/{vtotal}" + (f' <b>{len(vbad)} bad: {html.escape(", ".join(vbad)[:80])}</b>' if vbad else "")
         rows += (f'<tr><td><a href="https://archive.org/details/{html.escape(item)}" target="_blank">{html.escape(item)}</a></td>'
-                 f'<td>{it["complete"]}/{it["files"]}</td><td>{it["done"]/2**30:,.1f} / {it["total"]/2**30:,.1f} GB</td>'
+                 f'<td>{it["complete"]}/{it["files"]}</td><td>{ver}</td><td>{it["done"]/2**30:,.1f} / {it["total"]/2**30:,.1f} GB</td>'
                  f'<td><div class="bar"><div style="width:{pct:.1f}%"></div></div>{pct:.1f}%</td>'
                  f'<td>{it["speed"]/2**20:.1f} MB/s</td><td>{eta}</td><td>{state}{err}</td></tr>')
-    return f'<h2>Queued links</h2><table><tr><th>item</th><th>files</th><th>size</th><th>progress</th><th>speed</th><th>ETA</th><th>state</th></tr>{rows}</table><p class="small">Refreshes every 10 s. Totals cover what aria2 still lists; clearing finished tasks in the portal drops them from here.</p>'
+    return f'<h2>Queued links</h2><table><tr><th>item</th><th>downloaded</th><th>verified</th><th>size</th><th>progress</th><th>speed</th><th>ETA</th><th>state</th></tr>{rows}</table><p class="small">Refreshes every 10 s. "verified" = finished files whose MD5 matched archive.org\'s manifest; a mismatch is deleted and re-queued, twice at most, then shown in red. Totals cover what aria2 still lists; clearing finished tasks in the portal drops them from here.</p>'
 
 
 def page(msg="", rows=""):
@@ -102,7 +206,7 @@ def page(msg="", rows=""):
 <style>body{{font:15px/1.5 system-ui,sans-serif;background:#111;color:#eee;margin:auto;padding:24px;max-width:860px}}input[type=text]{{width:100%;padding:10px;font-size:15px;background:#1c1c1c;color:#eee;border:1px solid #333;border-radius:6px}}
 button{{padding:10px 16px;margin:10px 8px 0 0;font-size:15px;border:0;border-radius:6px;background:#ffd23f;color:#111;cursor:pointer}}button.alt{{background:#333;color:#eee}}p.msg{{color:#ffd23f}}table{{border-collapse:collapse;width:100%;font-size:13px}}td,th{{text-align:left;padding:5px 10px 5px 0;border-bottom:1px solid #222;color:#aaa;vertical-align:middle}}a{{color:#ffd23f}}
 h2{{font-size:17px;margin:32px 0 8px}}.bar{{background:#2a2a2a;border-radius:4px;height:8px;overflow:hidden;min-width:120px;margin-bottom:3px}}.bar div{{background:#ffd23f;height:100%}}b{{color:#ff6b6b}}p.small{{font-size:12px;color:#777}}</style></head><body>
-<h1>Queue an archive.org item</h1><p>Paste an archive.org link (details, download or metadata page) or just the identifier. Every original file of the item goes to aria2 with its MD5, into <code>Downloads/&lt;item&gt;/</code>. Watch and control it in the <a href="/">portal</a>.</p>
+<h1>Queue an archive.org item</h1><p>Paste an archive.org link (details, download or metadata page) or just the identifier. Every original file of the item goes to aria2 and is MD5-checked against the manifest when it finishes, into <code>Downloads/&lt;item&gt;/</code>. Watch and control it in the <a href="/">portal</a>.</p>
 <form method="post"><input type="text" name="item" placeholder="https://archive.org/details/some-item" required><button type="submit">Queue all files</button><button class="alt" type="submit" name="dry" value="1">Preview only</button></form>
 {f'<p class="msg">{msg}</p>' if msg else ''}{rows}{status}</body></html>"""
 
@@ -143,4 +247,5 @@ class H(BaseHTTPRequestHandler):
             self.send(page(f"Failed: {html.escape(str(e))}"))
 
 
+threading.Thread(target=verify_loop, daemon=True).start()
 ThreadingHTTPServer(("0.0.0.0", PORT), H).serve_forever()
