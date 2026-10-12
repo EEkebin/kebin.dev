@@ -37,14 +37,13 @@ New-Item -ItemType Directory -Force -Path $CfgDir | Out-Null
 if (Test-Path $Cfg) { Copy-Item $Cfg "$Cfg.bak.$([int](Get-Date -UFormat %s))" }
 $json = @{
     '$schema' = "https://opencode.ai/config.json"
-    model = "aibox/qwen3.5-9b"
+    model = "aibox/qwen3.8-27b"
     provider = @{ aibox = @{
         npm = "@ai-sdk/openai-compatible"
         name = "kebin.dev (ai.kebin.dev)"
         options = @{ baseURL = $Api; apiKey = $Key }
         models = @{
-            'qwen3.5-9b' = @{ name = "Qwen3.5 9B (vision, 128K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 131072; output = 16384 } }
-            'qwen3.8-27b' = @{ name = "Qwen3.8 27B (vision, 32K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 32768; output = 8192 } }
+            'qwen3.8-27b' = @{ name = "Qwen3.8 27B (vision, 262K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 262144; output = 32768 } }
         }
     } }
     mcp = @{ searxng = @{

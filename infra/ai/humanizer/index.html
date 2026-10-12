@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Humanize · kebin</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#ffd23f">
+<style>
+:root{--bg:#000;--fg:#ececf1;--muted:#9a9aa6;--line:#1c1c22;--card:#0c0c10;--accent:#ffd23f;--accent-fg:#111;--down:#ff5c5c}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 16px}
+h1{font-size:24px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 24px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:800px){.cols{grid-template-columns:1fr}}
+.pane{display:flex;flex-direction:column;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;min-height:28px}
+textarea,.out{width:100%;min-height:420px;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:12px;padding:14px;font:inherit;resize:vertical}
+textarea:focus{outline:none;border-color:var(--accent)}
+.out{white-space:pre-wrap;overflow-wrap:anywhere;overflow:auto}
+.out.empty{color:var(--muted)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+button{font:600 14px/1 inherit;font-family:inherit;border-radius:10px;padding:11px 18px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+button.go{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default}
+.small{padding:6px 10px;font-size:12px}
+.count.over{color:var(--down)}
+.state{color:var(--muted);font-size:13px}
+.note{color:var(--muted);font-size:13px;margin-top:20px}
+a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Humanize</h1>
+  <p class="lead">Paste a draft, get it back rewritten so it reads like a person wrote it. English or Chinese. Runs on the home server, nothing leaves it.</p>
+
+  <div class="cols">
+    <section class="pane">
+      <div class="head"><span>Draft</span><span class="count" id="count">0 / 12000</span></div>
+      <textarea id="draft" placeholder="Paste your text here…" spellcheck="true"></textarea>
+    </section>
+    <section class="pane">
+      <div class="head"><span>Rewrite</span><button class="small" id="copy" disabled>Copy</button></div>
+      <div class="out empty" id="out">The rewrite shows up here.</div>
+    </section>
+  </div>
+
+  <div class="bar">
+    <button class="go" id="go">Rewrite</button>
+    <button id="stop" disabled>Stop</button>
+    <span class="state" id="state"></span>
+  </div>
+
+  <p class="note">Proofread numbers, dates and names: the model is trained to keep them but can still slip. Formatting (lists, headings) may be flattened. Each run is different, so hit Rewrite again if you don't like one. The first run after a while takes about 20&nbsp;s to load the model.</p>
+</main>
+<script>
+const MAX = 12000;
+const $ = id => document.getElementById(id);
+const draft = $('draft'), out = $('out'), go = $('go'), stop = $('stop'), copy = $('copy'), state = $('state'), count = $('count');
+let ctrl = null;
+
+try { draft.value = localStorage.getItem('humanize-draft') || ''; } catch (e) {}
+function updateCount() {
+  count.textContent = draft.value.length + ' / ' + MAX;
+  count.classList.toggle('over', draft.value.length > MAX);
+  try { localStorage.setItem('humanize-draft', draft.value); } catch (e) {}
+}
+draft.addEventListener('input', updateCount);
+updateCount();
+
+function busy(on) { go.disabled = on; stop.disabled = !on; draft.readOnly = on; }
+
+go.onclick = async () => {
+  const text = draft.value.trim();
+  if (!text) { state.textContent = 'Paste something first.'; return; }
+  if (text.length > MAX) { state.textContent = 'Too long, split it into parts.'; return; }
+  ctrl = new AbortController();
+  busy(true);
+  out.textContent = ''; out.classList.remove('empty'); copy.disabled = true;
+  state.textContent = 'Starting… (loading the model can take ~20 s)';
+  const t0 = performance.now(); let tokens = 0, got = '';
+  try {
+    const r = await fetch('api/rewrite', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                           body: JSON.stringify({text}), signal: ctrl.signal});
+    if (!r.ok) throw new Error(await r.text() || ('HTTP ' + r.status));
+    const reader = r.body.getReader(), dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const {value, done} = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, {stream: true});
+      let i;
+      while ((i = buf.indexOf('\n')) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') continue;
+        try {
+          const piece = JSON.parse(data).choices?.[0]?.text || '';
+          if (piece) { got += piece; tokens++; out.textContent = got.replace(/^\s+/, ''); }
+        } catch (e) {}
+      }
+      if (tokens) state.textContent = 'Writing… ' + tokens + ' tokens';
+    }
+    const s = (performance.now() - t0) / 1000;
+    state.textContent = 'Done in ' + s.toFixed(1) + ' s.';
+  } catch (e) {
+    state.textContent = e.name === 'AbortError' ? 'Stopped.' : ('Error: ' + e.message);
+  } finally {
+    busy(false); ctrl = null;
+    copy.disabled = !out.textContent || out.classList.contains('empty');
+  }
+};
+stop.onclick = () => ctrl && ctrl.abort();
+copy.onclick = async () => {
+  try { await navigator.clipboard.writeText(out.textContent); copy.textContent = 'Copied'; }
+  catch (e) { copy.textContent = 'Copy failed'; }
+  setTimeout(() => copy.textContent = 'Copy', 1500);
+};
+</script>
+</body>
+</html>

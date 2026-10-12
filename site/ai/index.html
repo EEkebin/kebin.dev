@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>AI · kebin</title>
-  <meta name="description" content="kebin.dev AI: OpenCode, ComfyUI, SearXNG, the model router and the CLI installer.">
+  <meta name="description" content="kebin.dev AI: OpenCode, ComfyUI, SearXNG, the model router, the humanizer and the CLI installer.">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffd23f">
@@ -18,7 +18,7 @@
   <main class="wrap">
     <a class="back" href="/">← kebin.dev</a>
     <h1>AI</h1>
-    <p class="lead">Everything on the V100. Portal login for the pages, API key for the CLI.</p>
+    <p class="lead">Everything on three V100s. Portal login for the pages, API key for the CLI.</p>
 
     <section aria-label="AI apps">
       <div class="grid">
@@ -41,6 +41,11 @@
           <img class="logo" src="/images/apps/models.svg" alt="" width="40" height="40">
           <span class="name">Models</span>
           <span class="status" hx-get="/api/status?svc=models" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://humanize.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/humanize.svg" alt="" width="40" height="40">
+          <span class="name">Humanize</span>
+          <span class="status" hx-get="/api/status?svc=humanize" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
         </a>
         <a class="card" href="/cli/">
           <img class="logo" src="/images/apps/cli.svg" alt="" width="40" height="40">

@@ -1,33 +1,44 @@
 # llama-swap: one OpenAI/Anthropic-compatible endpoint on :8080, loads whichever model is asked for.
-# Model names below are what OpenCode and any client use. "capstone-qwen" stays as an alias for the Capstone box.
+# Model names below are what OpenCode and any client use. "capstone-qwen" (the Capstone box) and "qwen" are aliases
+# of the 27B.
+# One model is loaded at a time (llama-swap's default): asking for another unloads the current one.
+# GGUFs live on the NAS (/mnt/storage/AI/models, NFS); --load-mode none copies what stays on the CPU into RAM at load,
+# so a running model never reads the share again.
 healthCheckTimeout: 300
 logLevel: info
 
+# load the main model as soon as llama-swap starts
+hooks:
+  on_startup:
+    preload: ["qwen3.8-27b"]
+
 macros:
   server: /home/user/.local/share/capstone-inference/llama.cpp/build-multi/bin/llama-server
+  models: /mnt/storage/AI/models
   common: >-
-    --host 127.0.0.1 --port ${PORT} -ngl all -fa auto --jinja -np 1 -t 6 -tb 6
+    --host 127.0.0.1 --port ${PORT} -ngl all --load-mode none --jinja -np 1 -t 6 -tb 6
     --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
 
 models:
-  # default: everything on the V100 (device 0), vision on, 128K, thinking budget kept
-  qwen3.5-9b:
-    cmd: >-
-      ${server} ${common}
-      -m /home/user/.local/share/capstone-inference/Qwen3.5-9B-Q6_K.gguf
-      --mmproj /home/user/.local/share/capstone-inference/mmproj-F16.gguf --image-max-tokens 2048
-      -c 131072 -ctk f16 -ctv f16 --reasoning-budget 1536
-      --device CUDA0
-    aliases: ["capstone-qwen", "qwen"]
-    ttl: 1800
-
-  # bigger option already on disk: split across V100 + P100 so vision and 32K fit
+  # the main model: Q8 split evenly over all three V100s, vision on, full 262K window with a q8 KV cache
   qwen3.8-27b:
     cmd: >-
       ${server} ${common}
-      -m /home/user/models/Qwen3.8-27B-UD-Q3_K_XL.gguf
-      --mmproj /home/user/models/mmproj-F16.gguf --image-max-tokens 2048
-      --chat-template-file /home/user/models/chat_template.jinja
-      -c 32768 -ctk f16 -ctv f16 --reasoning-budget 2048
-      --device CUDA0,CUDA1 --tensor-split 4,1 -fa off
-    ttl: 900
+      -m ${models}/qwen3.8-27b/Qwen3.8-27B-Q8_0.gguf
+      --mmproj ${models}/qwen3.8-27b/mmproj-F16.gguf --image-max-tokens 2048
+      --chat-template-file ${models}/qwen3.8-27b/chat_template.jinja
+      -c 262144 -fa on -ctk q8_0 -ctv q8_0 --reasoning-budget 2048
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 1,1,1
+    aliases: ["capstone-qwen", "qwen"]
+    # no ttl: stays loaded until another model is asked for
+
+  # text rewriter (Gemma 4 12B fine-tune), plain completion model: the prompt is built by the humanizer page
+  # (infra/ai/humanizer), not a chat template. 8K window is what it was trained for. Spread over all three cards
+  # like the 27B; asking for it unloads whatever else is loaded.
+  humanizer:
+    cmd: >-
+      ${server} ${common}
+      -m ${models}/humanizer/humanizer-12b-Q8_0.gguf
+      -c 8192 -fa auto
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 1,1,1
+    ttl: 300

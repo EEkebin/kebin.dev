@@ -1,0 +1,13 @@
+[Unit]
+Description=Humanizer page (draft -> rewrite via the humanizer model in llama-swap) on :8095
+After=network-online.target llama-swap.service
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/user/.local/share/humanizer/humanizer.py
+# prompt_format.json lives next to the model on the NAS; if the share is not up yet, retry
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
