@@ -31,6 +31,7 @@ Models live on the NAS: `/mnt/storage/AI/models/<model>/`, through the media VM'
 |---|---|---|
 | `qwen3.8-27b` (the main model, aliases `capstone-qwen`, `qwen`) | `qwen3.8-27b/` (Q8_0, plus the old UD-Q3_K_XL / IQ3_XXS quants and an MTP draft) | all three cards, split 5.6/6.4/5 (about 14.9/15.5/13.1 GB, leaving about 3 GB on CUDA2 for transcodes), 262K with a q8_0 KV cache, vision |
 | `humanizer` | `humanizer/` (Q8_0 + `prompt_format.json`) | all three cards, 8K, completion only |
+| `artemis`, `wicked-tutu` | `artemis/`, `wicked-tutu/` (Q8_0) | all three cards, 64K, for SillyTavern; unload after 30 idle minutes |
 
 One model is loaded at a time: asking for a different one unloads the current one first (about 70 s for the 27B, less for the humanizer). The 27B is preloaded when llama-swap starts and unloads after 15 idle minutes, so ComfyUI gets CUDA0 back; the humanizer unloads after 5 idle minutes. Either comes back on the next request for it.
 

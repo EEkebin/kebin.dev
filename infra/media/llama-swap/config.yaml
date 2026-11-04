@@ -45,3 +45,22 @@ models:
       -c 8192 -fa auto
       --device CUDA0,CUDA1,CUDA2 --tensor-split 1,1,1
     ttl: 300
+
+  # fiction models for SillyTavern (tavern.kebin.dev), both Gemma 4 31B finetunes at Q8, about 12.7/14/11.6-12.9 GB with
+  # 64K context. Artemis is the better writer and its thinking helps roleplay. Wicked Tutu is the explicit one (its GGUF
+  # files are named Broken-Tutu-Unleashed), and its maker does not prioritize thinking, so that is off.
+  artemis:
+    cmd: >-
+      ${server} ${common}
+      -m ${models}/artemis/TheDrummer_Artemis-31B-v1.2-Q8_0.gguf
+      -c 65536 -fa on -ctk q8_0 -ctv q8_0
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 5.6,6.4,5
+    ttl: 1800
+
+  wicked-tutu:
+    cmd: >-
+      ${server} ${common}
+      -m ${models}/wicked-tutu/Broken-Tutu-Unleashed-31B-v0.1-Q8_0_hb16.gguf
+      -c 65536 -fa on -ctk q8_0 -ctv q8_0 --reasoning-budget 0
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 5.6,6.4,5
+    ttl: 1800
