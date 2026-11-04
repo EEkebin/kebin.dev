@@ -1,0 +1,26 @@
+[Unit]
+Description=SillyTavern (tavern.kebin.dev, Tinyauth in front)
+After=network-online.target
+
+[Container]
+Image=ghcr.io/sillytavern/sillytavern:latest
+ContainerName=sillytavern
+# No login of its own: Tinyauth at nginx is the gate. The whitelist in config/config.yaml (it has to be there, the env var
+# can't hold a list) only accepts the web VM, 10.0.10.20, so nothing else on the network can open the chats through this port.
+PublishPort=8010:8000
+Environment=NODE_ENV=production
+Environment=SILLYTAVERN_LISTEN=true
+Environment=SILLYTAVERN_WHITELISTMODE=true
+Environment=SILLYTAVERN_ENABLEFORWARDEDWHITELIST=false
+Volume=/home/user/.local/share/sillytavern/config:/home/node/app/config:z
+Volume=/home/user/.local/share/sillytavern/data:/home/node/app/data:z
+Volume=/home/user/.local/share/sillytavern/plugins:/home/node/app/plugins:z
+Volume=/home/user/.local/share/sillytavern/extensions:/home/node/app/public/scripts/extensions/third-party:z
+AutoUpdate=registry
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

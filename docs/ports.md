@@ -21,6 +21,7 @@
 | auth.kebin.dev | 10.0.10.100:3000 | Tinyauth login page |
 | code.kebin.dev | 10.0.10.100:4096 | OpenCode web, behind Tinyauth |
 | comfy.kebin.dev | 10.0.10.30:8188 | ComfyUI, behind Tinyauth |
+| tavern.kebin.dev | 10.0.10.100:8010 | SillyTavern, behind Tinyauth; the app itself only accepts the web VM |
 | humanize.kebin.dev | 10.0.10.100:8095 | Humanizer page (rewrites a draft with the humanizer model), behind Tinyauth |
 | pve.kebin.dev | https://10.0.0.200:8006 | Proxmox UI, behind Tinyauth, self-signed upstream |
 | ai.kebin.dev | 10.0.10.30:8086 | llama-swap: `/v1/` needs the bearer key (`$ai_key_ok` from `/etc/nginx/secrets/ai-key-map.conf`), the dashboard at `/ui/` takes the key or a Tinyauth login |

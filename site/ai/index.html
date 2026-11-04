@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>AI · kebin</title>
-  <meta name="description" content="kebin.dev AI: OpenCode, ComfyUI, SearXNG, the model router, the humanizer and the CLI installer.">
+  <meta name="description" content="kebin.dev AI: OpenCode, ComfyUI, SearXNG, the model router, the humanizer, SillyTavern and the CLI installer.">
   <meta name="robots" content="noindex, nofollow, noarchive">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffd23f">
@@ -46,6 +46,11 @@
           <img class="logo" src="/images/apps/humanize.svg" alt="" width="40" height="40">
           <span class="name">Humanize</span>
           <span class="status" hx-get="/api/status?svc=humanize" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
+        </a>
+        <a class="card" href="https://tavern.kebin.dev" target="_blank" rel="noopener">
+          <img class="logo" src="/images/apps/tavern.svg" alt="" width="40" height="40">
+          <span class="name">Tavern</span>
+          <span class="status" hx-get="/api/status?svc=tavern" hx-trigger="load, every 60s" hx-swap="innerHTML"><span class="dot"></span>checking</span>
         </a>
         <a class="card" href="/cli/">
           <img class="logo" src="/images/apps/cli.svg" alt="" width="40" height="40">

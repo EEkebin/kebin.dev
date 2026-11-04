@@ -14,6 +14,7 @@ This VM holds the AI apps. The GPUs, llama-swap and ComfyUI are on the media VM 
 | `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled; its page is search.kebin.dev behind Tinyauth |
 | `postgres.service` (Quadlet) | 0.0.0.0:5432 | PostgreSQL, `pgautoupgrade` image (latest major, upgrades its own data folder), logins only from 10.0.0.0/24, 10.0.10.0/24, 10.0.20.0/24 |
 | `humanizer.service` | 0.0.0.0:8095 | the humanize.kebin.dev page: builds the humanizer model's fixed prompt and streams the rewrite from llama-swap on the media VM |
+| `sillytavern.service` (Quadlet) | 0.0.0.0:8010 | SillyTavern for tavern.kebin.dev, data in `~/.local/share/sillytavern`, models from llama-swap on the media VM |
 | `mcp-searxng.service` (Quadlet) | 0.0.0.0:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
