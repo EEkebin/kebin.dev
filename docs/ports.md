@@ -20,10 +20,10 @@
 | shelfmark.kebin.dev | 10.0.10.30:8084 | Shelfmark book/audiobook downloader, behind Tinyauth |
 | auth.kebin.dev | 10.0.10.100:3000 | Tinyauth login page |
 | code.kebin.dev | 10.0.10.100:4096 | OpenCode web, behind Tinyauth |
-| comfy.kebin.dev | 10.0.10.100:8188 | ComfyUI, behind Tinyauth |
+| comfy.kebin.dev | 10.0.10.30:8188 | ComfyUI, behind Tinyauth |
 | humanize.kebin.dev | 10.0.10.100:8095 | Humanizer page (rewrites a draft with the humanizer model), behind Tinyauth |
 | pve.kebin.dev | https://10.0.0.200:8006 | Proxmox UI, behind Tinyauth, self-signed upstream |
-| ai.kebin.dev | 10.0.10.100:8080 | llama-swap: `/v1/` needs the bearer key (`$ai_key_ok` from `/etc/nginx/secrets/ai-key-map.conf`), the dashboard at `/ui/` takes the key or a Tinyauth login |
+| ai.kebin.dev | 10.0.10.30:8086 | llama-swap: `/v1/` needs the bearer key (`$ai_key_ok` from `/etc/nginx/secrets/ai-key-map.conf`), the dashboard at `/ui/` takes the key or a Tinyauth login |
 | search.kebin.dev | 10.0.10.100:8888 and :8899 | SearXNG's page behind Tinyauth; `/mcp` and `/health` go to mcp-searxng with the same bearer key as ai.kebin.dev |
 | kebin.dev/cli/ | static | OpenCode CLI installers; page behind Tinyauth with the API key filled in, scripts public |
 | share.kebin.dev | web VM 127.0.0.1:8766 | send files between browsers (kebin-share.service), public, rate-limited |

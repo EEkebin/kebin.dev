@@ -4,9 +4,9 @@
   "provider": {
     "aibox": {
       "npm": "@ai-sdk/openai-compatible",
-      "name": "aibox (llama-swap on 3x V100)",
+      "name": "aibox (llama-swap on the media VM, 3x V100)",
       "options": {
-        "baseURL": "http://127.0.0.1:8080/v1",
+        "baseURL": "http://10.0.10.30:8086/v1",
         "apiKey": "local"
       },
       "models": {

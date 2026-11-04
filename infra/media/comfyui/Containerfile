@@ -1,0 +1,4 @@
+# Base for the ComfyUI container: the Python and venv come from the mounted folder, this only adds what ComfyUI-Manager
+# needs to install plugins. Build once: podman build -t localhost/comfyui-base:26.04 infra/media/comfyui
+FROM docker.io/library/ubuntu:26.04
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates && rm -rf /var/lib/apt/lists/*

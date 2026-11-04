@@ -6,7 +6,7 @@
 |---|---|---|
 | router | 76.x WAN | forwards 80/tcp, 443/tcp, 443/udp to the web VM |
 | web | 10.0.10.20 | nginx 1.30 with HTTP/3, wildcard TLS, homepage, status endpoint |
-| media | 10.0.10.30 | Podman stack, Tesla P100 for NVENC/NVDEC |
+| media | 10.0.10.30 | Podman stack, 3 Tesla V100s: NVENC/NVDEC, llama-swap, ComfyUI |
 | nas | 10.0.10.10 | NFS export `/srv/tank/storage` (16 TB ZFS) |
 
 DNS is at Porkbun: one A record per subdomain pointing at the WAN IP. The WAN IP is residential and can change; there is deliberately no dynamic-DNS updater, records are updated by hand.

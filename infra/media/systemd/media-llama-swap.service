@@ -1,0 +1,16 @@
+[Unit]
+Description=llama-swap model router on :8086 (OpenAI/Anthropic compatible API)
+After=network-online.target mnt-storage.mount
+Wants=network-online.target
+
+[Service]
+User=user
+WorkingDirectory=/srv/media/llama
+Environment=CUDA_DEVICE_ORDER=PCI_BUS_ID
+Environment=LD_LIBRARY_PATH=/srv/media/llama/bin
+ExecStart=/srv/media/llama/llama-swap --config /srv/media/llama/config.yaml --listen 0.0.0.0:8086
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

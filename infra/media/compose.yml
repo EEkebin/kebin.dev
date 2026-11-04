@@ -17,7 +17,8 @@ services:
       NVIDIA_DRIVER_CAPABILITIES: all
       JELLYFIN_PublishedServerUrl: https://stream.kebin.dev
     devices:
-      - nvidia.com/gpu=all
+      # pinned to one card (CUDA2); llama-swap leaves about 3 GB free on it for transcodes
+      - nvidia.com/gpu=GPU-6882ab91-520d-ee64-959d-51d4e5ed97d1
     volumes:
       - /srv/media/config/jellyfin:/config
       - /srv/media/cache/jellyfin:/cache
@@ -147,7 +148,8 @@ services:
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: all
     devices:
-      - nvidia.com/gpu=all
+      # same card as Jellyfin
+      - nvidia.com/gpu=GPU-6882ab91-520d-ee64-959d-51d4e5ed97d1
     volumes:
       - /srv/media/config/tdarr/server:/app/server
       - /srv/media/config/tdarr/configs:/app/configs
@@ -327,6 +329,28 @@ services:
       - /srv/media/config/nextcloud/html:/var/www/html
       - /mnt/storage:/storage:ro
     restart: always
+
+  # ---------- image generation ----------
+  # Plugins can run code, so this container only sees its own folders, never /mnt/storage. It runs the same Python and
+  # venv as the folder it mounts (paths have to match the venv's). Pinned to CUDA0: the 27B idles out to free it.
+  comfyui:
+    image: localhost/comfyui-base:26.04   # built from infra/media/comfyui/Containerfile; update.sh skips what it can't pull
+    container_name: comfyui
+    user: "1000:1000"
+    working_dir: /home/user/.local/share/comfyui/ComfyUI
+    environment:
+      HOME: /home/user/.local/share/comfyui
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+    devices:
+      - nvidia.com/gpu=GPU-84847bcc-4bed-2338-5107-4b0af7506197
+    volumes:
+      - /srv/media/config/comfyui/ComfyUI:/home/user/.local/share/comfyui/ComfyUI
+      - /srv/media/config/comfyui/uv:/home/user/.local/share/uv:ro
+    command: [".venv/bin/python", "main.py", "--listen", "0.0.0.0", "--port", "8188", "--fp32-vae", "--preview-method", "auto"]
+    ports:
+      - "8188:8188"
+    restart: unless-stopped
 
 # Dual-stack container network: containers reach the internet over IPv6 as well (NAT66 behind the VM's address).
 # The internal IPv6 subnet is deliberately NOT a private fd00::/8 (ULA) range: browsers and libc rank a ULA source

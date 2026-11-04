@@ -24,25 +24,4 @@ echo "== SDXL base checkpoint (6.9 GB)"
 mkdir -p models/checkpoints
 [ -f models/checkpoints/sd_xl_base_1.0.safetensors ] || curl -sL -o models/checkpoints/sd_xl_base_1.0.safetensors "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors"
 ls -la models/checkpoints/ | awk 'NR>3{print $5,$9}'
-echo "== unit"
-mkdir -p ~/.config/systemd/user
-cat > ~/.config/systemd/user/comfyui.service <<U
-[Unit]
-Description=ComfyUI on 127.0.0.1:8188 (default device: V100)
-After=network-online.target
-
-[Service]
-WorkingDirectory=$D/ComfyUI
-Environment=CUDA_DEVICE_ORDER=PCI_BUS_ID
-ExecStart=$D/ComfyUI/.venv/bin/python main.py --listen 0.0.0.0 --port 8188 --cuda-device 0 --fp32-vae --preview-method auto
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=default.target
-U
-export XDG_RUNTIME_DIR=/run/user/1000
-systemctl --user daemon-reload && systemctl --user enable --now comfyui.service
-for i in $(seq 1 40); do curl -sf -o /dev/null http://127.0.0.1:8188/system_stats && break; sleep 3; done
-curl -s http://127.0.0.1:8188/system_stats | python3 -c 'import sys,json; d=json.load(sys.stdin); print("comfy", d["system"]["comfyui_version"], "| torch", d["system"]["pytorch_version"]); [print("  device:", x["name"], x["vram_total"]//2**20, "MiB") for x in d["devices"]]'
-df -h / | tail -1
+# Runs from the comfyui service in infra/media/compose.yml: keep this folder at /srv/media/config/comfyui/ComfyUI and uv's Python at /srv/media/config/comfyui/uv.

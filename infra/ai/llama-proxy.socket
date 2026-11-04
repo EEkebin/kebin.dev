@@ -1,0 +1,8 @@
+[Unit]
+Description=Old model API address on the ai VM (:8080), forwarded to llama-swap on the media VM
+
+[Socket]
+ListenStream=0.0.0.0:8080
+
+[Install]
+WantedBy=sockets.target

@@ -12,8 +12,8 @@ import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-FORMAT = os.environ.get("HUMANIZER_FORMAT", "/mnt/storage/AI/models/humanizer/prompt_format.json")
-UPSTREAM = os.environ.get("HUMANIZER_UPSTREAM", "127.0.0.1:8080")
+FORMAT = os.environ.get("HUMANIZER_FORMAT", os.path.join(HERE, "prompt_format.json"))
+UPSTREAM = os.environ.get("HUMANIZER_UPSTREAM", "10.0.10.30:8086")
 MODEL = os.environ.get("HUMANIZER_MODEL", "humanizer")
 LISTEN = int(os.environ.get("HUMANIZER_PORT", "8095"))
 MAX_CHARS = 12000      # the model has an 8192-token window for instruction + draft + rewrite

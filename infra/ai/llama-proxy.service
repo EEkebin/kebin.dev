@@ -1,0 +1,5 @@
+[Unit]
+Description=Forward :8080 to llama-swap on the media VM (keeps the Capstone tunnel and LAN clients working)
+
+[Service]
+ExecStart=/usr/lib/systemd/systemd-socket-proxyd 10.0.10.30:8086

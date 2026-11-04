@@ -2,25 +2,27 @@
 # Model names below are what OpenCode and any client use. "capstone-qwen" (the Capstone box) and "qwen" are aliases
 # of the 27B.
 # One model is loaded at a time (llama-swap's default): asking for another unloads the current one.
+# Runs on the media VM next to Jellyfin and Tdarr, which are pinned to CUDA2. Every model leaves about 3 GB free there.
 # GGUFs live on the NAS (/mnt/storage/AI/models, NFS); --load-mode none copies what stays on the CPU into RAM at load,
 # so a running model never reads the share again.
 healthCheckTimeout: 300
 logLevel: info
 
-# load the main model as soon as llama-swap starts
+# load the main model as soon as llama-swap starts (it still idles out after its ttl)
 hooks:
   on_startup:
     preload: ["qwen3.8-27b"]
 
 macros:
-  server: /home/user/.local/share/capstone-inference/llama.cpp/build-multi/bin/llama-server
+  server: /srv/media/llama/bin/llama-server
   models: /mnt/storage/AI/models
   common: >-
     --host 127.0.0.1 --port ${PORT} -ngl all --load-mode none --jinja -np 1 -t 6 -tb 6
     --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
 
 models:
-  # the main model: Q8 split evenly over all three V100s, vision on, full 262K window with a q8 KV cache
+  # the main model: Q8 over all three V100s, vision on, full 262K window with a q8 KV cache. The split is measured:
+  # about 14.9/15.5/13.1 GB. CUDA0 also holds the vision add-on, and CUDA2 keeps its room for transcodes.
   qwen3.8-27b:
     cmd: >-
       ${server} ${common}
@@ -28,9 +30,10 @@ models:
       --mmproj ${models}/qwen3.8-27b/mmproj-F16.gguf --image-max-tokens 2048
       --chat-template-file ${models}/qwen3.8-27b/chat_template.jinja
       -c 262144 -fa on -ctk q8_0 -ctv q8_0 --reasoning-budget 2048
-      --device CUDA0,CUDA1,CUDA2 --tensor-split 1,1,1
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 5.6,6.4,5
     aliases: ["capstone-qwen", "qwen"]
-    # no ttl: stays loaded until another model is asked for
+    # unloads after 15 idle minutes so ComfyUI gets CUDA0 back
+    ttl: 900
 
   # text rewriter (Gemma 4 12B fine-tune), plain completion model: the prompt is built by the humanizer page
   # (infra/ai/humanizer), not a chat template. 8K window is what it was trained for. Spread over all three cards

@@ -42,9 +42,9 @@ SERVICES = {
     "shelfmark":   f"{MEDIA}:8084/api/health",
     # ai
     "code":        f"{AI}:4096/",
-    "comfy":       f"{AI}:8188/system_stats",
+    "comfy":       f"{MEDIA}:8188/system_stats",
     "search":      f"{AI}:8888/healthz",
-    "models":      f"{AI}:8080/running",
+    "models":      f"{MEDIA}:8086/running",
     "humanize":    f"{AI}:8095/health",
     # system
     "pve":         "https://10.0.0.200:8006/",

@@ -1,6 +1,6 @@
 # Media VM (10.0.10.30)
 
-Ubuntu 26.04, 8 vCPU, 15 GB RAM, Tesla P100 16 GB passed through. Rootful Podman with podman-compose. All containers run as uid/gid 1000, which is what owns every file on the NAS.
+Ubuntu 26.04, 8 vCPU, three Tesla V100 16 GB passed through (CUDA0 SXM2, CUDA1 and CUDA2 PCIe). Rootful Podman with podman-compose. All containers run as uid/gid 1000, which is what owns every file on the NAS.
 
 ## Host prerequisites
 
@@ -64,6 +64,8 @@ Every *arr container and qBittorrent mount `/mnt/storage/Media` at `/data`, so p
 | qBittorrent | 8080, 6881 | qbittorrent.kebin.dev |
 | Tdarr | 8265 (UI), 8266 (server) | tdarr.kebin.dev |
 | Navidrome | 4533 | music.kebin.dev |
+| llama-swap (systemd, not a container) | 8086 | ai.kebin.dev, see `infra/ai/README.md` |
+| ComfyUI (sandboxed: sees only its own folder) | 8188 | comfy.kebin.dev |
 | FileBrowser Quantum | 8090 | files.kebin.dev |
 | Nextcloud | 8081 | cloud.kebin.dev |
 | Audiobookshelf | 13378 | books.kebin.dev |
