@@ -339,7 +339,7 @@ services:
     user: "1000:1000"
     working_dir: /home/user/.local/share/comfyui/ComfyUI
     environment:
-      HOME: /home/user/.local/share/comfyui
+      HOME: /home/user/.local/share/comfyui/ComfyUI/.home
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: all
     devices:
