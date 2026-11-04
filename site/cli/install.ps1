@@ -10,16 +10,40 @@ $Cfg = Join-Path $CfgDir "opencode.json"
 function Say($m) { Write-Host $m -ForegroundColor Yellow }
 
 Say "1/3  OpenCode"
+# OpenCode 1 and 2 share the `opencode` command, and Scoop and Chocolatey only carry 1.x, so any package-managed 1.x has to go first.
+$OcVer = $null
 if (Get-Command opencode -ErrorAction SilentlyContinue) {
-    Write-Host "already installed: $(opencode --version 2>$null | Select-Object -First 1)"
-} elseif (Get-Command npm -ErrorAction SilentlyContinue) {
-    npm install -g opencode-ai
-} elseif (Get-Command scoop -ErrorAction SilentlyContinue) {
-    scoop install opencode
-} elseif (Get-Command choco -ErrorAction SilentlyContinue) {
-    choco install -y opencode
+    $m = [regex]::Match((opencode --version 2>$null | Select-Object -First 1), '\d+\.\d+\.\d+')
+    if ($m.Success) { $OcVer = $m.Value }
+}
+if ($OcVer -and [int]($OcVer.Split('.')[0]) -ge 2) {
+    Write-Host "already installed: OpenCode $OcVer"
 } else {
-    Write-Host "No npm, scoop or choco found. Install Node.js from https://nodejs.org then rerun, or grab the Windows binary from https://github.com/anomalyco/opencode/releases" -ForegroundColor Red
+    if ($OcVer) {
+        Write-Host "replacing OpenCode $OcVer with OpenCode 2"
+        if (Get-Command npm -ErrorAction SilentlyContinue) { try { npm uninstall -g opencode-ai 2>$null | Out-Null } catch {} }
+        if (Get-Command scoop -ErrorAction SilentlyContinue) { try { scoop uninstall opencode 2>$null | Out-Null } catch {} }
+        if (Get-Command choco -ErrorAction SilentlyContinue) { try { choco uninstall -y opencode 2>$null | Out-Null } catch {} }
+    }
+    if (Get-Command npm -ErrorAction SilentlyContinue) {
+        npm install -g @opencode/cli
+    } else {
+        # no npm: the standalone binary from the release, into ~/.opencode/bin on the user's PATH
+        $Ver = (Invoke-RestMethod https://registry.npmjs.org/@opencode/cli/latest).version
+        $Arch = if ($env:PROCESSOR_ARCHITECTURE -eq 'ARM64') { 'arm64' } else { 'x64' }
+        $Bin = Join-Path $HOME ".opencode\bin"
+        New-Item -ItemType Directory -Force -Path $Bin | Out-Null
+        $Zip = Join-Path $env:TEMP "opencode-$Ver.zip"
+        Invoke-WebRequest -UseBasicParsing "https://github.com/anomalyco/opencode/releases/download/v$Ver/opencode-windows-$Arch.zip" -OutFile $Zip
+        Expand-Archive -Force $Zip $Bin
+        Remove-Item $Zip
+        $UserPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        if ($UserPath -notlike "*$Bin*") { [Environment]::SetEnvironmentVariable('Path', "$Bin;$UserPath", 'User') }
+        $env:Path = "$Bin;$env:Path"
+    }
+}
+if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
+    Write-Host "OpenCode didn't install. Grab the Windows binary from https://github.com/anomalyco/opencode/releases, put it on your PATH, then rerun."
     exit 1
 }
 
@@ -54,8 +78,7 @@ $json = @{
         enabled = $true
         timeout = 60000
     } }
-    permission = @{ webfetch = "allow"; websearch = "deny"; 'searxng_*' = "allow" }
-    lsp = $true
+    permission = @{ webfetch = "allow"; websearch = "deny"; 'searxng_*' = "allow"; external_directory = "ask" }
 }
 $json | ConvertTo-Json -Depth 8 | Set-Content -Path $Cfg -Encoding utf8
 Write-Host ""

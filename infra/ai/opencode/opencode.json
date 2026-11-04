@@ -30,7 +30,6 @@
       }
     }
   },
-  "lsp": true,
   "mcp": {
     "searxng": {
       "type": "remote",
@@ -43,6 +42,7 @@
   "permission": {
     "webfetch": "allow",
     "websearch": "deny",
-    "searxng_*": "allow"
+    "searxng_*": "allow",
+    "external_directory": "ask"
   }
 }

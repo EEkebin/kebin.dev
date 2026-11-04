@@ -9,7 +9,7 @@ This VM holds the AI apps. The GPUs, llama-swap and ComfyUI are on the media VM 
 | Unit | Listens | What |
 |---|---|---|
 | `llama-proxy.socket` | 0.0.0.0:8080 | forwards the old model address to llama-swap on the media VM, so the Capstone tunnel and LAN clients keep working |
-| `opencode-web.service` | 0.0.0.0:4096 | OpenCode web UI + API, workspace `/srv/code/projects` |
+| `opencode-web.service` | 0.0.0.0:4096 | OpenCode 2 (`opencode serve`): web UI + API, workspace `/srv/code/projects`, password in `~/.config/opencode/server.env` |
 | `tinyauth.service` (Quadlet) | 0.0.0.0:3000 | login page for code/comfy, used by nginx `auth_request` |
 | `searxng.service` (Quadlet) | 0.0.0.0:8888 | SearXNG metasearch (Brave + Google CSE engines), JSON format enabled; its page is search.kebin.dev behind Tinyauth |
 | `postgres.service` (Quadlet) | 0.0.0.0:5432 | PostgreSQL, `pgautoupgrade` image (latest major, upgrades its own data folder), logins only from 10.0.0.0/24, 10.0.10.0/24, 10.0.20.0/24 |
@@ -53,6 +53,18 @@ Check: `opencode mcp list` shows `searxng connected`; `curl 127.0.0.1:8899/healt
 
 Remote installs (kebin.dev/cli) get the same tool through `https://search.kebin.dev/mcp`, gated by the ai.kebin.dev bearer key and passed as an `Authorization` header in the `mcp.searxng` entry; nothing runs on the user's machine.
 
+## OpenCode 2
+
+This VM and the CLI installers run OpenCode 2, which ships separately from 1.x: the installer is `https://opencode.ai/v2/install` and the npm package is `@opencode/cli`, not `opencode-ai`. `opencode upgrade` stays on the 2.x line. The two share the `opencode` command and the config locations, so they can't sit side by side. `opencode/opencode.json` stays in the 1.x format, which V2 still reads; converting it to V2's native format is optional.
+
+What changed for this setup:
+
+- `opencode web` is gone; `opencode serve` hosts the web app.
+- The server always requires a password. `~/.config/opencode/server.env` holds `OPENCODE_SERVER_PASSWORD`, and nginx sends it as Basic auth (user `opencode`) from `/etc/nginx/secrets/code-auth.conf`, so Tinyauth stays the only login. Change one, change both.
+- V2 no longer asks before touching paths outside the project unless told to, so the config sets `external_directory` to `ask`.
+- V2 doesn't run language servers. LSP tools and diagnostics are gone, so the agent relies on lint, typecheck and compiler commands.
+- The shared background service is off on this VM (`opencode service set disabled true`), because `opencode-web.service` is the server.
+
 ## PostgreSQL
 
 `postgres/postgres.container` runs `docker.io/pgautoupgrade/pgautoupgrade:latest`: the official PostgreSQL image plus an automatic `pg_upgrade` on start when the data folder belongs to an older major. That is what makes a `latest` tag safe here; a plain `postgres:latest` would refuse to start after a major release. Data lives in `~/.local/share/postgres` (the parent of PGDATA, so two majors can coexist during an upgrade), credentials in `~/.config/postgres/env` (`postgres/env.example`), allowed client networks in `~/.config/postgres/pg_hba.conf` (mounted read-only, change it and `systemctl --user restart postgres`). Connect: host 10.0.10.100, port 5432, user `admin`, database `postgres`, password required (scram). JSONB needs nothing extra. No extensions are installed; `pgvector` would mean switching to the `pgvector/pgvector` image, which does not auto-upgrade.
@@ -76,7 +88,7 @@ All on the media VM: llama-swap's model spans the three cards, ComfyUI is pinned
 ## Install from scratch
 
 1. `prep.sh` — stops legacy units, installs git/uv/OpenCode/llama-swap, Python 3.12.
-2. `llama-swap/` config + unit, `opencode/` config + unit, `tinyauth/` env template + Quadlet, `comfyui/install.sh` (venv, torch cu126, ComfyUI + Manager, SDXL base, unit).
+2. `opencode/` config + unit (write `~/.config/opencode/server.env` first, then `opencode service set disabled true`), `tinyauth/` env template + Quadlet, `comfyui/install.sh` (venv, torch cu126, ComfyUI + Manager, SDXL base, unit).
 3. `postgres/` (Quadlet, `env.example` -> `~/.config/postgres/env`, `pg_hba.conf` -> `~/.config/postgres/`, `pg-backup.sh` -> `~/.config/`, the two backup units -> `~/.config/systemd/user/`, then `systemctl --user enable --now pg-backup.timer`); `searxng/` Quadlets (copy `settings.yml.example` to `~/llama/searxng/settings.yml` with a random `secret_key`); `update/` script + user units (`ai-update.sh` goes to `~/.config/`, the units to `~/.config/systemd/user/`, then `systemctl --user enable --now ai-update.timer`).
 4. Public side: `infra/web/nginx/conf.d/{auth,code,comfy}.kebin.dev.conf` and `snippets/tinyauth.conf`; DNS A records for the same names.
 

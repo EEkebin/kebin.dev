@@ -43,6 +43,8 @@ if (Test-Path $Cfg) {
 
 Say "2/2  OpenCode itself"
 if ($All) {
+    if (Get-Command opencode -ErrorAction SilentlyContinue) { try { opencode service stop 2>$null | Out-Null } catch {} }
+    if (Get-Command npm -ErrorAction SilentlyContinue) { try { npm uninstall -g @opencode/cli 2>$null | Out-Null } catch {} }
     if (Get-Command npm -ErrorAction SilentlyContinue) { try { npm uninstall -g opencode-ai 2>$null | Out-Null } catch {} }
     if (Get-Command scoop -ErrorAction SilentlyContinue) { try { scoop uninstall opencode 2>$null | Out-Null } catch {} }
     if (Get-Command choco -ErrorAction SilentlyContinue) { try { choco uninstall -y opencode 2>$null | Out-Null } catch {} }

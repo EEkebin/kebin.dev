@@ -43,8 +43,10 @@ fi
 
 say "2/2  OpenCode itself"
 if [ "$ALL" = 1 ]; then
+  command -v opencode >/dev/null 2>&1 && opencode service stop >/dev/null 2>&1 || true
   rm -rf "$HOME/.opencode"
   for f in "$HOME/.local/bin/opencode" /usr/local/bin/opencode; do [ -L "$f" ] || [ -f "$f" ] && rm -f "$f" 2>/dev/null || true; done
+  command -v npm >/dev/null 2>&1 && npm ls -g @opencode/cli >/dev/null 2>&1 && npm uninstall -g @opencode/cli >/dev/null 2>&1 || true
   command -v npm >/dev/null 2>&1 && npm ls -g opencode-ai >/dev/null 2>&1 && npm uninstall -g opencode-ai >/dev/null 2>&1 || true
   command -v brew >/dev/null 2>&1 && brew list opencode >/dev/null 2>&1 && brew uninstall opencode >/dev/null 2>&1 || true
   rm -rf "$HOME/.local/share/opencode" "$HOME/.cache/opencode" "$CFG_DIR" 2>/dev/null || true

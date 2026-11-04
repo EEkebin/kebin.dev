@@ -18,7 +18,7 @@ command -v ~/.local/bin/uv >/dev/null || curl -LsSf https://astral.sh/uv/install
 ~/.local/bin/uv --version
 
 echo "== opencode"
-curl -fsSL https://opencode.ai/install | bash >/dev/null 2>&1
+curl -fsSL https://opencode.ai/v2/install | bash >/dev/null 2>&1
 ls ~/.opencode/bin/opencode ~/.local/bin/opencode 2>/dev/null
 OC=$(ls ~/.opencode/bin/opencode ~/.local/bin/opencode 2>/dev/null | head -1); "$OC" --version 2>&1 | head -1
 

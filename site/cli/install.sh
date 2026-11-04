@@ -11,11 +11,20 @@ CFG="$CFG_DIR/opencode.json"
 say() { printf '\033[1;33m%s\033[0m\n' "$*"; }
 
 say "1/3  OpenCode"
-if command -v opencode >/dev/null 2>&1; then
-  echo "already installed: $(opencode --version 2>/dev/null | head -1)"
+# OpenCode 1 and 2 share the `opencode` command, so a package-managed 1.x has to go first (the V2 installer replaces a curl-installed one).
+oc_ver=""
+command -v opencode >/dev/null 2>&1 && oc_ver=$(opencode --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || true)
+if [ -n "$oc_ver" ] && [ "${oc_ver%%.*}" -ge 2 ]; then
+  echo "already installed: OpenCode $oc_ver"
 else
-  curl -fsSL https://opencode.ai/install | bash
+  if [ -n "$oc_ver" ]; then
+    echo "replacing OpenCode $oc_ver with OpenCode 2"
+    if command -v npm >/dev/null 2>&1 && npm ls -g opencode-ai >/dev/null 2>&1; then npm uninstall -g opencode-ai >/dev/null 2>&1 || true; fi
+    if command -v brew >/dev/null 2>&1 && brew list opencode >/dev/null 2>&1; then brew uninstall opencode >/dev/null 2>&1 || true; fi
+  fi
+  curl -fsSL https://opencode.ai/v2/install | bash
   export PATH="$HOME/.opencode/bin:$PATH"
+  hash -r 2>/dev/null || true
 fi
 
 say "2/3  API key"
@@ -61,8 +70,7 @@ cat > "$CFG" <<JSON
       "timeout": 60000
     }
   },
-  "permission": { "webfetch": "allow", "websearch": "deny", "searxng_*": "allow" },
-  "lsp": true
+  "permission": { "webfetch": "allow", "websearch": "deny", "searxng_*": "allow", "external_directory": "ask" }
 }
 JSON
 chmod 600 "$CFG"

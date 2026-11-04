@@ -1,9 +1,11 @@
 [Unit]
 Description=OpenCode web UI + API on :4096
-After=network-online.target llama-swap.service
+After=network-online.target
 
 [Service]
-ExecStart=/home/user/.opencode/bin/opencode web --hostname 0.0.0.0 --port 4096
+# V2 always wants a password. It lives in server.env (OPENCODE_SERVER_PASSWORD=...), and nginx sends it for logged-in users.
+EnvironmentFile=/home/user/.config/opencode/server.env
+ExecStart=/home/user/.opencode/bin/opencode serve --hostname 0.0.0.0 --port 4096
 WorkingDirectory=/srv/code/projects
 Environment=HOME=/home/user
 Environment=PATH=/home/user/.opencode/bin:/home/user/.local/bin:/usr/local/bin:/usr/bin:/bin
