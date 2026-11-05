@@ -350,7 +350,7 @@ services:
     command: [".venv/bin/python", "main.py", "--listen", "0.0.0.0", "--port", "8188", "--fp32-vae", "--preview-method", "auto"]
     ports:
       - "8188:8188"
-    restart: unless-stopped
+    restart: always
 
 # Dual-stack container network: containers reach the internet over IPv6 as well (NAT66 behind the VM's address).
 # The internal IPv6 subnet is deliberately NOT a private fd00::/8 (ULA) range: browsers and libc rank a ULA source
