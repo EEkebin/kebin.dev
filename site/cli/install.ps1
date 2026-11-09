@@ -1,6 +1,9 @@
 # Installs the OpenCode CLI on Windows and points it at the kebin.dev model server.
 #   Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression
 #   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression    (non-interactive)
+# Everything runs inside & { } so that, under `irm | iex`, nothing (error mode, variables, the key) is left behind in
+# your session, and a failed check returns instead of closing your PowerShell window.
+& {
 $ErrorActionPreference = "Stop"
 $Api = "https://ai.kebin.dev/v1"
 $Search = "https://search.kebin.dev"
@@ -44,21 +47,21 @@ if ($OcVer -and [int]($OcVer.Split('.')[0]) -ge 2) {
 }
 if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
     Write-Host "OpenCode didn't install. Grab the Windows binary from https://github.com/anomalyco/opencode/releases, put it on your PATH, then rerun."
-    exit 1
+    return
 }
 
 Say "2/3  API key"
 $Key = $env:AIBOX_KEY
 if (-not $Key) { $Key = Read-Host "Paste the ai.kebin.dev API key" }
-if (-not $Key) { Write-Host "no key given" -ForegroundColor Red; exit 1 }
+if (-not $Key) { Write-Host "no key given" -ForegroundColor Red; return }
 try { Invoke-WebRequest -Uri "$Api/models" -Headers @{ Authorization = "Bearer $Key" } -UseBasicParsing | Out-Null; Write-Host "key accepted" }
-catch { Write-Host "key rejected by $Api" -ForegroundColor Red; exit 1 }
+catch { Write-Host "key rejected by $Api" -ForegroundColor Red; return }
 try { Invoke-WebRequest -Uri "$Search/health" -Headers @{ Authorization = "Bearer $Key" } -UseBasicParsing | Out-Null; Write-Host "web search reachable" }
 catch { Write-Host "warning: $Search not reachable, web search may not work right now" -ForegroundColor DarkYellow }
 
 Say "3/3  config -> $Cfg"
 New-Item -ItemType Directory -Force -Path $CfgDir | Out-Null
-if (Test-Path $Cfg) { Copy-Item $Cfg "$Cfg.bak.$([int](Get-Date -UFormat %s))" }
+if (Test-Path $Cfg) { Copy-Item $Cfg "$Cfg.bak.$([DateTimeOffset]::UtcNow.ToUnixTimeSeconds())" }
 $json = @{
     '$schema' = "https://opencode.ai/config.json"
     model = "aibox/qwen3.8-27b"
@@ -84,3 +87,4 @@ $json | ConvertTo-Json -Depth 8 | Set-Content -Path $Cfg -Encoding utf8
 Write-Host ""
 Say "done. open a project folder and run:  opencode"
 Write-Host "switch models inside OpenCode with /models. Web search (searxng_web_search) and page fetch are on. Re-run this script any time to update."
+}

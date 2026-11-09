@@ -1,6 +1,9 @@
 # Removes what install.ps1 set up.
 #   Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression                       # remove the kebin.dev profile only
 #   $env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression   # also remove OpenCode itself
+# Everything runs inside & { } so that, under `irm | iex`, nothing (error mode, variables, the key) is left behind in
+# your session, and a failed check returns instead of closing your PowerShell window.
+& {
 $ErrorActionPreference = "Stop"
 $CfgDir = Join-Path $HOME ".config\opencode"
 $Cfg = Join-Path $CfgDir "opencode.json"
@@ -21,18 +24,18 @@ if (Test-Path $Cfg) {
             $hit = $true
             $d.provider.PSObject.Properties.Remove("aibox")
             if ("$($d.model)".StartsWith("aibox/")) { $d.PSObject.Properties.Remove("model") }
-            if ($d.provider.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("provider") }
+            if (@($d.provider.PSObject.Properties).Count -eq 0) { $d.PSObject.Properties.Remove("provider") }
         }
         if ($d.mcp -and $d.mcp.PSObject.Properties.Name -contains "searxng") {
             $hit = $true
             $d.mcp.PSObject.Properties.Remove("searxng")
-            if ($d.mcp.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("mcp") }
+            if (@($d.mcp.PSObject.Properties).Count -eq 0) { $d.PSObject.Properties.Remove("mcp") }
         }
         if ($d.permission) {
             foreach ($k in @("searxng_*", "webfetch", "websearch")) {
                 if ($d.permission.PSObject.Properties.Name -contains $k) { $hit = $true; $d.permission.PSObject.Properties.Remove($k) }
             }
-            if ($d.permission.PSObject.Properties.Count -eq 0) { $d.PSObject.Properties.Remove("permission") }
+            if (@($d.permission.PSObject.Properties).Count -eq 0) { $d.PSObject.Properties.Remove("permission") }
         }
         if ($hit) {
             $d | ConvertTo-Json -Depth 8 | Set-Content -Path $Cfg -Encoding utf8
@@ -56,3 +59,4 @@ if ($All) {
     Write-Host 'left installed. Set $env:AIBOX_UNINSTALL_ALL = "1" and run again to remove OpenCode too.'
 }
 Say "done"
+}
