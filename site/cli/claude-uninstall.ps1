@@ -1,5 +1,8 @@
 # Removes what claude-install.ps1 set up: the claude-local profile only. Claude Code itself and your ~\.claude are never touched.
 #   Invoke-RestMethod https://kebin.dev/cli/claude-uninstall.ps1 | Invoke-Expression
+# Everything runs inside & { } so that, under `irm | iex`, nothing (error mode, variables, the key) is left behind in
+# your session, and a failed check returns instead of closing your PowerShell window.
+& {
 $ErrorActionPreference = "Stop"
 $Bin = Join-Path $HOME ".local\bin"
 $EnvDir = Join-Path $HOME ".config\kebin"
@@ -12,3 +15,4 @@ if (-not (Test-Path (Join-Path $Bin "codex-local.cmd"))) { Remove-Item -Force (J
 if ((Test-Path $EnvDir) -and -not (Get-ChildItem $EnvDir)) { Remove-Item $EnvDir }
 Write-Host "removed claude-local, its settings and history. Claude Code itself and your normal 'claude' are untouched."
 Say "done"
+}

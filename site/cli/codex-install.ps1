@@ -3,6 +3,9 @@
 # It only adds the profile: Codex itself has to be installed already (https://developers.openai.com/codex).
 #   Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression
 #   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression    (non-interactive)
+# Everything runs inside & { } so that, under `irm | iex`, nothing (error mode, variables, the key) is left behind in
+# your session, and a failed check returns instead of closing your PowerShell window.
+& {
 $ErrorActionPreference = "Stop"
 $Api = "https://ai.kebin.dev/v1"
 $EnvDir = Join-Path $HOME ".config\kebin"
@@ -20,21 +23,20 @@ function Add-ToUserPath($dir) {
 }
 
 Say "1/3  Codex"
-if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { Write-Host "Codex isn't installed. Install it first (https://developers.openai.com/codex), then rerun this script."; exit 1 }
+if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { Write-Host "Codex isn't installed. Install it first (https://developers.openai.com/codex), then rerun this script."; return }
 Write-Host "found: $(codex --version 2>$null | Select-Object -First 1)"
 
 Say "2/3  API key"
 $Key = $env:AIBOX_KEY
 if (-not $Key) { $Key = Read-Host "Paste the ai.kebin.dev API key" }
-if (-not $Key) { Write-Host "no key given"; exit 1 }
+if (-not $Key) { Write-Host "no key given"; return }
 try { Invoke-WebRequest -UseBasicParsing -Headers @{ Authorization = "Bearer $Key" } "$Api/models" | Out-Null; Write-Host "key accepted" }
-catch { Write-Host "key rejected by $Api"; exit 1 }
+catch { Write-Host "key rejected by $Api"; return }
 
 Say "3/3  codex-local"
 New-Item -ItemType Directory -Force -Path $EnvDir, $HomeDir, $Bin | Out-Null
 [IO.File]::WriteAllText($EnvFile, "AIBOX_KEY=$Key`r`n", $NoBom)
 $Toml = Join-Path $HomeDir "config.toml"
-if (Test-Path $Toml) { Copy-Item $Toml "$Toml.bak.$([int](Get-Date -UFormat %s))" }
 $Config = @"
 # kebin.dev: written by codex-install.ps1
 model = "qwen3.8-27b"
@@ -65,3 +67,4 @@ Add-ToUserPath $Bin
 Write-Host ""
 Say "done. open a project folder and run:  codex-local"
 Write-Host "Uses qwen3.8-27b on ai.kebin.dev. No web search here (Codex doesn't hand search tools to local models). Your normal 'codex' still uses OpenAI. Open a new terminal if 'codex-local' isn't found yet."
+}

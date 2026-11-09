@@ -23,14 +23,14 @@ KEY="${AIBOX_KEY:-}"
 if [ -z "$KEY" ] && [ -t 0 ]; then read -r -p "Paste the ai.kebin.dev API key: " KEY; fi
 if [ -z "$KEY" ] && [ -r /dev/tty ]; then read -r -p "Paste the ai.kebin.dev API key: " KEY < /dev/tty; fi
 [ -n "$KEY" ] || { echo "no key given; set AIBOX_KEY=... and rerun" >&2; exit 1; }
+case "$KEY" in *[!A-Za-z0-9._~+/=-]*) echo "that key has unexpected characters; paste it exactly as shown on kebin.dev/cli" >&2; exit 1 ;; esac
 code=$(curl -s -o /dev/null -w '%{http_code}' -H "Authorization: Bearer $KEY" "$API/models" || true)
 [ "$code" = 200 ] || { echo "key rejected by $API (HTTP $code)" >&2; exit 1; }
 echo "key accepted"
 
 say "3/3  codex-local"
 mkdir -p "$ENV_DIR" "$HOME_DIR" "$BIN_DIR"
-( umask 077; printf "AIBOX_KEY='%s'\n" "$KEY" > "$ENV_FILE" )
-[ -f "$HOME_DIR/config.toml" ] && cp "$HOME_DIR/config.toml" "$HOME_DIR/config.toml.bak.$(date +%s)"
+( umask 077; printf "AIBOX_KEY='%s'\n" "$KEY" > "$ENV_FILE" ); chmod 600 "$ENV_FILE"
 cat > "$HOME_DIR/config.toml" <<TOML
 # kebin.dev: written by codex-install.sh
 model = "$MODEL"
