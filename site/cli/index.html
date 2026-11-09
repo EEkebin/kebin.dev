@@ -12,9 +12,11 @@
     .wrap { max-width: 720px; }
     h1 { text-align: center; margin-top: 0; }
     .lead { color: var(--muted); text-align: center; margin: 0 0 22px; }
-    .toggle { display: flex; gap: 0; margin: 0 auto 22px; width: max-content; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
+    .toggle { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; margin: 0 auto 14px; width: max-content; max-width: 100%; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--card); }
     .toggle button { font: inherit; font-size: .88rem; font-weight: 600; padding: 8px 18px; border: 0; border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; transition: background .15s, color .15s; }
     .toggle button.on { background: #1c1c24; color: var(--fg); }
+    .toggle.tools { margin-bottom: 10px; }
+    .toggle.os { margin-bottom: 22px; }
     .step { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 12px; }
     .step h3 { margin: 0 0 8px; font-size: 1rem; }
     .step p { margin: 0 0 8px; color: var(--muted); font-size: .92rem; }
@@ -22,86 +24,189 @@
     pre code { user-select: all; -webkit-user-select: all; cursor: text; }
     pre .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--line); background: #15151b; color: var(--muted); cursor: pointer; }
     pre .copy:hover { color: var(--fg); }
-    [data-os] { display: none; }
+    [data-tool], [data-os] { display: none; }
+    body.tool-opencode [data-tool="opencode"], body.tool-claude [data-tool="claude"], body.tool-codex [data-tool="codex"] { display: block; }
     body.os-unix [data-os="unix"], body.os-win [data-os="win"] { display: block; }
     .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: .85rem; }
     .back:hover { color: var(--fg); background: var(--card-hover); }
   </style>
 </head>
-<body class="os-unix">
+<body class="os-unix tool-opencode">
   <main class="wrap">
     <a class="back" href="/">← kebin.dev</a>
-    <h1>OpenCode CLI</h1>
-    <p class="lead">Run the coding agent on your own machine, in your own project, using the models on ai.kebin.dev. Web search through search.kebin.dev is included.</p>
+    <h1>AI CLI</h1>
+    <p class="lead">Run a coding agent on your own machine, in your own project, using the models on ai.kebin.dev. Pick a tool, then your system.</p>
 
     <div class="step">
       <h3>API key</h3>
-      <p>Already filled into the commands below. Keep it private: anyone with it can use the GPU.</p>
+      <p>Already filled into the commands below, and the same for all three tools. Keep it private: anyone with it can use the GPU.</p>
       <pre><code>__AIBOX_KEY__</code></pre>
     </div>
 
-    <div class="toggle" role="tablist">
+    <div class="toggle tools" role="tablist">
+      <button id="tool-opencode" class="on" onclick="setTool('opencode')">OpenCode</button>
+      <button id="tool-claude" onclick="setTool('claude')">Claude Code</button>
+      <button id="tool-codex" onclick="setTool('codex')">Codex</button>
+    </div>
+    <div class="toggle os" role="tablist">
       <button id="t-unix" class="on" onclick="setOS('unix')">Linux / macOS</button>
       <button id="t-win" onclick="setOS('win')">Windows</button>
     </div>
 
-    <div data-os="unix">
-      <div class="step">
-        <h3>Install</h3>
-        <p>Installs OpenCode 2, replacing OpenCode 1 if you have it, and writes the config with the key above: models, web search and page fetch.</p>
-        <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
-      </div>
-      <div class="step">
-        <h3>Then</h3>
-        <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
-        <pre><code>cd my-project
+    <!-- ===================== OpenCode ===================== -->
+    <div data-tool="opencode">
+      <div data-os="unix">
+        <div class="step">
+          <h3>Install</h3>
+          <p>Installs OpenCode 2, replacing OpenCode 1 if you have it, and writes the config with the key above: models, web search and page fetch.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
+          <pre><code>cd my-project
 opencode</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash</code></pre>
+          <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash -s -- --all</code></pre>
+        </div>
+      </div>
+      <div data-os="win">
+        <div class="step">
+          <h3>Install</h3>
+          <p>PowerShell. Installs OpenCode 2, replacing OpenCode 1 if you have it, through npm if you have Node.js, otherwise as a standalone download. Writes the config with the key above: models, web search and page fetch.</p>
+          <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
+          <pre><code>cd my-project
+opencode</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
+          <pre><code>Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression</code></pre>
+          <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression</code></pre>
+        </div>
       </div>
       <div class="step">
-        <h3>Uninstall</h3>
-        <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
-        <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash</code></pre>
-        <pre><code>curl -fsSL https://kebin.dev/cli/uninstall.sh | bash -s -- --all</code></pre>
+        <h3>Already have OpenCode?</h3>
+        <p>The scripts add a provider named <strong>aibox</strong> and an MCP named <strong>searxng</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, search MCP <code>https://search.kebin.dev/mcp</code>, both take the key as a bearer token.</p>
       </div>
     </div>
 
-    <div data-os="win">
-      <div class="step">
-        <h3>Install</h3>
-        <p>PowerShell. Installs OpenCode 2, replacing OpenCode 1 if you have it, through npm if you have Node.js, otherwise as a standalone download. Writes the config with the key above: models, web search and page fetch.</p>
-        <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/install.ps1 | Invoke-Expression</code></pre>
+    <!-- ===================== Claude Code ===================== -->
+    <div data-tool="claude">
+      <div data-os="unix">
+        <div class="step">
+          <h3>Install</h3>
+          <p>Installs Claude Code if you don't have it, then adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/claude-install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a project folder and start it. Plain <code>claude</code> keeps using Anthropic as before.</p>
+          <pre><code>cd my-project
+claude-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>claude-local</code> and its settings and history. The second form also removes Claude Code itself, including your normal <code>claude</code>.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/claude-uninstall.sh | bash</code></pre>
+          <pre><code>curl -fsSL https://kebin.dev/cli/claude-uninstall.sh | bash -s -- --all</code></pre>
+        </div>
+      </div>
+      <div data-os="win">
+        <div class="step">
+          <h3>Install</h3>
+          <p>PowerShell. Installs Claude Code if you don't have it, then adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
+          <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/claude-install.ps1 | Invoke-Expression</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a new terminal in a project folder and start it. Plain <code>claude</code> keeps using Anthropic as before.</p>
+          <pre><code>cd my-project
+claude-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>claude-local</code> and its settings and history. The second form also removes Claude Code itself, including your normal <code>claude</code>.</p>
+          <pre><code>Invoke-RestMethod https://kebin.dev/cli/claude-uninstall.ps1 | Invoke-Expression</code></pre>
+          <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/claude-uninstall.ps1 | Invoke-Expression</code></pre>
+        </div>
       </div>
       <div class="step">
-        <h3>Then</h3>
-        <p>Open a project folder and start it. Pick a model inside OpenCode with <code>/models</code>.</p>
-        <pre><code>cd my-project
-opencode</code></pre>
-      </div>
-      <div class="step">
-        <h3>Uninstall</h3>
-        <p>Removes the kebin.dev profile and restores your previous OpenCode config. The second form also removes OpenCode itself.</p>
-        <pre><code>Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression</code></pre>
-        <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/uninstall.ps1 | Invoke-Expression</code></pre>
+        <h3>How it works</h3>
+        <p><code>claude-local</code> starts Claude Code with <code>ANTHROPIC_BASE_URL=https://ai.kebin.dev</code>, the key as <code>ANTHROPIC_AUTH_TOKEN</code> and the model set to <strong>qwen3.8-27b</strong>. It keeps its own settings and history in <code>~/.claude-local</code>, so it never touches your normal Claude Code login or chats.</p>
       </div>
     </div>
 
-    <div class="step">
-      <h3>Already have OpenCode?</h3>
-      <p>The scripts add a provider named <strong>aibox</strong> and an MCP named <strong>searxng</strong> to <code>~/.config/opencode/opencode.json</code>, backing up the old file first. API base <code>https://ai.kebin.dev/v1</code>, search MCP <code>https://search.kebin.dev/mcp</code>, both take the key as a bearer token.</p>
+    <!-- ===================== Codex ===================== -->
+    <div data-tool="codex">
+      <div data-os="unix">
+        <div class="step">
+          <h3>Install</h3>
+          <p>Installs Codex if you don't have it, then adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/codex-install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a project folder and start it. Plain <code>codex</code> keeps using OpenAI as before.</p>
+          <pre><code>cd my-project
+codex-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>codex-local</code> and its settings and history. The second form also removes Codex itself, including your normal <code>codex</code>.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/codex-uninstall.sh | bash</code></pre>
+          <pre><code>curl -fsSL https://kebin.dev/cli/codex-uninstall.sh | bash -s -- --all</code></pre>
+        </div>
+      </div>
+      <div data-os="win">
+        <div class="step">
+          <h3>Install</h3>
+          <p>PowerShell. Installs Codex if you don't have it, then adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
+          <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a new terminal in a project folder and start it. Plain <code>codex</code> keeps using OpenAI as before.</p>
+          <pre><code>cd my-project
+codex-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>codex-local</code> and its settings and history. The second form also removes Codex itself, including your normal <code>codex</code>.</p>
+          <pre><code>Invoke-RestMethod https://kebin.dev/cli/codex-uninstall.ps1 | Invoke-Expression</code></pre>
+          <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/codex-uninstall.ps1 | Invoke-Expression</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <h3>How it works</h3>
+        <p><code>codex-local</code> starts Codex with its own <code>CODEX_HOME</code> (<code>~/.codex-local</code>), whose config adds a provider named <strong>aibox</strong> (<code>https://ai.kebin.dev/v1</code>, Responses API) and selects <strong>qwen3.8-27b</strong>. No web search in Codex: it doesn't pass search tools to models it doesn't know. Use OpenCode or Claude Code when you need search.</p>
+      </div>
     </div>
   </main>
   <script>
-    function setOS(os) {
-      document.body.className = 'os-' + os;
+    function remember(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function recall(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    let os = 'unix', tool = 'opencode';
+    function apply() {
+      document.body.className = 'os-' + os + ' tool-' + tool;
       document.getElementById('t-unix').classList.toggle('on', os === 'unix');
       document.getElementById('t-win').classList.toggle('on', os === 'win');
-      try { localStorage.setItem('cli-os', os); } catch (e) {}
+      ['opencode', 'claude', 'codex'].forEach(t => document.getElementById('tool-' + t).classList.toggle('on', t === tool));
     }
+    function setOS(v) { os = v; remember('cli-os', v); apply(); }
+    function setTool(v) { tool = v; remember('cli-tool', v); apply(); }
     (function () {
-      let os = null;
-      try { os = localStorage.getItem('cli-os'); } catch (e) {}
-      if (os !== 'unix' && os !== 'win') os = /Windows/i.test(navigator.userAgent) ? 'win' : 'unix';
-      setOS(os);
+      const o = recall('cli-os'); os = (o === 'unix' || o === 'win') ? o : (/Windows/i.test(navigator.userAgent) ? 'win' : 'unix');
+      const t = recall('cli-tool'); tool = ['opencode', 'claude', 'codex'].includes(t) ? t : 'opencode';
+      apply();
       document.querySelectorAll('pre').forEach(pre => {
         const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'copy';
         b.onclick = async () => {

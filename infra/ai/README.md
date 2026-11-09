@@ -55,6 +55,18 @@ Check: `opencode mcp list` shows `searxng connected`; `curl 127.0.0.1:8899/healt
 
 Remote installs (kebin.dev/cli) get the same tool through `https://search.kebin.dev/mcp`, gated by the ai.kebin.dev bearer key and passed as an `Authorization` header in the `mcp.searxng` entry; nothing runs on the user's machine.
 
+## CLI installers (kebin.dev/cli)
+
+The page has a tab per tool, each with install and uninstall scripts for Linux/macOS (`.sh`) and Windows (`.ps1`), all in `site/cli/`. nginx fills the API key into the page.
+
+| Tool | Scripts | What it sets up |
+|---|---|---|
+| OpenCode | `install`, `uninstall` | `aibox` provider and `searxng` MCP in `~/.config/opencode/opencode.json` |
+| Claude Code | `claude-install`, `claude-uninstall` | a `claude-local` command: `ANTHROPIC_BASE_URL=https://ai.kebin.dev`, the key as `ANTHROPIC_AUTH_TOKEN`, model `qwen3.8-27b`, its own `CLAUDE_CONFIG_DIR` (`~/.claude-local`) with the `searxng` MCP |
+| Codex | `codex-install`, `codex-uninstall` | a `codex-local` command: its own `CODEX_HOME` (`~/.codex-local`) with an `aibox` provider (Responses API) and model `qwen3.8-27b`; on Windows also `[windows] sandbox = "elevated"` |
+
+The key lives in `~/.config/kebin/aibox.env`, shared by `claude-local` and `codex-local`. Neither touches the user's normal `claude`/`codex` login or history. Codex has no web search here: with an unknown model it keeps MCP tools away from the model, and a custom `model_catalog_json` made things worse.
+
 ## OpenCode 2
 
 This VM and the CLI installers run OpenCode 2, which ships separately from 1.x: the installer is `https://opencode.ai/v2/install` and the npm package is `@opencode/cli`, not `opencode-ai`. `opencode upgrade` stays on the 2.x line. The two share the `opencode` command and the config locations, so they can't sit side by side. `opencode/opencode.json` stays in the 1.x format, which V2 still reads; converting it to V2's native format is optional.
