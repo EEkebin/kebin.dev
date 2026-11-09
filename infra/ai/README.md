@@ -65,7 +65,7 @@ The page has a tab per tool, each with install and uninstall scripts for Linux/m
 | Claude Code | `claude-install`, `claude-uninstall` | a `claude-local` command: `ANTHROPIC_BASE_URL=https://ai.kebin.dev`, the key as `ANTHROPIC_AUTH_TOKEN`, model `qwen3.8-27b`, its own `CLAUDE_CONFIG_DIR` (`~/.claude-local`) with the `searxng` MCP |
 | Codex | `codex-install`, `codex-uninstall` | a `codex-local` command: its own `CODEX_HOME` (`~/.codex-local`) with an `aibox` provider (Responses API) and model `qwen3.8-27b`; on Windows also `[windows] sandbox = "elevated"` |
 
-The key lives in `~/.config/kebin/aibox.env`, shared by `claude-local` and `codex-local`. Neither touches the user's normal `claude`/`codex` login or history. Codex has no web search here: with an unknown model it keeps MCP tools away from the model, and a custom `model_catalog_json` made things worse.
+The key lives in `~/.config/kebin/aibox.env`, shared by `claude-local` and `codex-local`. Neither touches the user's normal `claude`/`codex` login or history, and the scripts never install or remove the CLIs themselves: install stops with a pointer if the CLI is missing, and uninstall only deletes the profile. Codex has no web search here: with an unknown model it keeps MCP tools away from the model, and a custom `model_catalog_json` made things worse.
 
 ## OpenCode 2
 

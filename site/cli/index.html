@@ -104,7 +104,7 @@ opencode</code></pre>
       <div data-os="unix">
         <div class="step">
           <h3>Install</h3>
-          <p>Installs Claude Code if you don't have it, then adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
+          <p>Needs Claude Code installed already (<a href="https://code.claude.com/docs" target="_blank" rel="noopener">install it</a>). Adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
           <pre><code>curl -fsSL https://kebin.dev/cli/claude-install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
         </div>
         <div class="step">
@@ -115,15 +115,14 @@ claude-local</code></pre>
         </div>
         <div class="step">
           <h3>Uninstall</h3>
-          <p>Removes <code>claude-local</code> and its settings and history. The second form also removes Claude Code itself, including your normal <code>claude</code>.</p>
+          <p>Removes <code>claude-local</code> and its settings and history. Claude Code itself and your normal <code>claude</code> stay installed.</p>
           <pre><code>curl -fsSL https://kebin.dev/cli/claude-uninstall.sh | bash</code></pre>
-          <pre><code>curl -fsSL https://kebin.dev/cli/claude-uninstall.sh | bash -s -- --all</code></pre>
         </div>
       </div>
       <div data-os="win">
         <div class="step">
           <h3>Install</h3>
-          <p>PowerShell. Installs Claude Code if you don't have it, then adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
+          <p>PowerShell. Needs Claude Code installed already (<a href="https://code.claude.com/docs" target="_blank" rel="noopener">install it</a>). Adds a <code>claude-local</code> command that runs it on ai.kebin.dev, with web search through search.kebin.dev.</p>
           <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/claude-install.ps1 | Invoke-Expression</code></pre>
         </div>
         <div class="step">
@@ -134,9 +133,8 @@ claude-local</code></pre>
         </div>
         <div class="step">
           <h3>Uninstall</h3>
-          <p>Removes <code>claude-local</code> and its settings and history. The second form also removes Claude Code itself, including your normal <code>claude</code>.</p>
+          <p>Removes <code>claude-local</code> and its settings and history. Claude Code itself and your normal <code>claude</code> stay installed.</p>
           <pre><code>Invoke-RestMethod https://kebin.dev/cli/claude-uninstall.ps1 | Invoke-Expression</code></pre>
-          <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/claude-uninstall.ps1 | Invoke-Expression</code></pre>
         </div>
       </div>
       <div class="step">
@@ -150,7 +148,7 @@ claude-local</code></pre>
       <div data-os="unix">
         <div class="step">
           <h3>Install</h3>
-          <p>Installs Codex if you don't have it, then adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
+          <p>Needs Codex installed already (<a href="https://developers.openai.com/codex" target="_blank" rel="noopener">install it</a>). Adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
           <pre><code>curl -fsSL https://kebin.dev/cli/codex-install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
         </div>
         <div class="step">
@@ -161,15 +159,14 @@ codex-local</code></pre>
         </div>
         <div class="step">
           <h3>Uninstall</h3>
-          <p>Removes <code>codex-local</code> and its settings and history. The second form also removes Codex itself, including your normal <code>codex</code>.</p>
+          <p>Removes <code>codex-local</code> and its settings and history. Codex itself and your normal <code>codex</code> stay installed.</p>
           <pre><code>curl -fsSL https://kebin.dev/cli/codex-uninstall.sh | bash</code></pre>
-          <pre><code>curl -fsSL https://kebin.dev/cli/codex-uninstall.sh | bash -s -- --all</code></pre>
         </div>
       </div>
       <div data-os="win">
         <div class="step">
           <h3>Install</h3>
-          <p>PowerShell. Installs Codex if you don't have it, then adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
+          <p>PowerShell. Needs Codex installed already (<a href="https://developers.openai.com/codex" target="_blank" rel="noopener">install it</a>). Adds a <code>codex-local</code> command that runs it on ai.kebin.dev.</p>
           <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression</code></pre>
         </div>
         <div class="step">
@@ -180,9 +177,8 @@ codex-local</code></pre>
         </div>
         <div class="step">
           <h3>Uninstall</h3>
-          <p>Removes <code>codex-local</code> and its settings and history. The second form also removes Codex itself, including your normal <code>codex</code>.</p>
+          <p>Removes <code>codex-local</code> and its settings and history. Codex itself and your normal <code>codex</code> stay installed.</p>
           <pre><code>Invoke-RestMethod https://kebin.dev/cli/codex-uninstall.ps1 | Invoke-Expression</code></pre>
-          <pre><code>$env:AIBOX_UNINSTALL_ALL = "1"; Invoke-RestMethod https://kebin.dev/cli/codex-uninstall.ps1 | Invoke-Expression</code></pre>
         </div>
       </div>
       <div class="step">

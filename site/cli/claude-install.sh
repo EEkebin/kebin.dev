@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Sets up `claude-local`: Claude Code running on the kebin.dev model server instead of Anthropic's cloud.
 # Your normal `claude` is left alone; claude-local keeps its own settings and history in ~/.claude-local.
+# It only adds the profile: Claude Code itself has to be installed already (https://code.claude.com/docs).
 #   curl -fsSL https://kebin.dev/cli/claude-install.sh | bash
 #   AIBOX_KEY=... curl -fsSL https://kebin.dev/cli/claude-install.sh | bash   (non-interactive)
 set -euo pipefail
@@ -15,12 +16,8 @@ BIN_DIR="$HOME/.local/bin"
 say() { printf '\033[1;33m%s\033[0m\n' "$*"; }
 
 say "1/3  Claude Code"
-if command -v claude >/dev/null 2>&1; then
-  echo "already installed: $(claude --version 2>/dev/null | head -1)"
-else
-  curl -fsSL https://claude.ai/install.sh | bash
-  export PATH="$BIN_DIR:$PATH"; hash -r 2>/dev/null || true
-fi
+command -v claude >/dev/null 2>&1 || { echo "Claude Code isn't installed. Install it first (https://code.claude.com/docs), then rerun this script." >&2; exit 1; }
+echo "found: $(claude --version 2>/dev/null | head -1)"
 
 say "2/3  API key"
 KEY="${AIBOX_KEY:-}"

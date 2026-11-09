@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Sets up `codex-local`: Codex running on the kebin.dev model server instead of OpenAI's cloud.
 # Your normal `codex` is left alone; codex-local keeps its own settings and history in ~/.codex-local.
+# It only adds the profile: Codex itself has to be installed already (https://developers.openai.com/codex).
 #   curl -fsSL https://kebin.dev/cli/codex-install.sh | bash
 #   AIBOX_KEY=... curl -fsSL https://kebin.dev/cli/codex-install.sh | bash   (non-interactive)
 set -euo pipefail
@@ -14,12 +15,8 @@ BIN_DIR="$HOME/.local/bin"
 say() { printf '\033[1;33m%s\033[0m\n' "$*"; }
 
 say "1/3  Codex"
-if command -v codex >/dev/null 2>&1; then
-  echo "already installed: $(codex --version 2>/dev/null | head -1)"
-else
-  curl -fsSL https://chatgpt.com/codex/install.sh | sh
-  export PATH="$BIN_DIR:$PATH"; hash -r 2>/dev/null || true
-fi
+command -v codex >/dev/null 2>&1 || { echo "Codex isn't installed. Install it first (https://developers.openai.com/codex), then rerun this script." >&2; exit 1; }
+echo "found: $(codex --version 2>/dev/null | head -1)"
 
 say "2/3  API key"
 KEY="${AIBOX_KEY:-}"

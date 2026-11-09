@@ -1,5 +1,6 @@
 # Sets up `claude-local` on Windows: Claude Code running on the kebin.dev model server instead of Anthropic's cloud.
 # Your normal `claude` is left alone; claude-local keeps its own settings and history in ~\.claude-local.
+# It only adds the profile: Claude Code itself has to be installed already (https://code.claude.com/docs).
 #   Invoke-RestMethod https://kebin.dev/cli/claude-install.ps1 | Invoke-Expression
 #   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/claude-install.ps1 | Invoke-Expression    (non-interactive)
 $ErrorActionPreference = "Stop"
@@ -20,13 +21,8 @@ function Add-ToUserPath($dir) {
 }
 
 Say "1/3  Claude Code"
-if (Get-Command claude -ErrorAction SilentlyContinue) {
-    Write-Host "already installed: $(claude --version 2>$null | Select-Object -First 1)"
-} else {
-    Invoke-RestMethod https://claude.ai/install.ps1 | Invoke-Expression
-    Add-ToUserPath $Bin
-    if (-not (Get-Command claude -ErrorAction SilentlyContinue)) { Write-Host "Claude Code didn't install. See https://code.claude.com/docs then rerun."; exit 1 }
-}
+if (-not (Get-Command claude -ErrorAction SilentlyContinue)) { Write-Host "Claude Code isn't installed. Install it first (https://code.claude.com/docs), then rerun this script."; exit 1 }
+Write-Host "found: $(claude --version 2>$null | Select-Object -First 1)"
 
 Say "2/3  API key"
 $Key = $env:AIBOX_KEY

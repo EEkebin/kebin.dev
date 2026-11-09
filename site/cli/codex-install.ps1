@@ -1,5 +1,6 @@
 # Sets up `codex-local` on Windows: Codex running on the kebin.dev model server instead of OpenAI's cloud.
 # Your normal `codex` is left alone; codex-local keeps its own settings and history in ~\.codex-local.
+# It only adds the profile: Codex itself has to be installed already (https://developers.openai.com/codex).
 #   Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression
 #   $env:AIBOX_KEY = "..."; Invoke-RestMethod https://kebin.dev/cli/codex-install.ps1 | Invoke-Expression    (non-interactive)
 $ErrorActionPreference = "Stop"
@@ -19,13 +20,8 @@ function Add-ToUserPath($dir) {
 }
 
 Say "1/3  Codex"
-if (Get-Command codex -ErrorAction SilentlyContinue) {
-    Write-Host "already installed: $(codex --version 2>$null | Select-Object -First 1)"
-} else {
-    Invoke-RestMethod https://chatgpt.com/codex/install.ps1 | Invoke-Expression
-    $env:Path = [Environment]::GetEnvironmentVariable('Path', 'User') + ";" + [Environment]::GetEnvironmentVariable('Path', 'Machine')
-    if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { Write-Host "Codex didn't install, or needs a new terminal. Open one and rerun this script."; exit 1 }
-}
+if (-not (Get-Command codex -ErrorAction SilentlyContinue)) { Write-Host "Codex isn't installed. Install it first (https://developers.openai.com/codex), then rerun this script."; exit 1 }
+Write-Host "found: $(codex --version 2>$null | Select-Object -First 1)"
 
 Say "2/3  API key"
 $Key = $env:AIBOX_KEY
