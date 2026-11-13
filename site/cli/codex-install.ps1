@@ -60,7 +60,7 @@ rem kebin.dev: Codex on the model server at ai.kebin.dev. Settings and history l
 setlocal
 for /f "usebackq tokens=1,* delims==" %%a in ("%USERPROFILE%\.config\kebin\aibox.env") do set "%%a=%%b"
 set "CODEX_HOME=%USERPROFILE%\.codex-local"
-codex %*
+codex -m qwen3.8-27b %*
 '@
 [IO.File]::WriteAllText((Join-Path $Bin "codex-local.cmd"), ($Launcher -replace "`r?`n", "`r`n"), $NoBom)
 Add-ToUserPath $Bin
