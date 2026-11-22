@@ -2,9 +2,44 @@ const $ = id => document.getElementById(id);
 const titles = ['Higashiyama lanes', 'Arashiyama riverside', 'Fushimi & downtown'];
 const key = 'waypost-kyoto-v1';
 let trip = {days:[['Walk the lanes of Ninenzaka','Visit Kiyomizu-dera'],['Explore the bamboo grove','Picnic by the Katsura River'],['Walk the Fushimi Inari gates','Dinner near Nishiki Market']],packing:[['Passport',false],['Walking shoes',false],['Travel adapter',false],['Rain jacket',false]]};
+const template=structuredClone(trip);
 try { const saved = localStorage.getItem(key); if(saved) trip = JSON.parse(saved); } catch {}
 let day = 0;
-function save() { localStorage.setItem(key, JSON.stringify(trip)); render(); }
+let signedIn=false, pending=Promise.resolve();
+async function api(path,body) {
+  const options=body===undefined ? {} : {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)};
+  const response=await fetch('/api/'+path,options);
+  if(!response.ok) throw new Error(String(response.status));
+  return response.json();
+}
+function save() {
+  if(signedIn){
+    const snapshot=structuredClone(trip);
+    pending=pending.then(()=>api('trip',snapshot)).then(()=>{$('notice').textContent='Changes saved.';}).catch(()=>{$('notice').textContent='Save failed. Sign in again and retry.';});
+  } else localStorage.setItem(key, JSON.stringify(trip));
+  render();
+}
+function useAccount(data) {
+  signedIn=true; trip=data.trip || structuredClone(template);
+  $('account').textContent='Sign out · '+data.username;
+  document.querySelector('footer span').textContent='Travel journal · Account storage';
+  render();
+}
+$('account').onclick=async()=>{
+  closeMenu();
+  if(!signedIn){$('signin').showModal();return;}
+  await pending;
+  try{await api('logout',{});location.reload();}catch{$('notice').textContent='Sign-out failed. Please retry.';}
+};
+$('dismiss').onclick=()=>$('signin').close();
+$('loginForm').onsubmit=async event=>{
+  event.preventDefault();
+  try{
+    const data=await api('login',{login:$('login').value.trim(),password:$('password').value});
+    useAccount(data); $('loginForm').reset(); $('loginError').textContent=''; $('signin').close();
+  }catch{$('loginError').textContent='Sign-in failed. Check your credentials and try again.';}
+};
+api('me').then(useAccount).catch(error=>{if(error.message!=='401')$('notice').textContent='Account service unavailable.';}).finally(()=>{$('account').disabled=false;});
 function el(tag,text) { const node=document.createElement(tag); if(text!==undefined) node.textContent=text; return node; }
 function button(text, action) { const node=el('button',text); node.onclick=action; return node; }
 function check(item) {

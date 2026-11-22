@@ -1,0 +1,16 @@
+[Unit]
+Description=Waypost travel planner API
+After=network-online.target
+
+[Container]
+Image=localhost/waypost:latest
+ContainerName=waypost
+PublishPort=10.0.10.30:8197:8197
+Volume=waypost-data:/data:U
+NoNewPrivileges=true
+
+[Service]
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
