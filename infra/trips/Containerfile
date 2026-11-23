@@ -1,9 +1,0 @@
-FROM docker.io/library/node:22-bookworm-slim
-WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
-COPY schema.prisma .
-RUN npm install --save-exact prisma@6.19.0 @prisma/client@6.19.0 && npx prisma generate --schema schema.prisma
-COPY server.cjs .
-USER node
-
-CMD ["sh","-c","./node_modules/.bin/prisma db push --skip-generate --schema schema.prisma && exec node server.cjs"]
