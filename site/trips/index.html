@@ -1,0 +1,10 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#fbfcfe"><title>Waypost · Flight planner</title><link rel="stylesheet" href="/app.css"><script src="/app.js" defer></script></head><body>
+<header><a class="brand" href="#explore"><b aria-hidden="true">↗</b> Waypost</a><nav aria-label="Planner"><a href="#explore">Explore</a><a href="#saved">Saved trips</a></nav><button id="account">Sign in</button></header>
+<main><section id="explore"><div class="hero"><div><p>KYOTO &nbsp; / &nbsp; JAPAN</p><h1>Where to next?</h1></div></div>
+<form id="planner"><div class="modes"><label><input type="radio" name="mode" value="round" checked> Round trip</label><label><input type="radio" name="mode" value="one"> One way</label></div>
+<div class="fields"><label>From<select id="origin"></select></label><button id="swap" type="button" aria-label="Swap airports">⇄</button><label>To<select id="dest"></select></label><label>Departure<input id="depart" type="date" required></label><label id="returnLabel">Return<input id="back" type="date" required></label></div>
+<div class="actions"><button class="primary">Find flights ↗</button><button type="button" id="save">Save trip</button></div></form>
+<div class="sectionTitle"><h2>Explore destinations</h2><span>Pick your next stop</span></div><div id="cards"></div></section>
+<section id="saved" hidden><h1>Saved trips</h1><div id="plans"></div></section>
+<p id="feedback" role="status"></p></main>
+<dialog id="signin"><form id="auth"><h2>Sign in to Waypost</h2><label>Username or email<input id="name" autocomplete="username" required></label><label>Password<input id="pw" type="password" autocomplete="current-password" required></label><p id="authError" role="alert"></p><div class="actions"><button type="button" id="cancel">Cancel</button><button class="primary">Sign in</button></div></form></dialog></body></html>
