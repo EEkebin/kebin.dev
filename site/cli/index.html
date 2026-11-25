@@ -25,7 +25,7 @@
     pre .copy { position: absolute; top: 8px; right: 8px; font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1px solid var(--line); background: #15151b; color: var(--muted); cursor: pointer; }
     pre .copy:hover { color: var(--fg); }
     [data-tool], [data-os] { display: none; }
-    body.tool-opencode [data-tool="opencode"], body.tool-claude [data-tool="claude"], body.tool-codex [data-tool="codex"] { display: block; }
+    body.tool-opencode [data-tool="opencode"], body.tool-claude [data-tool="claude"], body.tool-codex [data-tool="codex"], body.tool-agy [data-tool="agy"] { display: block; }
     body.os-unix [data-os="unix"], body.os-win [data-os="win"] { display: block; }
     .back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 18px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); font-size: .85rem; }
     .back:hover { color: var(--fg); background: var(--card-hover); }
@@ -39,7 +39,7 @@
 
     <div class="step">
       <h3>API key</h3>
-      <p>Already filled into the commands below, and the same for all three tools. Keep it private: anyone with it can use the GPU.</p>
+      <p>Already filled into the commands below, and the same for all four tools. Keep it private: anyone with it can use the GPU.</p>
       <pre><code>__AIBOX_KEY__</code></pre>
     </div>
 
@@ -47,6 +47,7 @@
       <button id="tool-opencode" class="on" onclick="setTool('opencode')">OpenCode</button>
       <button id="tool-claude" onclick="setTool('claude')">Claude Code</button>
       <button id="tool-codex" onclick="setTool('codex')">Codex</button>
+      <button id="tool-agy" onclick="setTool('agy')">Antigravity</button>
     </div>
     <div class="toggle os" role="tablist">
       <button id="t-unix" class="on" onclick="setOS('unix')">Linux / macOS</button>
@@ -186,6 +187,49 @@ codex-local</code></pre>
         <p><code>codex-local</code> starts Codex with its own <code>CODEX_HOME</code> (<code>~/.codex-local</code>), whose config adds a provider named <strong>aibox</strong> (<code>https://ai.kebin.dev/v1</code>, Responses API) and selects <strong>qwen3.8-27b</strong>. No web search in Codex: it doesn't pass search tools to models it doesn't know. Use OpenCode or Claude Code when you need search.</p>
       </div>
     </div>
+    <!-- ===================== Antigravity (agy) ===================== -->
+    <div data-tool="agy">
+      <div data-os="unix">
+        <div class="step">
+          <h3>Install</h3>
+          <p>Needs Google's Antigravity CLI installed already (<a href="https://antigravity.google/docs/install" target="_blank" rel="noopener">install it</a>). Adds an <code>agy-local</code> command that runs it on ai.kebin.dev.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/agy-install.sh | AIBOX_KEY=__AIBOX_KEY__ bash</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a project folder and start it. Plain <code>agy</code> keeps using Google as before.</p>
+          <pre><code>cd my-project
+agy-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>agy-local</code> and its settings and history. The Antigravity CLI and your normal <code>agy</code> stay installed.</p>
+          <pre><code>curl -fsSL https://kebin.dev/cli/agy-uninstall.sh | bash</code></pre>
+        </div>
+      </div>
+      <div data-os="win">
+        <div class="step">
+          <h3>Install</h3>
+          <p>PowerShell. Needs Google's Antigravity CLI installed already (<a href="https://antigravity.google/docs/install" target="_blank" rel="noopener">install it</a>). Adds an <code>agy-local</code> command that runs it on ai.kebin.dev.</p>
+          <pre><code>$env:AIBOX_KEY = "__AIBOX_KEY__"; Invoke-RestMethod https://kebin.dev/cli/agy-install.ps1 | Invoke-Expression</code></pre>
+        </div>
+        <div class="step">
+          <h3>Then</h3>
+          <p>Open a new terminal in a project folder and start it. Plain <code>agy</code> keeps using Google as before.</p>
+          <pre><code>cd my-project
+agy-local</code></pre>
+        </div>
+        <div class="step">
+          <h3>Uninstall</h3>
+          <p>Removes <code>agy-local</code> and its settings and history. The Antigravity CLI and your normal <code>agy</code> stay installed.</p>
+          <pre><code>Invoke-RestMethod https://kebin.dev/cli/agy-uninstall.ps1 | Invoke-Expression</code></pre>
+        </div>
+      </div>
+      <div class="step">
+        <h3>How it works</h3>
+        <p><code>agy-local</code> starts agy with its own settings folder (<code>~/.agy-local</code>) set to Google's "Gemini API key" mode, pointed at <code>https://ai.kebin.dev</code>. There a small translator turns agy's Gemini-format requests into requests for <strong>qwen3.8-27b</strong> and back, tool calls included. agy only accepts its own model names, so it shows a Gemini name, but every answer comes from Qwen. Web search goes through search.kebin.dev (agy's built-in search needs a Google login and comes back empty here).</p>
+      </div>
+    </div>
   </main>
   <script>
     function remember(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
@@ -195,13 +239,13 @@ codex-local</code></pre>
       document.body.className = 'os-' + os + ' tool-' + tool;
       document.getElementById('t-unix').classList.toggle('on', os === 'unix');
       document.getElementById('t-win').classList.toggle('on', os === 'win');
-      ['opencode', 'claude', 'codex'].forEach(t => document.getElementById('tool-' + t).classList.toggle('on', t === tool));
+      ['opencode', 'claude', 'codex', 'agy'].forEach(t => document.getElementById('tool-' + t).classList.toggle('on', t === tool));
     }
     function setOS(v) { os = v; remember('cli-os', v); apply(); }
     function setTool(v) { tool = v; remember('cli-tool', v); apply(); }
     (function () {
       const o = recall('cli-os'); os = (o === 'unix' || o === 'win') ? o : (/Windows/i.test(navigator.userAgent) ? 'win' : 'unix');
-      const t = recall('cli-tool'); tool = ['opencode', 'claude', 'codex'].includes(t) ? t : 'opencode';
+      const t = recall('cli-tool'); tool = ['opencode', 'claude', 'codex', 'agy'].includes(t) ? t : 'opencode';
       apply();
       document.querySelectorAll('pre').forEach(pre => {
         const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'copy';

@@ -1,0 +1,15 @@
+[Unit]
+Description=Gemini-API front for llama-swap (Antigravity CLI / agy-local) on :8097
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/user/.local/share/agy-gateway/agy_gateway.py
+Environment=AGY_UPSTREAM=http://10.0.10.30:8086/v1/chat/completions
+Environment=AGY_MODEL=qwen3.8-27b
+Environment=AGY_LISTEN=0.0.0.0:8097
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

@@ -38,7 +38,7 @@ acme.sh installs its own cron entry and renews about 30 days before expiry. The 
 
 | File | Used by | Content |
 |---|---|---|
-| `ai-key-map.conf` | `00-map.conf` (http context) | `map $http_authorization $ai_key_ok { default 0; "Bearer <key>" 1; }` — the ai.kebin.dev / search.kebin.dev API key |
+| `ai-key-map.conf` | `00-map.conf` (http context) | `map $http_authorization $ai_key_ok { default 0; "Bearer <key>" 1; }` — the ai.kebin.dev / search.kebin.dev API key; also `map $http_x_goog_api_key $ai_gkey_ok { ... }` with the same key for the Gemini route `/v1beta/` (agy-local) |
 | `code-auth.conf` | `code.kebin.dev.conf` | `proxy_set_header Authorization "Basic <base64 of opencode:password>";`, OpenCode 2's password from the ai VM's `~/.config/opencode/server.env` |
 | `aria2-subfilter.conf` | `downloads.kebin.dev.conf` | `sub_filter "<head>" "<head><script>...rpc/set/https/downloads.kebin.dev/443/jsonrpc/<base64 secret>...</script>"; sub_filter_once on;` configures AriaNg in the browser on first visit |
 | `ai-key-subfilter.conf` | `kebin.dev.conf`, the `/cli/` page | `sub_filter "__AIBOX_KEY__" "<key>"; sub_filter_once off; sub_filter_types text/html;` |

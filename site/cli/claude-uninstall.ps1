@@ -10,8 +10,8 @@ function Say($m) { Write-Host $m -ForegroundColor Yellow }
 
 Say "claude-local"
 foreach ($p in @((Join-Path $Bin "claude-local.cmd"), (Join-Path $HOME ".claude-local"))) { if (Test-Path $p) { Remove-Item -Recurse -Force $p } }
-# the key file is shared with codex-local; keep it while that is still installed
-if (-not (Test-Path (Join-Path $Bin "codex-local.cmd"))) { Remove-Item -Force (Join-Path $EnvDir "aibox.env") -ErrorAction SilentlyContinue }
+# the key file is shared with codex-local and agy-local; keep it while either is still installed
+if (-not ((Test-Path (Join-Path $Bin "codex-local.cmd")) -or (Test-Path (Join-Path $Bin "agy-local.cmd")))) { Remove-Item -Force (Join-Path $EnvDir "aibox.env") -ErrorAction SilentlyContinue }
 if ((Test-Path $EnvDir) -and -not (Get-ChildItem $EnvDir)) { Remove-Item $EnvDir }
 Write-Host "removed claude-local, its settings and history. Claude Code itself and your normal 'claude' are untouched."
 Say "done"

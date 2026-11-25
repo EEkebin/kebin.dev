@@ -66,6 +66,8 @@ set "ANTHROPIC_DEFAULT_SONNET_MODEL=qwen3.8-27b"
 set "ANTHROPIC_DEFAULT_HAIKU_MODEL=qwen3.8-27b"
 set "CLAUDE_CODE_MAX_CONTEXT_TOKENS=262144"
 set "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1"
+rem load MCP tools up front: on-demand tool search sends tool_reference blocks the Qwen chat template rejects (HTTP 500)
+set "ENABLE_TOOL_SEARCH=false"
 claude %*
 '@
 [IO.File]::WriteAllText((Join-Path $Bin "claude-local.cmd"), ($Launcher -replace "`r?`n", "`r`n"), $NoBom)
