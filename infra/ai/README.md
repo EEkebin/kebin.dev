@@ -30,6 +30,7 @@ Models live on the NAS: `/mnt/storage/AI/models/<model>/`, through the media VM'
 | Model | Folder | Where it runs |
 |---|---|---|
 | `qwen3.8-27b` (the main model, aliases `capstone-qwen`, `qwen`) | `qwen3.8-27b/` (Q8_0, plus the old UD-Q3_K_XL / IQ3_XXS quants and an MTP draft) | all three cards, split 5.6/6.4/5 (about 14.9/15.5/13.1 GB, leaving about 3 GB on CUDA2 for transcodes), 262K with a q8_0 KV cache, vision |
+| `qwen3.8-27b-abliterated` (alias `qwen-abliterated`) | `qwen3.8-27b-abliterated/` (huihui-ai Q8_0; uses the vision projector and chat template from `qwen3.8-27b/`) | same split, context and speed as the 27B (24 tok/s); answers what the stock model refuses |
 | `inkling-2-mini` (alias `inkling`) | `inkling-2-mini/` (IQ4_NL in use, plus the Q8_0 and the Q8_0 vision projector) | placed by llama.cpp's `-fit` (about 14.2/15.0/10.8 GB), 128K, vision; about 17 tok/s against the 27B's 24. See the comment in `config.yaml` for why it is the IQ4_NL |
 | `humanizer` | `humanizer/` (Q8_0 + `prompt_format.json`) | all three cards, 8K, completion only |
 | `dark-craving` | `dark-craving/` (Q8_0) | all three cards, 64K, for SillyTavern; unloads after 30 idle minutes |

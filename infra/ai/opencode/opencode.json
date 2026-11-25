@@ -43,6 +43,23 @@
             "context": 131072,
             "output": 32768
           }
+        },
+        "qwen3.8-27b-abliterated": {
+          "name": "Qwen3.8 27B abliterated Q8 (vision, 262K, 3x V100)",
+          "attachment": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 262144,
+            "output": 32768
+          }
         }
       }
     }

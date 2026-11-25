@@ -38,6 +38,19 @@ models:
   # text rewriter (Gemma 4 12B fine-tune), plain completion model: the prompt is built by the humanizer page
   # (infra/ai/humanizer), not a chat template. 8K window is what it was trained for. Spread over all three cards
   # like the 27B; asking for it unloads whatever else is loaded.
+  # huihui-ai's abliterated (refusals removed) Qwen3.8-27B, same Q8_0 and settings as qwen3.8-27b. Same architecture, so it
+  # reuses that folder's vision projector and patched chat template. Abliteration can cost a little coding/reasoning quality.
+  qwen3.8-27b-abliterated:
+    cmd: >-
+      ${server} ${common}
+      -m ${models}/qwen3.8-27b-abliterated/Huihui-Qwen3.8-27B-abliterated-Q8_0.gguf
+      --mmproj ${models}/qwen3.8-27b/mmproj-F16.gguf --image-max-tokens 2048
+      --chat-template-file ${models}/qwen3.8-27b/chat_template.jinja
+      -c 262144 -fa on -ctk q8_0 -ctv q8_0 --reasoning-budget 2048
+      --device CUDA0,CUDA1,CUDA2 --tensor-split 5.6,6.4,5
+    aliases: ["qwen-abliterated"]
+    ttl: 900
+
   # Thinking Machines' Inkling 2 Mini (Nov 2026): looped MoE, 26.4B total / 3.4B active, layers 6-17 run 3x per token.
   # Needs llama.cpp >= b12600. Reasoning depth per request: reasoning_effort none/minimal/low/medium/high (default)/xhigh/max.
   # llama.cpp b12723 cannot split this architecture the normal way (layer split puts the shared loop weights on one card,
