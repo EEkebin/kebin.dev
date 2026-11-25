@@ -1,0 +1,8 @@
+# Build environment for llama.cpp on the media VM's Tesla V100s (Volta, sm_70).
+# CUDA 12.x is the last toolkit line that can target sm_70 (CUDA 13 dropped Volta), so stay on 12.9.
+# Used by update-llama.sh; nothing here is installed on the VM itself.
+FROM docker.io/nvidia/cuda:12.9.1-devel-ubuntu24.04
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      git cmake ninja-build build-essential ca-certificates libssl-dev \
+ && rm -rf /var/lib/apt/lists/*

@@ -19,7 +19,7 @@ This VM holds the AI apps. The GPUs, llama-swap and ComfyUI are on the media VM 
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
 
-Weekly updates: `ai-update.timer` (Sunday 04:45 Pacific, 11:45 on the VM's UTC clock) runs `update/ai-update.sh`, which does `podman auto-update` for the Quadlets marked `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth) and `opencode upgrade`. llama.cpp, ComfyUI and the models are manual, see `docs/runbooks/updates.md`. The llama-swap dashboard is public at https://ai.kebin.dev/ui/ behind a Tinyauth login (the API under `/v1/` keeps the bearer key).
+Weekly updates: `ai-update.timer` (Sunday 04:45 Pacific, 11:45 on the VM's UTC clock) runs `update/ai-update.sh`, which does `podman auto-update` for the Quadlets marked `AutoUpdate=registry` (searxng, mcp-searxng, tinyauth) and `opencode upgrade`. llama.cpp and llama-swap update themselves weekly on the media VM (`media-llama-update.timer`, see below); ComfyUI and the models are manual, see `docs/runbooks/updates.md`. The llama-swap dashboard is public at https://ai.kebin.dev/ui/ behind a Tinyauth login (the API under `/v1/` keeps the bearer key).
 
 ## Model routing (llama-swap)
 
@@ -30,14 +30,24 @@ Models live on the NAS: `/mnt/storage/AI/models/<model>/`, through the media VM'
 | Model | Folder | Where it runs |
 |---|---|---|
 | `qwen3.8-27b` (the main model, aliases `capstone-qwen`, `qwen`) | `qwen3.8-27b/` (Q8_0, plus the old UD-Q3_K_XL / IQ3_XXS quants and an MTP draft) | all three cards, split 5.6/6.4/5 (about 14.9/15.5/13.1 GB, leaving about 3 GB on CUDA2 for transcodes), 262K with a q8_0 KV cache, vision |
+| `inkling-2-mini` (alias `inkling`) | `inkling-2-mini/` (IQ4_NL in use, plus the Q8_0 and the Q8_0 vision projector) | placed by llama.cpp's `-fit` (about 14.2/15.0/10.8 GB), 128K, vision; about 17 tok/s against the 27B's 24. See the comment in `config.yaml` for why it is the IQ4_NL |
 | `humanizer` | `humanizer/` (Q8_0 + `prompt_format.json`) | all three cards, 8K, completion only |
-| `artemis`, `dark-craving` | `artemis/`, `dark-craving/` (Q8_0) | all three cards, 64K, for SillyTavern; unload after 30 idle minutes |
+| `dark-craving` | `dark-craving/` (Q8_0) | all three cards, 64K, for SillyTavern; unloads after 30 idle minutes |
 
 One model is loaded at a time: asking for a different one unloads the current one first (about 70 s for the 27B, less for the humanizer). The 27B is preloaded when llama-swap starts and unloads after 15 idle minutes, so ComfyUI gets CUDA0 back; the humanizer unloads after 5 idle minutes. Either comes back on the next request for it.
 
 Add a model: drop the GGUF (and its `mmproj` if it has vision) in its folder on the share, add an entry, `systemctl --user restart llama-swap`, add the same name to `opencode/opencode.json` so it shows in OpenCode's picker.
 
-`--device CUDA0` pins a model to one card. `--tensor-split` sets how a model spreads over the listed cards. The binaries in `/srv/media/llama/bin` are the `build-multi` llama.cpp build plus copies of the CUDA libraries it needs (`libcudart`, `libcublas`, `libgomp`), because the media VM has no CUDA toolkit. Driver 580 is the last branch for Volta, and CUDA stays on 12.x (nvcc 12.4, PyTorch `cu126`). No FP8 or bf16 on these cards, so GGUF with F16 it is.
+`--device CUDA0` pins a model to one card. `--tensor-split` sets how a model spreads over the listed cards. Driver 580 is the last branch for Volta, and CUDA stays on 12.x (CUDA 13 dropped sm_70). No FP8 or bf16 on these cards, so GGUF with F16/Q8 it is.
+
+**Staying current.** `media-llama-update.timer` (Sunday 05:30, after the media stack update) runs `/srv/media/llama/update-llama.sh` (`infra/media/llama-swap/update-llama.sh`):
+
+1. builds the newest llama.cpp build tag (`bNNNNN`, the per-commit builds; the semver releases lag behind) for sm_70 inside `localhost/llama-builder:cuda12.9` (`Containerfile.build`: CUDA 12.9 devel image), so the VM itself needs no toolkit. The CUDA runtime libraries (`libcudart`, `libcublas`, `libcublasLt`) and `libgomp` are copied next to the binaries;
+2. downloads the newest llama-swap release;
+3. points the symlinks `/srv/media/llama/bin -> releases/<tag>` and `/srv/media/llama/llama-swap -> swap-releases/<ver>/llama-swap` at them and restarts `media-llama-swap`;
+4. asks `qwen3.8-27b` for a short answer. If it does not answer, the symlinks go back to the previous versions and the service is restarted again.
+
+The last three builds of each stay in `releases/` and `swap-releases/` for a manual rollback (`ln -sfn` the symlink back, restart). `/srv/media/llama/CURRENT` records what is live; the log is `/var/log/media-llama-update.log`. Run it by hand with `sudo /srv/media/llama/update-llama.sh` (`--force` rebuilds the same tag). A build takes about 20 minutes on the VM's 8 cores. The update restarts llama-swap, so whatever model was loaded is unloaded.
 
 ## Web access for the agent
 

@@ -26,6 +26,23 @@
             "context": 262144,
             "output": 32768
           }
+        },
+        "inkling-2-mini": {
+          "name": "Inkling 2 Mini IQ4 (vision, 128K, 3x V100)",
+          "attachment": true,
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          }
         }
       }
     }

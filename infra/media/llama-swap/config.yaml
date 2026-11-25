@@ -38,6 +38,25 @@ models:
   # text rewriter (Gemma 4 12B fine-tune), plain completion model: the prompt is built by the humanizer page
   # (infra/ai/humanizer), not a chat template. 8K window is what it was trained for. Spread over all three cards
   # like the 27B; asking for it unloads whatever else is loaded.
+  # Thinking Machines' Inkling 2 Mini (Nov 2026): looped MoE, 26.4B total / 3.4B active, layers 6-17 run 3x per token.
+  # Needs llama.cpp >= b12600. Reasoning depth per request: reasoning_effort none/minimal/low/medium/high (default)/xhigh/max.
+  # llama.cpp b12723 cannot split this architecture the normal way (layer split puts the shared loop weights on one card,
+  # row/tensor split are unsupported), so the Q8_0 (27.8 GB) does not fit 16 GB cards and spills to the CPU (11 tok/s).
+  # The IQ4_NL (17.6 GB) with llama.cpp's own placement (-fit, so no -ngl/--tensor-split here) stays on the GPUs:
+  # about 16 tok/s at 128K (14.2/15.0/10.8 GB), 18.6 tok/s at 32K. Its attention has no flash-attn path yet, so the
+  # compute buffer grows with context x batch: -ub 256 keeps 128K in memory (262K needs a 39 GB buffer).
+  # The Q8_0 stays in the folder for when llama.cpp learns to split it.
+  inkling-2-mini:
+    cmd: >-
+      ${server}
+      --host 127.0.0.1 --port ${PORT} --load-mode none --jinja -np 1 -t 6 -tb 6
+      -m ${models}/inkling-2-mini/Inkling-2-Mini-IQ4_NL.gguf
+      --mmproj ${models}/inkling-2-mini/mmproj-Inkling-2-Mini-Q8_0.gguf
+      -c 131072 -ub 256 -b 1024 -fa on -ctk q8_0 -ctv q8_0
+      --device CUDA0,CUDA1,CUDA2
+    aliases: ["inkling"]
+    ttl: 900
+
   humanizer:
     cmd: >-
       ${server} ${common}
@@ -46,16 +65,7 @@ models:
       --device CUDA0,CUDA1,CUDA2 --tensor-split 1,1,1
     ttl: 300
 
-  # fiction models for SillyTavern (tavern.kebin.dev), Gemma 4 finetunes at Q8 with 64K context. Artemis (31B, dense) is the
-  # better writer and its thinking helps roleplay. Dark Craving (26B-A4B) is the explicit one, and much lighter per token.
-  artemis:
-    cmd: >-
-      ${server} ${common}
-      -m ${models}/artemis/TheDrummer_Artemis-31B-v1.2-Q8_0.gguf
-      -c 65536 -fa on -ctk q8_0 -ctv q8_0
-      --device CUDA0,CUDA1,CUDA2 --tensor-split 5.6,6.4,5
-    ttl: 1800
-
+  # fiction model for SillyTavern (tavern.kebin.dev), a Gemma 4 26B-A4B finetune at Q8 with 64K context, thinking off.
   dark-craving:
     cmd: >-
       ${server} ${common}

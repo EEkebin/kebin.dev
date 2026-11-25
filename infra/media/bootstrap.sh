@@ -65,6 +65,17 @@ run systemctl daemon-reload
 run systemctl enable --now media-ia-queue.service
 # aria2 generates /srv/media/config/aria2/{aria2.conf,script.conf} on first start; apply the settings listed in docs/runbooks/archive-org-torrents.md afterwards.
 
+echo "== llama-swap model server (llama.cpp is built for the V100s by update-llama.sh, weekly)"
+run mkdir -p "$DEST/llama"
+run install -m 644 "$HERE/llama-swap/config.yaml" "$HERE/llama-swap/Containerfile.build" "$DEST/llama/"
+run install -m 755 "$HERE/llama-swap/update-llama.sh" "$DEST/llama/update-llama.sh"
+run chown -R 1000:1000 "$DEST/llama"
+run install -m 644 "$HERE/systemd/media-llama-swap.service" "$HERE/systemd/media-llama-update.service" "$HERE/systemd/media-llama-update.timer" /etc/systemd/system/
+run systemctl daemon-reload
+run systemctl enable media-llama-swap.service
+run systemctl enable --now media-llama-update.timer
+# First install: run /srv/media/llama/update-llama.sh once (builds llama.cpp, fetches llama-swap, starts and tests the server).
+
 echo "== ownership"
 run chown -R 1000:1000 "$DEST/config" "$DEST/cache" "$DEST/jellybridge"
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Build the newest llama.cpp for the V100s and update llama-swap, with automatic rollback (/srv/media/llama/update-llama.sh)
+After=network-online.target mnt-storage.mount
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/srv/media/llama/update-llama.sh
+StandardOutput=append:/var/log/media-llama-update.log
+StandardError=append:/var/log/media-llama-update.log
+TimeoutStartSec=3h
+Nice=10

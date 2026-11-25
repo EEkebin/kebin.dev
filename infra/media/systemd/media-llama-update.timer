@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly llama.cpp + llama-swap update (Sunday 05:30, after the media stack update)
+
+[Timer]
+OnCalendar=Sun *-*-* 05:30:00
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
