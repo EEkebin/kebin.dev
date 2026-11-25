@@ -71,6 +71,8 @@ $json = @{
         options = @{ baseURL = $Api; apiKey = $Key }
         models = @{
             'qwen3.8-27b' = @{ name = "Qwen3.8 27B (vision, 262K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 262144; output = 32768 } }
+            'qwen3.8-27b-abliterated' = @{ name = "Qwen3.8 27B abliterated (vision, 262K, uncensored)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 262144; output = 32768 } }
+            'inkling-2-mini' = @{ name = "Inkling 2 Mini (vision, 128K)"; attachment = $true; modalities = @{ input = @("text","image"); output = @("text") }; limit = @{ context = 131072; output = 32768 } }
         }
     } }
     mcp = @{ searxng = @{
