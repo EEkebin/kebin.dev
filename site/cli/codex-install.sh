@@ -49,7 +49,7 @@ cat > "$BIN_DIR/codex-local" <<'SH'
 . "$HOME/.config/kebin/aibox.env"
 export AIBOX_KEY
 export CODEX_HOME="$HOME/.codex-local"
-exec codex -m qwen3.8-27b "$@"
+exec codex "$@"
 SH
 chmod 755 "$BIN_DIR/codex-local"
 echo
