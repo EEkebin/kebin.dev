@@ -1,0 +1,22 @@
+[Unit]
+Description=ARTEX autonomous pentest on 127.0.0.1:8787 (BaaRai/ARTEX, single binary, Next.js UI embedded)
+After=network-online.target artex-postgres.service
+Wants=network-online.target artex-postgres.service
+
+[Service]
+# start.sh is the daemon wrapper: it restarts the binary after a backoff, which is what the
+# in-app updater relies on. Always start through it, never the raw binary.
+WorkingDirectory=/srv/artex
+# web VM's address: lets ARTEX read X-Forwarded-For for per-IP login rate limits and HSTS
+Environment=ARTEX_TRUSTED_PROXIES=10.0.10.20/32
+# global LLM fallback (the in-app LLM profile "local-qwen" is the primary one)
+Environment=ARTEX_LLM_PROVIDER=openai
+Environment=ARTEX_LLM_BASE_URL=http://10.0.10.30:8086/v1
+Environment=ARTEX_LLM_MODEL=qwen3.8-27b-abliterated
+Environment=ARTEX_LLM_API_KEY=local
+ExecStart=/srv/artex/start.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target

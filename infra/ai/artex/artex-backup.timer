@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily ARTEX backup (DB dump + data + keys)
+
+[Timer]
+OnCalendar=*-*-* 10:45:00
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

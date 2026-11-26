@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily ARTEX backup (pg_dump + data/ + keys/, keep 7)
+After=artex-postgres.service
+Requisite=artex-postgres.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.config/artex-backup.sh

@@ -1,0 +1,24 @@
+[Unit]
+Description=PostgreSQL 16 for ARTEX on port 5433 (its own instance; the main one on 5432 serves SillyTavern/tinyauth)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/library/postgres:16
+ContainerName=artex-postgres
+# POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB, see pg.env.example
+EnvironmentFile=%h/.config/artex/pg.env
+# the image entrypoint does not bind POSTGRES_PORT on the main server, so pass -p explicitly
+Exec=postgres -p 5433
+PublishPort=5433:5433
+Volume=%h/.local/share/artex/pgdata:/var/lib/postgresql/data:Z
+HealthCmd=pg_isready -U artex -d artex
+HealthInterval=30s
+HealthStartPeriod=90s
+
+[Service]
+Restart=always
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
