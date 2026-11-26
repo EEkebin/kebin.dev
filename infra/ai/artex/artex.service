@@ -9,12 +9,15 @@ Wants=network-online.target artex-postgres.service
 WorkingDirectory=/srv/artex
 # web VM's address: lets ARTEX read X-Forwarded-For for per-IP login rate limits and HSTS
 Environment=ARTEX_TRUSTED_PROXIES=10.0.10.20/32
+# bind all interfaces (default is 127.0.0.1); the status probe runs on the web VM, and the other ai-VM services bind 0.0.0.0 too
+Environment=ARTEX_BIND_ADDR=0.0.0.0
 # global LLM fallback (the in-app LLM profile "local-qwen" is the primary one)
 Environment=ARTEX_LLM_PROVIDER=openai
 Environment=ARTEX_LLM_BASE_URL=http://10.0.10.30:8086/v1
 Environment=ARTEX_LLM_MODEL=qwen3.8-27b-abliterated
 Environment=ARTEX_LLM_API_KEY=local
-ExecStart=/srv/artex/start.sh
+# 0.0.0.0 like the other ai-VM services (the status probe runs on the web VM); protected by Tinyauth + its own admin login
+ExecStart=/srv/artex/start.sh -addr 0.0.0.0:8787
 Restart=always
 RestartSec=10
 
