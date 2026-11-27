@@ -1,0 +1,34 @@
+[Unit]
+Description=ScopeSentry server (web + API + MCP)
+After=ss-mongodb.service ss-redis.service
+Wants=ss-mongodb.service ss-redis.service
+
+[Container]
+Image=docker.io/autumn27/scopesentry:latest
+ContainerName=scope-sentry
+Network=scopesentry-network
+EnvironmentFile=%h/.config/scopesentry/env
+Environment=TIMEZONE=UTC
+# container-name DNS on the podman network; keep names in sync with the [Container] units
+Environment=MONGODB_IP=scopesentry-mongodb
+Environment=MONGODB_PORT=27017
+Environment=MONGODB_DATABASE=ScopeSentry
+# setup.sh rewrites the ${...} placeholders with literal values (do NOT use %VAR here:
+# quadlet's specifier expansion truncates the env name, e.g. %MONGO_INITDB_ROOT_PASSWORD
+# arrives as ONGO_INITDB_ROOT_PASSWORD)
+Environment=MONGODB_USER=${MONGO_INITDB_ROOT_USERNAME}
+Environment=MONGODB_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+Environment=REDIS_IP=scopesentry-redis
+Environment=REDIS_PORT=6379
+Environment=REDIS_PASSWORD=${REDIS_PASSWORD}
+Volume=%h/.local/share/scopesentry/files:/opt/ScopeSentry/files:Z
+Volume=%h/.local/share/scopesentry/images:/opt/ScopeSentry/images:Z
+Volume=%h/.local/share/scopesentry/uploads:/opt/ScopeSentry/uploads:Z
+PublishPort=8082:8082
+HealthCmd=curl -f http://127.0.0.1:8082
+HealthInterval=30s
+HealthStartPeriod=240s
+
+[Service]
+Restart=always
+TimeoutStartSec=900

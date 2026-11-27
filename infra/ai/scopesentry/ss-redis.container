@@ -1,0 +1,20 @@
+[Unit]
+Description=ScopeSentry Redis 7
+# setup.sh rewrites the ${REDIS_PASSWORD} placeholders below with the literal value
+# from the env file at install time (quadlet does not expand env in Exec/HealthCmd).
+
+[Container]
+Image=docker.io/library/redis:7.0.11
+ContainerName=scopesentry-redis
+Network=scopesentry-network
+EnvironmentFile=%h/.config/scopesentry/env
+Exec=redis-server --requirepass ${REDIS_PASSWORD}
+Volume=%h/.local/share/scopesentry/redis/data:/data:Z
+PublishPort=127.0.0.1:6379:6379
+HealthCmd=redis-cli -a ${REDIS_PASSWORD} ping
+HealthInterval=10s
+HealthStartPeriod=30s
+
+[Service]
+Restart=always
+TimeoutStartSec=300

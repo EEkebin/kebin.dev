@@ -1,0 +1,21 @@
+[Unit]
+Description=ScopeSentry MongoDB 7
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/library/mongo:7.0.28
+ContainerName=scopesentry-mongodb
+Network=scopesentry-network
+EnvironmentFile=%h/.config/scopesentry/env
+Volume=%h/.local/share/scopesentry/mongodb:/data/db:Z
+PublishPort=127.0.0.1:27017:27017
+# no quotes/parens in the eval: quadlet passes the value through /bin/sh and its own
+# quote handling mangles both. {ping:1} is a plain word, so it survives.
+HealthCmd=mongosh --quiet --eval db.adminCommand({ping:1})
+HealthInterval=10s
+HealthStartPeriod=120s
+
+[Service]
+Restart=always
+TimeoutStartSec=900

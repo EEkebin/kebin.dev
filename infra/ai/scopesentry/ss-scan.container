@@ -1,0 +1,25 @@
+[Unit]
+Description=ScopeSentry scan worker (host network, like the upstream compose file)
+After=ss-server.service
+Wants=ss-server.service
+
+[Container]
+Image=docker.io/autumn27/scopesentry-scan:latest
+ContainerName=scopesentry-scan
+Network=host
+EnvironmentFile=%h/.config/scopesentry/env
+Environment=NodeName=ai-vm
+Environment=TimeZoneName=UTC
+Environment=MONGODB_IP=127.0.0.1
+Environment=MONGODB_PORT=27017
+Environment=MONGODB_DATABASE=ScopeSentry
+# setup.sh rewrites the ${...} placeholders with literal values
+Environment=MONGODB_USER=${MONGO_INITDB_ROOT_USERNAME}
+Environment=MONGODB_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+Environment=REDIS_IP=127.0.0.1
+Environment=REDIS_PORT=6379
+Environment=REDIS_PASSWORD=${REDIS_PASSWORD}
+
+[Service]
+Restart=always
+TimeoutStartSec=300
