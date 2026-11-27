@@ -10,9 +10,10 @@ Network=scopesentry-network
 EnvironmentFile=%h/.config/scopesentry/env
 Volume=%h/.local/share/scopesentry/mongodb:/data/db:Z
 PublishPort=127.0.0.1:27017:27017
-# no quotes/parens in the eval: quadlet passes the value through /bin/sh and its own
-# quote handling mangles both. {ping:1} is a plain word, so it survives.
-HealthCmd=mongosh --quiet --eval db.adminCommand({ping:1})
+# no quotes/parens in the eval: quadlet passes the value through /bin/sh, and an
+# unquoted ( (as in adminCommand({ping:1})) is a shell syntax error. The method form
+# db.adminCommand.ping takes no arguments and needs no quoting.
+HealthCmd=mongosh --quiet --eval db.adminCommand.ping
 HealthInterval=10s
 HealthStartPeriod=120s
 
