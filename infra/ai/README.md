@@ -16,8 +16,9 @@ This VM holds the AI apps. The GPUs, llama-swap and ComfyUI are on the media VM 
 | `humanizer.service` | 0.0.0.0:8095 | the humanize.kebin.dev page: builds the humanizer model's fixed prompt and streams the rewrite from llama-swap on the media VM |
 | `sillytavern.service` (Quadlet) | 0.0.0.0:8010 | SillyTavern for tavern.kebin.dev, data in `~/.local/share/sillytavern`, models from llama-swap on the media VM |
 | `mcp-searxng.service` (Quadlet) | 0.0.0.0:8899 | MCP server (streamable HTTP) that exposes SearXNG as `searxng_web_search`, `searxng_search_suggestions`, `web_url_read` tools |
-| `artex.service` | 127.0.0.1:8787 | ARTEX autonomous pentest (BaaRai/ARTEX v0.7.0), artex.kebin.dev; runs on the abliterated Qwen via llama-swap, search via the SearXNG MCP; see `artex/` |
+| `artex.service` | 0.0.0.0:8787 | ARTEX autonomous pentest (BaaRai/ARTEX v0.7.0), artex.kebin.dev; runs on the abliterated Qwen via llama-swap, search via the SearXNG MCP, browser via playwright-mcp; assets synced from ScopeSentry; see `artex/` and `scopesentry/` |
 | `artex-postgres.service` (Quadlet) | 127.0.0.1:5433 | dedicated PostgreSQL 16 for ARTEX (5432 is the main one); daily backup timer `artex-backup.timer` |
+| `ss-mongodb` / `ss-redis` / `ss-server` / `ss-scan` (Quadlet) | 127.0.0.1:27017 / :6379 / 0.0.0.0:8082 | ScopeSentry (ASM) stack feeding ARTEX, scope.kebin.dev; see `scopesentry/` |
 
 Manage with `XDG_RUNTIME_DIR=/run/user/1000 systemctl --user <status|restart|stop> <unit>` when over SSH.
 

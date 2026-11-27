@@ -30,8 +30,10 @@
 | share.kebin.dev | web VM 127.0.0.1:8766 | send files between browsers (kebin-share.service), public, rate-limited |
 | downloads.kebin.dev | 10.0.10.30:6880 (AriaNg), :6800 /jsonrpc (aria2 RPC), :8097 /ia/ (archive.org helper) | download portal, Tinyauth |
 | vr.kebin.dev | 10.0.10.30:8000 | HLS for VRChat players, per-share tokens, no Tinyauth on purpose |
+| artex.kebin.dev | 10.0.10.100:8787 | ARTEX autonomous pentest, behind Tinyauth |
+| scope.kebin.dev | 10.0.10.100:8082 | ScopeSentry attack-surface management, behind Tinyauth; feeds ARTEX asset sync |
 
-Internal only on the ai VM: PostgreSQL 10.0.10.100:5432 (LAN, VM LAN and WLAN, password), SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 10.0.10.100:8899 (LAN, used by OpenCode on the VM and by nginx for search.kebin.dev).
+Internal only on the ai VM: PostgreSQL 10.0.10.100:5432 (LAN, VM LAN and WLAN, password), SearXNG 10.0.10.100:8888 (LAN), mcp-searxng 10.0.10.100:8899 (LAN, used by OpenCode on the VM and by nginx for search.kebin.dev), ARTEX 10.0.10.100:8787 (LAN), ScopeSentry 10.0.10.100:8082 (LAN) with its MongoDB 127.0.0.1:27017 and Redis 127.0.0.1:6379 loopback-only.
 
 Router forwards: 80/tcp, 443/tcp, 443/udp to 10.0.10.20. Nothing else.
 
