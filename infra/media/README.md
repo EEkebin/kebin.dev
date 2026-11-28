@@ -101,4 +101,6 @@ checkpoint versions specified by the installed ComfyUI templates (0.9 and
 For an image shot, upload a still. For restyling, upload a short clip; the
 workflow decodes the input before selecting the first 49 frames. A larger
 SplitSigmas step retains more of the source. These workflows output silent
-clips. Assemble shots and audio in a video editor.
+clips. Open **Assemble shots** to join clips in order. Its Concatenate Video
+node also accepts a complete soundtrack. Upload two clips when rebuilding on
+a fresh installation; the live installation includes two test shots.

@@ -44,3 +44,11 @@ graph = {
     "17": node("SaveVideo", video=["16", 0], filename_prefix="video/LTX-edit", format="auto", **{"format.codec": "auto"}),
 }
 (out / "LTX video to video.json").write_text(json.dumps(graph, indent=2))
+
+sequence = {
+    "1": node("LoadVideo", file="ltx-starter.mp4"),
+    "2": node("LoadVideo", file="ltx-second-shot.mp4"),
+    "3": node("ConcatenateVideo", codec="auto", **{"videos.video0": ["1", 0], "videos.video1": ["2", 0]}),
+    "4": node("SaveVideo", video=["3", 0], filename_prefix="video/LTX-sequence", format="auto", **{"format.codec": "auto"}),
+}
+(out / "Assemble shots.json").write_text(json.dumps(sequence, indent=2))
