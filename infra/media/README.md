@@ -81,3 +81,24 @@ Every *arr container and qBittorrent mount `/mnt/storage/Media` at `/data`, so p
 - Updates run weekly on their own (`media-update.timer`, Sunday 04:30, `/srv/media/update.sh`, log in `/var/log/media-update.log`). By hand: `sudo /srv/media/update.sh --dry-run` then `sudo /srv/media/update.sh`. Jellyfin never crosses a major automatically and Nextcloud is pinned to a major tag, see `docs/runbooks/updates.md`.
 - Podman needs fully qualified image names (`docker.io/...`). FileBrowser needs the `ip_unprivileged_port_start=0` sysctl in the compose file to bind port 80 as uid 1000.
 - Jellyfin hardware settings live in `config/jellyfin/encoding.xml`; the REST endpoint rejects them on Jellyfin 12. `wire.sh` handles it.
+
+## Local video models
+
+ComfyUI on the media VM serves SDXL Base 1.0 and Lightricks LTX-Video 2B. The
+`/ai/` page lists these beside the text service. The ComfyUI container sees one
+16 GB V100. Its models, workflows, inputs and outputs persist in its existing
+bind mount. No custom video nodes are required.
+
+On the media VM, from `infra/media/comfyui/` with Python 3.11+:
+
+    root=/srv/media/config/comfyui/ComfyUI
+    python3 fetch-local-video.py "$root"
+    python3 local-video.py "$root"
+
+In ComfyUI, open Workflows > Local video. The text and image workflows use the
+checkpoint versions specified by the installed ComfyUI templates (0.9 and
+0.9.5 respectively). Video restyling uses 0.9.5. Start at 512x320 and 49 frames.
+For an image shot, upload a still. For restyling, upload a short clip; the
+workflow decodes the input before selecting the first 49 frames. A larger
+SplitSigmas step retains more of the source. These workflows output silent
+clips. Assemble shots and audio in a video editor.
